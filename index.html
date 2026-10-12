@@ -309,6 +309,35 @@ input[type=text]{font:inherit;border:2px solid var(--ink);border-radius:12px;pad
 .visitor{position:absolute;left:4%;bottom:6%;width:96px;height:96px;border:0;background:none;padding:0;cursor:pointer;z-index:2;animation:bob 2.2s ease-in-out infinite}
 .visitor svg{width:100%;height:100%}
 .vtag{position:absolute;left:50%;top:-6px;transform:translateX(-50%);background:var(--sky);color:#fff;border-radius:999px;font-size:11px;font-weight:900;padding:1px 8px;white-space:nowrap}
+.disco-btn{position:absolute;z-index:3;top:46px;left:calc(98px + (100% - 112px)/2 - 30px);width:60px;height:58px;border:0;background:none;padding:0;cursor:pointer;border-radius:50%}
+.disco-btn span{position:absolute;left:calc(100% - 4px);top:50%;transform:translateY(-50%);white-space:nowrap;background:var(--plum);color:#fff;font-size:11px;font-weight:900;border-radius:999px;padding:1px 8px;animation:bob 1.6s ease-in-out infinite}
+.disco-btn:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.stage.party .disco-btn span{display:none}
+.stage.party .disco-ball{transform-box:fill-box;transform-origin:center;animation:spin 3s linear infinite}
+.pfx{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden;background:rgba(20,10,40,.38);animation:pfx-in .6s ease-out}
+@keyframes pfx-in{from{opacity:0}}
+.beam{position:absolute;top:30px;left:50%;width:150px;height:330px;margin-left:-75px;transform-origin:50% 0;clip-path:polygon(46% 0,54% 0,100% 100%,0 100%);opacity:.32;filter:blur(2px);animation:sway 3.2s ease-in-out infinite alternate,hue 8s linear infinite}
+.b1{background:#ff4f7b;--a:-38deg}.b2{background:#6cb8f0;--a:0deg;animation-delay:-1.1s,-2s}.b3{background:#ffd35c;--a:38deg;animation-delay:-2.2s,-4s}
+@keyframes sway{from{transform:rotate(calc(var(--a) - 18deg))}to{transform:rotate(calc(var(--a) + 18deg))}}
+@keyframes hue{to{filter:blur(2px) hue-rotate(360deg)}}
+.conf{position:absolute;top:-10px;width:8px;height:5px;border-radius:1px;animation:fall linear infinite}
+.party-hud{position:absolute;z-index:6;left:8px;right:8px;bottom:8px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;background:rgba(255,255,255,.92);border:2px solid var(--ink);border-radius:14px;padding:6px}
+.party-hud span{font-weight:900;font-size:14px}.party-hud .btn{font-size:13px;padding:4px 10px}
+.visitor.dance{animation:vdance 1s ease-in-out infinite}
+@keyframes vdance{25%{transform:translateY(-16px) rotate(-8deg)}50%{transform:none}75%{transform:translateY(-16px) rotate(8deg)}}
+.gcard.locked{opacity:.6;cursor:not-allowed;box-shadow:none;border-style:dashed}
+.g-rhythm{background:#2a2350}
+.g-rhythm .pfx{background:transparent}
+.r-pet{position:absolute;left:50%;bottom:8px;width:120px;height:120px;margin-left:-60px;z-index:1}.r-pet svg{width:100%;height:100%}
+.r-target,.r-ring{position:absolute;left:50%;top:40%;width:96px;height:96px;border-radius:50%;pointer-events:none}
+.r-target{transform:translate(-50%,-50%);border:5px solid rgba(255,255,255,.9);background:radial-gradient(circle,rgba(255,79,123,.55),rgba(255,79,123,.15) 70%);z-index:2}
+.r-target svg{position:absolute;left:50%;top:50%;width:40px;height:40px;transform:translate(-50%,-46%)}
+.r-ring{border:5px solid #ffd35c;z-index:3;will-change:transform}
+.r-judge{position:absolute;left:50%;top:14%;transform:translateX(-50%);font-family:var(--f-num);font-weight:800;font-size:26px;z-index:4;pointer-events:none;opacity:0;text-shadow:0 2px 0 rgba(0,0,0,.35)}
+.r-judge.perfect{color:#ffd35c}.r-judge.good{color:#7cf0a5}.r-judge.miss{color:#c9d3e6}
+.r-judge.pop{animation:jpop .7s ease-out forwards}
+@keyframes jpop{0%{opacity:1;transform:translateX(-50%) scale(1.3)}100%{opacity:0;transform:translateX(-50%) translateY(-14px) scale(1)}}
+.r-hit{position:absolute;inset:0;border:0;background:transparent;z-index:5;cursor:pointer}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}.bub{animation-duration:4s!important}}
 </style>
 
@@ -405,6 +434,9 @@ const TRACKS={
   play:{name:"🎾 一起玩吧",bpm:150,
     lead:{w:"square",v:.055,s:"C5:1 C5:1 G5:1 C5:1 E5:1 G5:1 C6:2 | A5:1 G5:1 E5:1 G5:1 A5:2 G5:2 | F5:1 F5:1 A5:1 F5:1 E5:1 E5:1 G5:1 E5:1 | D5:1 E5:1 F5:1 D5:1 C5:4"},
     bass:{w:"triangle",v:.2,s:"C3:1 C4:1 C3:1 C4:1 C3:1 C4:1 C3:1 C4:1 | A2:1 A3:1 A2:1 A3:1 A2:1 A3:1 A2:1 A3:1 | F2:1 F3:1 F2:1 F3:1 C3:1 C4:1 C3:1 C4:1 | G2:1 G3:1 G2:1 G3:1 C3:2 C4:2"},hat:1,stacc:1},
+  party:{name:"🪩 派對時間",bpm:120,
+    lead:{w:"square",v:.055,s:"C5:1 E5:1 G5:1 E5:1 A5:2 G5:2 | F5:1 A5:1 C6:1 A5:1 G5:4 | E5:1 G5:1 C6:1 G5:1 A5:1 G5:1 E5:1 C5:1 | D5:1 E5:1 F5:1 D5:1 C5:4"},
+    bass:{w:"triangle",v:.22,s:"C3:1 C4:1 C3:1 C4:1 C3:1 C4:1 C3:1 C4:1 | F2:1 F3:1 F2:1 F3:1 G2:1 G3:1 G2:1 G3:1 | A2:1 A3:1 A2:1 A3:1 F2:1 F3:1 F2:1 F3:1 | G2:1 G3:1 G2:1 G3:1 C3:2 C4:2"},hat:1,stacc:1},
   shop:{name:"🏪 逛逛商店",bpm:120,
     lead:{w:"triangle",v:.17,s:"D5:1 F#5:1 A5:1 F#5:1 B5:2 A5:2 | G5:1 B5:1 A5:1 G5:1 F#5:2 E5:2 | D5:1 F#5:1 A5:1 D6:1 C#6:1 B5:1 A5:2 | G5:1 E5:1 C#5:1 E5:1 D5:4"},
     bass:{w:"sine",v:.18,s:"D3:2 A3:2 D3:2 A3:2 | E3:2 B3:2 A2:2 C#3:2 | D3:2 F#3:2 G3:2 A3:2 | A2:2 C#3:2 D3:4"},hat:1}
@@ -473,8 +505,9 @@ function setMusic(on){
   else{if(actx)master.gain.setTargetAtTime(0,actx.currentTime,.08);$("nowPlaying").textContent=""}
 }
 let openSheet=null,eatUntil=0,bathUntil=0,gaming=false;
+let curGame=null;
 function wantTrack(){const p=P(),n=Date.now();
-  if(gaming)return"play";if(openSheet==="shop"||openSheet==="closet"||openSheet==="book")return"shop";
+  if(partyOn||(gaming&&curGame==="rhythm"))return"party";if(gaming)return"play";if(openSheet==="shop"||openSheet==="closet"||openSheet==="book")return"shop";
   if(openSheet==="feed"||n<eatUntil)return"eat";if(n<bathUntil)return"bath";
   if(p.sleeping)return"sleep";return"home"}
 document.addEventListener("pointerdown",e=>{if(musicOn&&!e.target.closest("#musicBtn")){audioInit();const c=curTrack;curTrack=null;setTrack(c||wantTrack())}},{once:true});
@@ -560,6 +593,7 @@ const IT={
   d_plant:{n:"小盆栽",cat:"deco",slot:"floorL",price:10,art:()=>svgBox(FL,`<g ${O}><path d="M34 62 q-30 -10 -26 -44 q22 8 26 44 z" fill="#4fae63"/><path d="M34 62 q30 -14 24 -50 q-24 12 -24 50 z" fill="#5cc173"/><path d="M34 64 q-4 -40 4 -58 q10 24 -4 58 z" fill="#3f9a52"/><path d="M14 62 h40 l-6 38 h-28 z" fill="#e0794a"/><rect x="11" y="58" width="46" height="10" rx="3" fill="#ef8b5b"/></g>`)},
   d_rug:{n:"圓圓地毯",cat:"deco",slot:"rug",price:15,art:()=>svgBox("0 0 230 46",`<ellipse cx="115" cy="23" rx="112" ry="21" fill="#ff9e80" ${O}/><ellipse cx="115" cy="23" rx="86" ry="15" fill="none" stroke="#fff3c4" stroke-width="5" stroke-dasharray="10 7"/><ellipse cx="115" cy="23" rx="56" ry="9" fill="#ffd35c"/>`)},
   d_stars:{n:"星星吊燈",cat:"deco",slot:"top",price:20,art:()=>{let s=`<path d="M4 4 Q120 34 236 4" stroke="${INK}" stroke-width="2" fill="none"/>`;[.1,.3,.5,.7,.9].forEach((t,i)=>{const[x,y]=onStr(t,4,34);s+=`<path d="M${x} ${y} v10" stroke="${INK}" stroke-width="1.5"/>`+star(x,y+20,10,["#ffd35c","#ff9db8","#7cc6ee"][i%3],`animation-delay:${i*.3}s`)});return svgBox(TOP,s)}},
+  d_disco:{n:"派對彩燈",cat:"deco",slot:"top",price:180,lux:1,art:()=>svgBox(TOP,`<path d="M120 0 V12" stroke="${INK}" stroke-width="2.5"/><g class="disco-ball"><circle cx="120" cy="34" r="22" fill="#c9d3e6" stroke="${INK}" stroke-width="3"/><g stroke="#8a97ad" stroke-width="1.6" fill="none"><path d="M98 34 H142 M101 24 H139 M101 44 H139 M108 15 H132 M108 53 H132"/><path d="M120 12 V56 M110 13 q-6 21 0 42 M130 13 q6 21 0 42"/></g><g fill="#fff"><rect x="108" y="20" width="6" height="5"/><rect x="124" y="36" width="5" height="5" fill="#ffd35c"/><rect x="114" y="44" width="5" height="4" fill="#ff8fb1"/><rect x="130" y="24" width="5" height="4" fill="#7cc6ee"/></g></g>${star(84,26,7,"#ffd35c","animation-delay:.3s")}${star(158,40,6,"#ff8fb1","animation-delay:.8s")}${star(170,14,5,"#7cc6ee")}`)},
   d_fish:{n:"金魚缸",cat:"deco",slot:"floorR",price:25,art:()=>svgBox(FR,`<rect x="14" y="80" width="44" height="36" rx="4" fill="#c98d4a" ${O}/><circle cx="36" cy="52" r="32" fill="#e3f5ff"/><path d="M5 56 a31 31 0 0 0 62 0 z" fill="#8fd0f2"/><circle cx="36" cy="52" r="32" fill="none" ${O}/><ellipse cx="36" cy="21" rx="17" ry="5" fill="#f4fbff" ${O3}/><g class="swim"><ellipse cx="32" cy="62" rx="10" ry="7" fill="#ff8a1f" ${O3}/><path d="M22 62 l-8 -6 v12 z" fill="#ff8a1f" ${O3}/><circle cx="36" cy="60" r="1.8" fill="${INK}"/></g><circle cx="48" cy="44" r="3" fill="#fff" ${O3} class="twinkle"/><circle cx="52" cy="34" r="2" fill="#fff" ${O3} class="twinkle" style="animation-delay:.5s"/>`)},
   /* --- shop: toys --- */
   t_yarn:{n:"毛線球",cat:"toy",price:6,bonus:1,svg:`<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M30 30 q6 4 8 8" stroke="#ff6f9c" stroke-width="2.5" fill="none"/><circle cx="20" cy="20" r="15" fill="#ff8fb1" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/><path d="M8 16 q12 -6 24 6 M7 23 q14 -4 25 6 M12 9 q4 14 16 22" stroke="#fff" stroke-width="2" fill="none" opacity=".8"/></svg>`},
@@ -740,7 +774,7 @@ function render(){
   $("pName").textContent=p.name;$("pSpecies").textContent=SPECIES[p.sp].n+"・"+STAGES[si].n+(traitLabel(p)?"・"+traitLabel(p):"");
   const af=Math.floor(p.aff||0),ab=$("affBar");if(ab.dataset.v!==String(af)){ab.dataset.v=af;ab.style.width=af+"%";$("affNum").textContent=af+"/100"}$("pLv").textContent="Lv."+p.lv;
   const pw=$("petWrap");if(pw.dataset.st!==String(si)){pw.dataset.st=si;pw.style.setProperty("--sc",STAGES[si].sc)}
-  renderQuick();renderTheme();renderTricks();renderWall();renderTut();
+  renderQuick();renderTheme();renderTricks();renderWall();renderDisco();renderTut();
   const mn=mealNow();const mb=$("mealBadge");
   mb.classList.toggle("on",!!mn&&!p.meals[mn]);
   mb.textContent=mn?(p.meals[mn]?`${MEAL[mn]}吃過了 ✓`:`現在是${MEAL[mn]}時間！`):`下一餐：${nextMeal()}`;
@@ -1040,10 +1074,11 @@ const GAMES=[
   {id:"memory",n:"翻牌配對",d:"記住位置，把一樣的兩張翻出來",e:"🃏",rate:.5},
   {id:"whack",n:"躲貓貓",d:"寵物從洞裡探頭，快點牠！",e:"🕳️",rate:.35},
   {id:"bubble",n:"戳泡泡",d:"戳指定顏色，連續戳對有連擊加分",e:"🫧",rate:.3},
-  {id:"cups",n:"猜杯子",d:"盯緊球在哪個杯子下面",e:"🥤",rate:1}];
+  {id:"cups",n:"猜杯子",d:"盯緊球在哪個杯子下面",e:"🥤",rate:1},
+  {id:"rhythm",n:"派對節奏",d:"圈圈縮到中間時點一下，跟著音樂跳舞",e:"🎵",rate:.4,need:"d_disco"}];
 function openGames(){const p=P(),d=daily();
   if(p.sleeping){toast("噓，牠在睡覺");return}
-  const cards=GAMES.map(g=>`<button class="gcard" data-g="${g.id}"><span class="ge">${g.e}</span><b>${g.n}</b><small>${g.d}</small><small class="best">最高分 ${(S.best&&S.best[g.id])||0}</small></button>`).join("");
+  const cards=GAMES.map(g=>{const lock=g.need&&!S.owned[g.need];return`<button class="gcard${lock?" locked":""}" data-g="${g.id}" ${lock?"disabled":""}><span class="ge">${g.e}</span><b>${g.n}</b><small>${g.d}</small><small class="best">${lock?`需要「${IT[g.need].n}」（商店 ${IT[g.need].price} 金幣）`:`最高分 ${(S.best&&S.best[g.id])||0}`}</small></button>`}).join("");
   sheet(`和 ${p.name} 玩什麼？`,`${resting()?`<p class="hint warn">🥤 ${p.name}在休息喝水，再 ${restLeft()} 分鐘。現在玩不會拿金幣和經驗，要不要先去喝杯水、動一動？</p>`:""}<p class="hint">玩小遊戲可以賺金幣、經驗和快樂。今天小遊戲金幣：<b>${d.gc}/${GAME_CAP}</b>${d.gc>=GAME_CAP?"（今天的金幣拿滿了，還是可以玩）":""}</p><div class="glist">${cards}</div>`,close=>{
     document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{
       if(P().e<15){toast(`${P().name} 太累了，先哄牠睡一下`);return}
@@ -1061,7 +1096,7 @@ function finishGame(id,score){const p=P(),g=GAMES.find(x=>x.id===id),d=daily();
     $("home").onclick=()=>{close();cheer()}},"result");
   if(score)sfx("level");
 }
-function startGame(id){const g=GAMES.find(x=>x.id===id);busy=true;gaming=true;
+function startGame(id){const g=GAMES.find(x=>x.id===id);busy=true;gaming=true;curGame=id;audioInit();
   let cleanup=null,ended=false;
   const done=score=>{if(ended)return;ended=true;cleanup&&cleanup();cleanup=null;finishGame(id,score)};
   sheet(`${g.e} ${g.n}`,`<div class="ghud" id="gHud"></div><div class="garea g-${id}" id="gArea"></div>`,()=>{
@@ -1071,6 +1106,29 @@ function startGame(id){const g=GAMES.find(x=>x.id===id);busy=true;gaming=true;
 const timers=()=>{const ts=[],is=[];return{t:(f,ms)=>{const x=setTimeout(f,ms);ts.push(x);return x},i:(f,ms)=>{const x=setInterval(f,ms);is.push(x);return x},clear:()=>{ts.forEach(clearTimeout);is.forEach(clearInterval)}}};
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const GAME_FN={
+  rhythm(area,hud,done){const T=timers(),p=P(),GAP=1000,APP=1000,N=20,PER=130,GOOD=260;
+    area.innerHTML=`${partyFX()}<div class="r-pet">${petSVG(p.sp,"happy",false,p.wear)}</div><div class="r-target"><svg viewBox="0 0 44 40"><path d="M22 40 C8 30 0 23 0 13 C0 5 6 0 12 0 C16 0 20 2 22 6 C24 2 28 0 32 0 C38 0 44 5 44 13 C44 23 36 30 22 40 z" fill="#ff4f7b"/></svg></div><div class="r-judge" id="rJudge"></div><button class="r-hit" aria-label="跟著節奏點"></button>`;
+    const pet=area.querySelector(".r-pet"),judge=area.querySelector("#rJudge"),t0=performance.now()+1200;let score=0,combo=0,maxC=0,idx=0,raf=0,dance=null;
+    const notes=Array.from({length:N},(_,i)=>({t:t0+APP+i*GAP,el:null,done:false}));
+    const upd=()=>{hud.textContent=`第 ${Math.min(idx+1,N)}/${N} 拍・${score} 分${combo>=2?`・連擊 ${combo}`:""}`};upd();
+    const show=(txt,cls)=>{judge.textContent=txt;judge.className="r-judge "+cls;void judge.offsetWidth;judge.classList.add("pop")};
+    const move=()=>{const ks=[[{transform:"rotate(0)"},{transform:"rotate(360deg)"}],[{transform:"none"},{transform:"translateY(-40px) scale(1.1)"},{transform:"none"}],[{transform:"rotate(0)"},{transform:"rotate(-15deg)"},{transform:"rotate(15deg)"},{transform:"rotate(0)"}]];
+      pet.animate(ks[Math.floor(Math.random()*ks.length)],{duration:600,easing:"ease-out"})};
+    const loop=now=>{notes.forEach(n=>{if(n.done)return;const left=n.t-now;
+        if(left<=APP&&!n.el){n.el=document.createElement("i");n.el.className="r-ring";area.appendChild(n.el)}
+        if(n.el){const sc=1+Math.max(0,left)/APP*2.2;n.el.style.transform=`translate(-50%,-50%) scale(${sc.toFixed(3)})`}
+        if(left<-GOOD){n.done=true;if(n.el)n.el.remove();combo=0;show("Miss","miss");idx++;upd()}});
+      if(notes.every(n=>n.done)){T.t(()=>done(score),600);return}raf=requestAnimationFrame(loop)};
+    raf=requestAnimationFrame(loop);
+    area.querySelector(".r-hit").addEventListener("pointerdown",e=>{e.preventDefault();const now=performance.now(),n=notes.find(x=>!x.done);if(!n)return;
+      const dt=Math.abs(n.t-now);if(dt>GOOD+150)return;
+      n.done=true;if(n.el)n.el.remove();idx++;
+      if(dt<=PER){score+=2;combo++;show(combo>=5?`Perfect! ✨ ${combo}`:"Perfect!","perfect");sfx("pop")}
+      else if(dt<=GOOD){score+=1;combo++;show("Good!","good");sfx("pop")}
+      else{combo=0;show("太快了～","miss")}
+      maxC=Math.max(maxC,combo);if(combo&&combo%5===0)move();else pet.animate([{transform:"translateY(0)"},{transform:"translateY(-12px)"},{transform:"translateY(0)"}],{duration:280});upd()});
+    dance=pet.animate(danceKF(),{duration:1000,iterations:Infinity});
+    return()=>{T.clear();cancelAnimationFrame(raf);if(dance)dance.cancel()}},
   memory(area,hud,done){const T=timers();let left=60,pairs=0,moves=0,open=[],lock=false;
     const ids=shuffle(["t_yarn","t_soccer","t_duck","t_lantern","t_mooncake","t_candy","t_snowman"]).slice(0,6);
     const deck=shuffle([...ids,...ids]);
@@ -1269,7 +1327,9 @@ const STICKERS=[
   {id:"bestie",e:"💞",n:"最好的朋友",d:"任一寵物親密度 100",c:"#ff4f7b",ok:()=>S.pets.some(p=>(p.aff||0)>=100)},
   {id:"trait",e:"🌱",n:"獨一無二",d:"寵物的性格定型",c:"#4fae63",ok:()=>S.pets.some(p=>p.trait)},
   {id:"walk",e:"🌳",n:"公園探險家",d:"在公園探索 20 次",c:"#3f9a52",ok:()=>st_("walk")>=20},
-  {id:"friend",e:"🤝",n:"交朋友",d:"朋友的寵物來家裡玩",c:"#3d9bd6",ok:()=>st_("visit")>=1}];
+  {id:"friend",e:"🤝",n:"交朋友",d:"朋友的寵物來家裡玩",c:"#3d9bd6",ok:()=>st_("visit")>=1},
+  {id:"party",e:"🪩",n:"派對動物",d:"在家裡開 10 次派對",c:"#9a6fd6",ok:()=>st_("party")>=10},
+  {id:"rhythm",e:"🎵",n:"節奏大師",d:"派對節奏拿到 30 分",c:"#ff4f7b",ok:()=>best("rhythm")>=30}];
 let stkT=0;
 function checkStickers(){S.stickers=S.stickers||{};const got=STICKERS.filter(s=>!S.stickers[s.id]&&s.ok());
   got.forEach(s=>{S.stickers[s.id]=Date.now();diary(P(),"🏅",`得到貼紙「${s.n}」！`);
@@ -1315,8 +1375,9 @@ function photoSVG(mem,fr){const p=P(),[wall,floor]=TH_COL[S.theme||"wood"]||TH_C
   const SPOS=[[8,92],[40,118],[8,146],[-8,92],[-40,118],[-8,146]];
   let stk=(S.wall||[]).slice(0,6).map((id,i)=>{const s=STICKERS.find(x=>x.id===id);if(!s)return"";const [ox,oy]=SPOS[i],x=ox>=0?px+(ox+15)*sc:px+pw+(ox-15)*sc,y=py+(oy+15)*vs;
     return`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="22" fill="#fff" stroke="${s.c}" stroke-width="5"/><text x="${x.toFixed(1)}" y="${(y+8).toFixed(1)}" text-anchor="middle" font-size="22">${s.e}</text>`}).join("");
+  if(partyOn){stk+=`<rect x="${px}" y="${py}" width="${pw}" height="${ph}" fill="#140a28" opacity=".35"/>`+[["#ff4f7b",-30],["#6cb8f0",0],["#ffd35c",30]].map(([c,a])=>`<path d="M${px+pw/2} ${py+30} L${px+pw/2-90} ${py+ph} L${px+pw/2+90} ${py+ph} z" fill="${c}" opacity=".28" transform="rotate(${a} ${px+pw/2} ${py+30})"/>`).join("")+Array.from({length:30},()=>`<rect x="${rnd(px,px+pw).toFixed(1)}" y="${rnd(py,py+ph).toFixed(1)}" width="8" height="5" fill="${["#ff7a59","#ffd35c","#4fae63","#6cb8f0","#ff8fb1"][Math.floor(Math.random()*5)]}" transform="rotate(${rnd(0,90).toFixed(0)})" transform-origin="center" style="transform-box:fill-box"/>`).join("")}
   if(activeHol().some(i=>i.h.id==="xmas"))for(let i=0;i<40;i++)stk+=`<circle cx="${rnd(px,px+pw).toFixed(1)}" cy="${rnd(py,py+ph).toFixed(1)}" r="${rnd(2.5,5).toFixed(1)}" fill="#fff" stroke="#c9d8f2" stroke-width="1"/>`;
-  const title=fr?`${esc(p.name)} 和 ${esc(fr.n)}`:`${esc(p.name)} Lv.${p.lv}・${STAGES[stageOf(p.lv)].n}`,sub=fr?`好朋友來家裡玩・${fmtDate(Date.now())}`:`${esc(SPECIES[p.sp].n)}・一起生活 ${daysWith(p)} 天・${fmtDate(Date.now())}`;
+  const title=fr?`${esc(p.name)} 和 ${esc(fr.n)}`:`${esc(p.name)} Lv.${p.lv}・${STAGES[stageOf(p.lv)].n}`,sub=fr?`${partyOn?"一起開派對":"好朋友來家裡玩"}・${fmtDate(Date.now())}`:partyOn?`🪩 派對時間・${fmtDate(Date.now())}`:`${esc(SPECIES[p.sp].n)}・一起生活 ${daysWith(p)} 天・${fmtDate(Date.now())}`;
   const memDeco=mem?`<rect x="8" y="8" width="${W-16}" height="${H-16}" rx="14" fill="none" stroke="#f2b51f" stroke-width="10"/>`+[[40,40],[W-40,40],[40,H-40],[W-40,H-40]].map(([x,y])=>heart(x,y-10,1.4,"#ff4f7b")).join("")+`<text x="${W/2}" y="${py+ph+190}" text-anchor="middle" font-family="PingFang TC,Noto Sans TC,Microsoft JhengHei,sans-serif" font-size="26" font-weight="900" fill="#ff4f7b">💞 最好的朋友・親密度 100</text>`:"";
   return`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" rx="18" fill="${mem?"#fff6dc":"#fffdf8"}"/>${memDeco}<rect x="1" y="1" width="${W-2}" height="${H-2}" rx="18" fill="none" stroke="#e6ddd0" stroke-width="2"/><clipPath id="cp"><rect x="${px}" y="${py}" width="${pw}" height="${ph}" rx="10"/></clipPath><g clip-path="url(#cp)">${g}${stk}</g><rect x="${px}" y="${py}" width="${pw}" height="${ph}" rx="10" fill="none" stroke="#2b3445" stroke-width="4"/>
 <text x="${W/2}" y="${py+ph+90}" text-anchor="middle" font-family="PingFang TC,Noto Sans TC,Microsoft JhengHei,sans-serif" font-size="40" font-weight="900" fill="#2b3445">${title}</text>
@@ -1451,13 +1512,40 @@ function greetVisitor(){const v=visitor;if(!v)return;S.visits=S.visits||{};const
   S.coins+=2;addAff(p,1);diary(p,"🤝",`朋友的 ${v.n} 來家裡玩，我們一起玩了好久！`);stat("visit");
   petSay(`${v.n}：你好！我是 ${v.n}！`);floatTxt("🤝 金幣 +2");sfx("coin");cheer();checkStickers();save()}
 
+/* ---------- party lights: 20-second dance party (soft colour changes, no strobe) ---------- */
+let partyOn=false,partyT=0,partyAnim=null;
+const PARTY_SEC=20;
+function partyFX(){return`<div class="pfx"><i class="beam b1"></i><i class="beam b2"></i><i class="beam b3"></i>${Array.from({length:16},()=>`<i class="conf" style="left:${Math.random()*100}%;background:${["#ff7a59","#ffd35c","#4fae63","#6cb8f0","#b9a6e8","#ff8fb1"][Math.floor(Math.random()*6)]};animation-duration:${3+Math.random()*3}s;animation-delay:${-Math.random()*4}s"></i>`).join("")}</div>`}
+function danceKF(){return[{transform:"translateY(0) rotate(0)"},{transform:"translateY(-22px) rotate(-8deg)",offset:.25},{transform:"translateY(0) rotate(0) scale(1.06,.94)",offset:.5},{transform:"translateY(-22px) rotate(8deg)",offset:.75},{transform:"translateY(0) rotate(0)"}]}
+function startParty(){const p=P();if(partyOn||busy)return;if(p.sleeping){toast("噓，牠在睡覺，醒來再開派對吧");return}
+  partyOn=true;busy=true;audioInit();const st=$("stage");st.classList.add("party");
+  const fx=document.createElement("div");fx.innerHTML=partyFX();st.appendChild(fx.firstChild);
+  partyAnim=$("pet").animate(danceKF(),{duration:1000,iterations:Infinity,easing:"ease-in-out"});
+  const v=st.querySelector(".visitor");if(v)v.classList.add("dance");
+  const hud=document.createElement("div");hud.className="party-hud";hud.innerHTML=`<span>🪩 派對中！</span><button class="btn" id="partyGame">🎵 跟著節奏玩</button><button class="btn ghost" id="partyStop">結束</button>`;st.appendChild(hud);
+  $("partyGame").onclick=()=>{stopParty(true);if(P().e<15){toast(`${P().name} 跳累了，先哄牠睡一下`);return}startGame("rhythm")};$("partyStop").onclick=()=>stopParty();
+  p.j=clamp(p.j+10);stat("party");const d=today();if(S.partyDay!==d){S.partyDay=d;addAff(p,2)}
+  if(st_("party")===1)diary(p,"🪩","第一次在家裡開派對，跳舞跳得好開心！");
+  render();partyT=setTimeout(()=>stopParty(),PARTY_SEC*1000);checkStickers();save();
+}
+function stopParty(quiet){if(!partyOn)return;partyOn=false;busy=false;clearTimeout(partyT);const st=$("stage");st.classList.remove("party");
+  st.querySelectorAll(".pfx,.party-hud").forEach(e=>e.remove());if(partyAnim){partyAnim.cancel();partyAnim=null}
+  const v=st.querySelector(".visitor");if(v)v.classList.remove("dance");
+  if(!quiet){toast(`${P().name}：派對好好玩！`);cheer()}render()}
+let discoKey="";
+function renderDisco(){const on=S.room&&S.room.top==="d_disco",k=String(on);if(k===discoKey)return;discoKey=k;
+  const st=$("stage");let b=st.querySelector(".disco-btn");
+  if(!on){if(b)b.remove();if(partyOn)stopParty(true);return}
+  if(!b){b=document.createElement("button");b.className="disco-btn";b.setAttribute("aria-label","開派對");b.innerHTML=`<span>點我開派對</span>`;b.onclick=startParty;st.appendChild(b)}
+}
+
 /* ---------- loop ---------- */
 $("musicBtn").onclick=()=>{if(musicOn&&!actx){setMusic(true);render();return}setMusic(!musicOn);render()};
 $("musicBtn").setAttribute("aria-pressed",musicOn);$("musicLbl").textContent=musicOn?"音樂開":"音樂關";
 $("taskBtn").onclick=()=>{if(!busy)openTasks()};
 $("bookBtn").onclick=()=>{if(!busy)openBook()};
 $("diaryBtn").onclick=()=>{if(!busy)openDiary()};
-$("photoBtn").onclick=()=>{if(!busy)openPhoto()};
+$("photoBtn").onclick=()=>{if(!busy||partyOn)openPhoto()};
 $("visitBtn").onclick=()=>{if(!busy)openVisitCard()};
 $("parkBtn").onclick=()=>{if(!busy)openPark()};
 setInterval(traitChat,45000);readVisit();
