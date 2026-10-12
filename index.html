@@ -739,7 +739,7 @@ const TASKS=[
   {id:"game",n:"玩 2 次小遊戲",need:2,r:8,e:"🎮"},
   {id:"pat",n:"摸摸頭 10 次",need:10,r:4,e:"💗"},
   {id:"sleep",n:"哄睡 1 次",need:1,r:4,e:"🌙"}];
-const ALL_BONUS=10,GAME_CAP=40;
+const ALL_BONUS=10,GAME_CAP=40,GAME_XP_CAP=200;
 let quickKey="";
 /* ---------- time & needs ---------- */
 function mealNow(){const h=new Date().getHours();if(h>=6&&h<10)return"b";if(h>=11&&h<14)return"l";if(h>=17&&h<21)return"d";return null}
@@ -959,12 +959,13 @@ $("aFeed").onclick=()=>{if(!busy)openFeed()};
 $("aShop").onclick=()=>{if(!busy)openShop()};
 $("aCloset").onclick=()=>{if(!busy)openCloset()};
 $("aBath").onclick=()=>{const p=P();if(busy)return;if(p.sleeping){toast("睡覺中，明天再洗吧");return}
+  if(p.c>=70){toast(`${p.name} 還很乾淨（清潔 ${Math.round(p.c)}），等清潔低於 70 再洗吧`);return}
   busy=true;bathUntil=Date.now()+6000;render();for(let i=0;i<14;i++)setTimeout(()=>{const b=document.createElement("div");b.className="bubble";const s=14+Math.random()*22;b.style.cssText=`width:${s}px;height:${s}px;left:${30+Math.random()*40}%;bottom:${10+Math.random()*30}%`;$("stage").appendChild(b);setTimeout(()=>b.remove(),1800)},i*90);
   setTimeout(()=>{p.c=100;p.j=clamp(p.j+6);gainXP(p,5);track("bath");stat("bath");addAff(p,2);perAdd(p,"tidy");firstTime(p,"bath","🛁","第一次洗澡，全身香噴噴！");floatTxt("香噴噴！+5 經驗");busy=false;lastKey="";cheer();save()},1300)};
 $("aSleep").onclick=()=>{const p=P();if(busy)return;
   if(p.sleeping){p.sleeping=false;sfx("wake");toast(`${p.name} 醒來了，伸個懶腰`)}
   else if(p.e>=90){toast(`${p.name} 精神很好，還不想睡`);return}
-  else{p.sleeping=true;gainXP(p,3);track("sleep");stat("sleep");toast(`晚安，${p.name}。精神會慢慢恢復`)}
+  else{p.sleeping=true;if(Date.now()-(p.sleepXP||0)>2*3600e3){p.sleepXP=Date.now();gainXP(p,3)}track("sleep");stat("sleep");toast(`晚安，${p.name}。精神會慢慢恢復`)}
   lastKey="";render();save()};
 $("aPlay").onclick=()=>{if(!busy)openGames()};
 function startCatch(){const p=P();
@@ -975,7 +976,7 @@ function startCatch(){const p=P();
   /* a few reusable balls instead of creating new ones every time */
   const pool=[0,1,2].map(()=>{const b=document.createElement("button");b.className="ball"+(toy?" toy":"");b.setAttribute("aria-label",toy?toy.n:"球");b.innerHTML=toyHTML;b.hidden=true;b._t=0;
     b.addEventListener("pointerdown",e=>{e.preventDefault();if(b.hidden)return;b.hidden=true;clearTimeout(b._t);
-      sfx("pop");score++;p.j=clamp(p.j+4+(toy?toy.bonus:0));p.e=clamp(p.e-1);gainXP(p,2);upd();cheer()});
+      sfx("pop");score++;p.j=clamp(p.j+4+(toy?toy.bonus:0));p.e=clamp(p.e-1);upd();cheer()});
     st.appendChild(b);return b});
   let spawn=0,timer=0;
   const end=()=>{clearInterval(timer);clearInterval(spawn);pool.forEach(b=>{clearTimeout(b._t);b.remove()});hud.remove();finishGame("catch",score)};
@@ -1118,18 +1119,18 @@ const GAMES=[
 function openGames(){const p=P(),d=daily();
   if(p.sleeping){toast("噓，牠在睡覺");return}
   const cards=GAMES.map(g=>{const lock=g.need&&!S.owned[g.need];return`<button class="gcard${lock?" locked":""}" data-g="${g.id}" ${lock?"disabled":""}><span class="ge">${g.e}</span><b>${g.n}</b><small>${g.d}</small><small class="best">${lock?`需要「${IT[g.need].n}」（商店 ${IT[g.need].price} 金幣）`:`最高分 ${(S.best&&S.best[g.id])||0}`}</small></button>`}).join("");
-  sheet(`和 ${p.name} 玩什麼？`,`${resting()?`<p class="hint warn">🥤 ${p.name}在休息喝水，再 ${restLeft()} 分鐘。現在玩不會拿金幣和經驗，要不要先去喝杯水、動一動？</p>`:""}<p class="hint">玩小遊戲可以賺金幣、經驗和快樂。今天小遊戲金幣：<b>${d.gc}/${GAME_CAP}</b>${d.gc>=GAME_CAP?"（今天的金幣拿滿了，還是可以玩）":""}</p><div class="glist">${cards}</div>`,close=>{
+  sheet(`和 ${p.name} 玩什麼？`,`${resting()?`<p class="hint warn">🥤 ${p.name}在休息喝水，再 ${restLeft()} 分鐘。現在玩不會拿金幣和經驗，要不要先去喝杯水、動一動？</p>`:""}<p class="hint">玩小遊戲可以賺金幣、經驗和快樂。今天小遊戲金幣 <b>${d.gc}/${GAME_CAP}</b>・經驗 <b>${d.gx||0}/${GAME_XP_CAP}</b>${d.gc>=GAME_CAP&&(d.gx||0)>=GAME_XP_CAP?"（今天都拿滿了，還是可以玩）":""}</p><div class="glist">${cards}</div>`,close=>{
     document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{
       if(P().e<15){toast(`${P().name} 太累了，先哄牠睡一下`);return}
       close();const id=b.dataset.g;if(id==="catch")startCatch();else startGame(id)})},"games");
 }
 function finishGame(id,score){const p=P(),g=GAMES.find(x=>x.id===id),d=daily();
-  const rest=resting(),coins=rest?0:Math.max(0,Math.min(Math.floor(score*g.rate),GAME_CAP-d.gc)),xp=rest?0:Math.min(Math.round(score*2),60);
+  d.gx=d.gx||0;const rest=resting(),coins=rest?0:Math.max(0,Math.min(Math.floor(score*g.rate),GAME_CAP-d.gc)),xp=rest?0:Math.max(0,Math.min(Math.round(score*2),60,GAME_XP_CAP-d.gx));d.gx+=xp;
   d.gc+=coins;S.coins+=coins;S.best=S.best||{};const nb=score>(S.best[id]||0);if(nb)S.best[id]=score;if(nb&&score>0)diary(p,g.e,`${g.n}創下新紀錄 ${score} 分！`);
   p.j=clamp(p.j+Math.min(score*2,25));p.e=clamp(p.e-6);if(xp)gainXP(p,p.trait==="active"?Math.round(xp*1.1):xp);if(score>0){track("game");addAff(p,2);perAdd(p,"active")}
   gaming=false;busy=false;save();
   sheet("遊戲結束",`<div class="result"><span class="ge">${g.e}</span><b>${g.n}</b><div class="rs">得分 <strong>${score}</strong>${nb&&score?`<span class="nb">新紀錄！</span>`:""}</div>
-<div class="rw"><span>金幣 +${coins}</span><span>經驗 +${xp}</span><span>快樂 +${Math.min(score*2,25)}</span></div>${rest?`<p class="hint">${p.name}正在休息喝水，這次不算金幣和經驗。再 ${restLeft()} 分鐘就好！</p>`:d.gc>=GAME_CAP?`<p class="hint">今天小遊戲的金幣已經拿滿 ${GAME_CAP} 個，明天再來！</p>`:""}</div>
+<div class="rw"><span>金幣 +${coins}</span><span>經驗 +${xp}</span><span>快樂 +${Math.min(score*2,25)}</span></div>${rest?`<p class="hint">${p.name}正在休息喝水，這次不算金幣和經驗。再 ${restLeft()} 分鐘就好！</p>`:d.gc>=GAME_CAP||d.gx>=GAME_XP_CAP?`<p class="hint">今天小遊戲的${d.gc>=GAME_CAP&&d.gx>=GAME_XP_CAP?"金幣和經驗都":d.gc>=GAME_CAP?"金幣":"經驗"}已經拿滿了（金幣上限 ${GAME_CAP}、經驗上限 ${GAME_XP_CAP}），明天再來！還是可以玩、加快樂喔。</p>`:""}</div>
 <div class="btn-row"><button class="btn" id="again">再玩一次</button><button class="btn ghost" id="home">回小屋</button></div>`,close=>{
     $("again").onclick=()=>{if(P().e<15){toast(`${P().name} 太累了，先哄牠睡一下`);return}close();id==="catch"?startCatch():startGame(id)};
     $("home").onclick=()=>{close();cheer()}},"result");
