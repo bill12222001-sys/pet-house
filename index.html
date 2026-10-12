@@ -298,7 +298,9 @@ input[type=text]{font:inherit;border:2px solid var(--ink);border-radius:12px;pad
 .qbtn b{background:var(--leaf);color:#fff;border-radius:999px;font-size:11px;min-width:18px;height:18px;display:inline-grid;place-items:center;padding:0 4px;margin-left:2px}
 .quick .qbtn{padding:6px 2px;font-size:13px;flex-direction:column;gap:2px;white-space:nowrap;min-height:50px;line-height:1.2}
 .quick .qbtn b{margin-left:0}
-.park{position:relative;height:300px;border:3px solid var(--ink);border-radius:18px;overflow:hidden}
+.park-scroll{border:3px solid var(--ink);border-radius:18px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.park{position:relative;width:720px;height:300px;overflow:hidden}
+.park-swipe{margin-top:-4px;font-weight:700}
 .park-svg{position:absolute;inset:0;width:100%;height:100%}
 .spot{position:absolute;transform:translate(-50%,-50%);border:2px solid var(--ink);background:#fff;border-radius:999px;padding:4px 12px;font:inherit;font-weight:900;font-size:14px;color:var(--ink);cursor:pointer;box-shadow:0 3px 0 var(--ink);z-index:2;animation:bob 1.6s ease-in-out infinite}
 .spot.done{background:#eaf7ec;color:var(--leaf);border-color:var(--leaf);box-shadow:none;animation:none}
@@ -380,6 +382,15 @@ input[type=text]{font:inherit;border:2px solid var(--ink);border-radius:12px;pad
 @keyframes fish{0%{transform:translate(-50%,-50%) rotate(-30deg);opacity:0}15%{opacity:1}50%{transform:translate(20%,-260%) rotate(0deg)}100%{transform:translate(90%,-40%) rotate(40deg);opacity:0}}
 .pkfx.zz{font-family:var(--f-num);font-weight:800;font-size:20px;color:#fff;text-shadow:0 2px 0 #2b3445;animation:pkup 1.3s ease-out forwards}
 .pkfx.sun{width:70px;height:70px;border-radius:50%;background:radial-gradient(circle,rgba(255,227,110,.8),rgba(255,227,110,0) 70%);animation:tw 1.8s ease-in-out}
+.pk-swing{transform-box:fill-box;transform-origin:50% 0}
+.pk-water{transform-box:fill-box;transform-origin:50% 100%}
+.pkfx.cone{width:30px;height:44px;animation:cone 2.4s ease-out forwards}.pkfx.cone svg{width:100%;height:100%}
+@keyframes cone{0%{transform:translate(-50%,-50%) scale(.2);opacity:0}15%{transform:translate(-50%,-50%) scale(1.1);opacity:1}80%{opacity:1}100%{transform:translate(-50%,-50%) scale(.6);opacity:0}}
+.pkfx.sandp{width:6px;height:6px;border-radius:50%;background:#d9b46a;animation:sandp .9s ease-out forwards}
+@keyframes sandp{to{transform:translate(calc(-50% + 20px),-400%);opacity:0}}
+.pkfx.coin{font-size:20px;animation:coin .9s ease-in forwards}
+@keyframes coin{0%{transform:translate(-50%,-50%)}50%{transform:translate(0,-200%)}100%{transform:translate(60%,-30%) scale(.6);opacity:.3}}
+.pkfx.drop{width:7px;height:9px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:#7cc6ee;animation:pkup 1s ease-out forwards}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}.bub{animation-duration:4s!important}}
 </style>
 
@@ -440,7 +451,8 @@ const FOODS={
   chicken:{n:"雞腿排",e:"🍗",price:8,h:30,j:12,xp:10,d:"外皮酥脆、多汁的雞腿排"},
   iberico:{n:"伊比利豬",e:"🥓",price:15,h:40,j:18,xp:16,d:"西班牙橡果豬，油花香甜"},
   wagyu:{n:"A5 和牛",e:"🥩",price:30,h:50,j:35,xp:30,d:"最高等級和牛，入口即化",lux:1},
-  cookie:{n:"手工餅乾",e:"🍪",price:0,h:12,j:14,xp:6,d:"小烤箱烤出來的",noShop:1}
+  cookie:{n:"手工餅乾",e:"🍪",price:0,h:12,j:14,xp:6,d:"小烤箱烤出來的",noShop:1},
+  icecream:{n:"冰淇淋",e:"🍦",price:0,h:10,j:20,xp:8,d:"公園冰淇淋車買的",noShop:1}
 };
 const KEY="pocketpet-v1";
 const clamp=v=>Math.max(0,Math.min(100,v));
@@ -678,6 +690,7 @@ const IT={
   h_towel:{n:"愛乾淨毛巾頭巾",cat:"head",trait:1,art:hy=>`<path d="M68 ${hy+10} q-4 -30 32 -32 q36 2 32 32 q-32 -10 -64 0 z" fill="#e3f5ff" ${O}/><path d="M76 ${hy-4} h48 M74 ${hy+4} h52" stroke="#7cc6ee" stroke-width="3"/><circle cx="128" cy="${hy-14}" r="8" fill="#e3f5ff" ${O3}/>`},
   /* --- park rare finds --- */
   h_acorn:{n:"橡實帽",cat:"head",park:1,art:hy=>`<path d="M74 ${hy+6} q26 -40 52 0 z" fill="#a0662f" ${O}/><path d="M80 ${hy-4} h40 M86 ${hy-14} h28" stroke="#7a4a1e" stroke-width="2.5"/><path d="M100 ${hy-14} q2 -10 8 -12" stroke="${INK}" stroke-width="4" fill="none" stroke-linecap="round"/>`},
+  t_shovel:{n:"小鏟子",cat:"toy",park:1,bonus:3,svg:`<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M28 6 L16 22" stroke="#a0662f" stroke-width="5" stroke-linecap="round"/><path d="M18 18 L6 30 q-2 6 4 6 L22 24 z" fill="#3d9bd6" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/><rect x="25" y="2" width="9" height="7" rx="3" fill="#ffd35c" stroke="${INK}" stroke-width="2" transform="rotate(40 29 5)"/></svg>`},
   t_frisbee:{n:"公園飛盤",cat:"toy",park:1,bonus:3,svg:`<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><ellipse cx="20" cy="22" rx="17" ry="9" fill="#4fae63" stroke="${INK}" stroke-width="2.5"/><ellipse cx="20" cy="20" rx="10" ry="4.5" fill="#6fcf86" stroke="${INK}" stroke-width="1.8"/></svg>`},
   /* --- festival gifts --- */
   h_party:{n:"新年派對帽",cat:"head",hol:"newyear",art:hy=>`<path d="M84 ${hy+6} L100 ${hy-36} L116 ${hy+6} z" fill="#7cc6ee"/><path d="M90 ${hy-10} H110" stroke="#ffd35c" stroke-width="6"/><path d="M95 ${hy-24} H105" stroke="#ff7a59" stroke-width="5"/><path d="M84 ${hy+6} L100 ${hy-36} L116 ${hy+6} z" fill="none" ${O}/><circle cx="100" cy="${hy-38}" r="6.5" fill="#ff7a59" ${O3}/>`},
@@ -829,7 +842,7 @@ function render(){
   $("pName").textContent=p.name;$("pSpecies").textContent=SPECIES[p.sp].n+"・"+STAGES[si].n+(traitLabel(p)?"・"+traitLabel(p):"");
   const af=Math.floor(p.aff||0),ab=$("affBar");if(ab.dataset.v!==String(af)){ab.dataset.v=af;ab.style.width=af+"%";$("affNum").textContent=af+"/100"}$("pLv").textContent="Lv."+p.lv;
   const pw=$("petWrap");if(pw.dataset.st!==String(si)){pw.dataset.st=si;pw.style.setProperty("--sc",STAGES[si].sc)}
-  renderQuick();renderTheme();renderTricks();renderWall();renderDisco();renderActs();renderPainting();renderTut();
+  checkWish();renderQuick();renderTheme();renderTricks();renderWall();renderDisco();renderActs();renderPainting();renderTut();
   const mn=mealNow();const mb=$("mealBadge");
   mb.classList.toggle("on",!!mn&&!p.meals[mn]);
   mb.textContent=mn?(p.meals[mn]?`${MEAL[mn]}吃過了 ✓`:`現在是${MEAL[mn]}時間！`):`下一餐：${nextMeal()}`;
@@ -1111,7 +1124,7 @@ function openBook(tab){tab=tab||"head";
 function renderQuick(){const d=daily(),done=TASKS.filter(t=>d.got[t.id]).length,ready=TASKS.some(t=>taskDone(t)&&!d.got[t.id])||(TASKS.every(t=>d.got[t.id])&&!d.got.all);
   const [a,b]=bookCount(),k=done+"|"+ready+"|"+a+"|"+TASKS.map(t=>d.c[t.id]||0).join()+"|"+S.dnew+"|"+Object.keys(parkDay().done).length;if(k===quickKey)return;quickKey=k;
   const tb=$("taskBtn");tb.innerHTML=`📋 任務 <b>${done}/${TASKS.length}</b>${ready?`<i class="dot" aria-label="有獎勵可以領"></i>`:""}`;tb.classList.toggle("ready",ready);
-  $("bookBtn").innerHTML=`📖 圖鑑 <b>${a}/${b}</b>`;$("diaryBtn").innerHTML=`📔 日記${S.dnew?`<i class="dot" aria-label="有新日記"></i>`:""}`;const pl=4-Object.keys(parkDay().done).length;$("parkBtn").innerHTML=`🌳 公園${pl?`<b>${pl}</b>`:""}`;
+  $("bookBtn").innerHTML=`📖 圖鑑 <b>${a}/${b}</b>`;$("diaryBtn").innerHTML=`📔 日記${S.dnew?`<i class="dot" aria-label="有新日記"></i>`:""}`;const pl=SPOT_N-Object.keys(parkDay().done).length;$("parkBtn").innerHTML=`🌳 公園${pl?`<b>${pl}</b>`:""}`;
 }
 
 /* ---------- welcome back ---------- */
@@ -1495,80 +1508,134 @@ function petSay(txt){const st=$("stage");let b=st.querySelector(".say");if(!b){b
   b.textContent=txt;b.classList.remove("show");void b.offsetWidth;b.classList.add("show");clearTimeout(sayT);sayT=setTimeout(()=>b.classList.remove("show"),2600)}
 function traitChat(){const p=P();if(!p.trait||busy||p.sleeping||document.hidden||openSheet)return;const L=TRAITS[p.trait].lines;petSay(L[Math.floor(Math.random()*L.length)])}
 
-/* ---------- park walk: 4 spots, each once a day ---------- */
+/* ---------- park walk: a wide map you can swipe; every spot once a day ---------- */
+const PW=720,PH=300,PX=(x,y)=>[x/PW*100,y/PH*100];
 const SPOTS={
-  slide:{n:"溜滑梯",x:16,y:30},bush:{n:"草叢",x:64,y:52},pond:{n:"池塘",x:20,y:66},bench:{n:"長椅",x:68,y:26}};
+  slide:{n:"溜滑梯",x:64,y:90},bush:{n:"草叢",x:228,y:150},pond:{n:"池塘",x:78,y:198},bench:{n:"長椅",x:241,y:74},
+  swing:{n:"鞦韆",x:430,y:62},icecream:{n:"冰淇淋車",x:540,y:72},sand:{n:"沙坑",x:560,y:190},fountain:{n:"噴水池",x:660,y:110}};
+const SPOT_N=Object.keys(SPOTS).length,ICE_PRICE=5,WISH_PRICE=1;
 function parkDay(){if(!S.park||S.park.date!==today())S.park={date:today(),done:{}};return S.park}
-function parkSVG(night){return`<svg viewBox="0 0 360 300" class="park-svg" preserveAspectRatio="xMidYMid slice">
-<rect width="360" height="300" fill="${night?"#2f3d6b":"#bfe3f0"}"/>${night?`<circle cx="300" cy="40" r="16" fill="#f4f1c6"/>`:`<circle cx="300" cy="40" r="18" fill="#f2b51f"/>`}
-<path d="M0 120 q60 -30 120 -6 q60 -26 120 0 q60 -24 120 6 V300 H0z" fill="#8fd07a"/><path d="M0 150 q90 -20 180 0 t180 0 V300 H0z" fill="#7cc46a"/>
-<path d="M150 300 q20 -80 60 -150" stroke="#e8d3a6" stroke-width="26" fill="none" stroke-linecap="round"/>
+function parkSVG(night){const sky=night?"#2f3d6b":"#bfe3f0";return`<svg viewBox="0 0 ${PW} ${PH}" class="park-svg" preserveAspectRatio="none">
+<rect width="${PW}" height="${PH}" fill="${sky}"/>${night?`<circle cx="300" cy="40" r="16" fill="#f4f1c6"/>`:`<circle cx="300" cy="40" r="18" fill="#f2b51f"/>`}
+<path d="M0 120 q60 -30 120 -6 q60 -26 120 0 q60 -24 120 6 q60 -28 120 -4 q60 -26 120 0 q60 -24 120 6 V300 H0z" fill="#8fd07a"/><path d="M0 150 q90 -20 180 0 t180 0 t180 0 t180 0 V300 H0z" fill="#7cc46a"/>
+<path d="M150 300 q20 -80 60 -150 q60 -40 160 -20 q100 30 200 10 q60 -10 150 0" stroke="#e8d3a6" stroke-width="24" fill="none" stroke-linecap="round"/>
 <g stroke="#2b3445" stroke-width="3" stroke-linejoin="round"><path d="M40 160 V92 h20 V160" fill="none"/><path d="M60 92 l50 68" stroke-width="14" stroke="#ff7a59"/><path d="M60 92 l50 68" fill="none"/><path d="M40 108 h20 M40 124 h20 M40 140 h20"/></g>
 <g stroke="#2b3445" stroke-width="3"><ellipse cx="80" cy="210" rx="62" ry="26" fill="#6cb8f0"/><path d="M60 206 q8 -6 16 0 M92 216 q8 -6 16 0" stroke="#fff" fill="none"/></g>
 <g stroke="#2b3445" stroke-width="3" class="pk-bush"><circle cx="240" cy="168" r="26" fill="#4fae63"/><circle cx="270" cy="160" r="22" fill="#5cc173"/><circle cx="256" cy="148" r="20" fill="#3f9a52"/></g>
-<g stroke="#2b3445" stroke-width="3" stroke-linejoin="round"><rect x="232" y="88" width="78" height="10" rx="3" fill="#c98d4a"/><rect x="232" y="102" width="78" height="10" rx="3" fill="#c98d4a"/><path d="M240 112 v18 M302 112 v18" /></g>
-<g stroke="#2b3445" stroke-width="3"><path d="M330 150 v-40" /><circle cx="330" cy="100" r="22" fill="#4fae63"/></g></svg>`}
+<g stroke="#2b3445" stroke-width="3" stroke-linejoin="round"><rect x="232" y="88" width="78" height="10" rx="3" fill="#c98d4a"/><rect x="232" y="102" width="78" height="10" rx="3" fill="#c98d4a"/><path d="M240 112 v18 M302 112 v18"/></g>
+<g stroke="#2b3445" stroke-width="3"><path d="M330 150 v-40"/><circle cx="330" cy="100" r="22" fill="#4fae63"/></g>
+<g stroke="#2b3445" stroke-width="4" stroke-linecap="round" fill="none"><path d="M392 170 L412 82 L458 82 L478 170"/><path d="M412 82 H458"/></g>
+<g class="pk-swing"><path d="M424 84 V146 M446 84 V146" stroke="#2b3445" stroke-width="2.5"/><rect x="418" y="144" width="34" height="8" rx="3" fill="#ff7a59" stroke="#2b3445" stroke-width="2.5"/></g>
+<g stroke="#2b3445" stroke-width="3" stroke-linejoin="round"><rect x="500" y="96" width="86" height="54" rx="10" fill="#fff4dc"/><rect x="510" y="104" width="40" height="24" rx="4" fill="#bfe8ff"/><path d="M500 150 h86"/><circle cx="516" cy="152" r="9" fill="#5a5f6a"/><circle cx="570" cy="152" r="9" fill="#5a5f6a"/><path d="M566 80 l8 20 l8 -20 z" fill="#e0904a"/><circle cx="574" cy="74" r="9" fill="#ff8fb1"/></g>
+<g stroke="#2b3445" stroke-width="3"><rect x="512" y="196" width="100" height="38" rx="10" fill="#c98d4a"/><rect x="518" y="200" width="88" height="30" rx="8" fill="#f5dca8"/><path d="M590 210 l10 -16" stroke-width="4"/><path d="M596 190 l10 4 l-4 8 z" fill="#3d9bd6"/></g>
+<g stroke="#2b3445" stroke-width="3"><ellipse cx="660" cy="170" rx="46" ry="16" fill="#9fd6f2"/><path d="M614 170 v10 q46 22 92 0 v-10" fill="#c9d3e6"/><rect x="654" y="136" width="12" height="30" fill="#c9d3e6"/><ellipse cx="660" cy="136" rx="18" ry="6" fill="#9fd6f2"/></g>
+<g class="pk-water" fill="#7cc6ee"><circle cx="660" cy="122" r="4"/><circle cx="652" cy="128" r="3"/><circle cx="668" cy="128" r="3"/></g>
+<g stroke="#2b3445" stroke-width="3"><path d="M700 160 v-40"/><circle cx="700" cy="104" r="20" fill="#5cc173"/></g></svg>`}
 const PARK_EVENTS={
   slide:[()=>({x:"咻～從溜滑梯溜下來，好好玩！",j:10,c:2}),()=>({x:"溜了三次滑梯，還想再溜！",j:12,c:1})],
   bush:[()=>({x:"在草叢裡找到幾枚金幣！",c:3+Math.floor(Math.random()*4)}),()=>({x:"在草叢裡撿到一盤水果！",food:"fruit"}),()=>({x:"草叢裡跳出一隻小青蛙，嚇了一跳！",j:6,c:1}),()=>({x:"找到一瓶溫牛奶，帶回家喝。",food:"milk"})],
   pond:[()=>({x:"看到池塘裡的小魚游來游去。",j:8,c:1}),()=>({x:"小鴨子在池塘裡排隊游泳，好可愛！",j:8,c:2}),()=>({x:"池塘邊閃閃發亮，是一顆金星！",c:6})],
-  bench:[()=>({x:"坐在長椅上曬太陽，好舒服。",e:12}),()=>({x:"在長椅上打了個小盹。",e:15}),()=>({x:"在長椅旁邊遇到一隻散步的小狗，互相打招呼。",j:8,e:6})]};
-const PARK_RARE=["h_acorn","t_frisbee"];
+  bench:[()=>({x:"坐在長椅上曬太陽，好舒服。",e:12}),()=>({x:"在長椅上打了個小盹。",e:15}),()=>({x:"在長椅旁邊遇到一隻散步的小狗，互相打招呼。",j:8,e:6})],
+  swing:[()=>({x:"盪鞦韆盪得好高，好像要飛起來了！",j:12}),()=>({x:"盪著鞦韆看天空的雲，好舒服～",j:10,e:4})],
+  icecream:[()=>({x:`花 ${ICE_PRICE} 金幣買了一支冰淇淋，舔得滿臉都是！再買一支帶回家。`,j:10,food:"icecream",pay:ICE_PRICE})],
+  sand:[()=>({x:"在沙坑挖呀挖，挖到幾枚金幣！",c:2+Math.floor(Math.random()*4)}),()=>({x:"用沙子堆了一座小城堡！",j:10,c:1}),()=>({x:"挖到一個亮晶晶的貝殼，好漂亮。",j:8,c:2})],
+  fountain:[()=>({x:`丟了 ${WISH_PRICE} 枚金幣許願，希望明天有好事發生！`,j:6,pay:WISH_PRICE,wish:1})]};
+const PARK_RARE=["h_acorn","t_frisbee","t_shovel"];
+function checkWish(){const w=S.wish;if(!w||w.date===today())return;S.wish=null;const p=S.pets.find(x=>x.id===w.pid)||P();
+  const r=Math.random(),c=8+Math.floor(Math.random()*8);let txt;
+  if(r<.7){S.coins+=c;txt=`${c} 枚金幣`}else{S.inv.chicken=(S.inv.chicken||0)+1;txt="一份雞腿排"}
+  diary(p,"⛲",`昨天在噴水池許的願望實現了，收到${txt}！`);setTimeout(()=>toast(`⛲ 噴水池的願望實現了！收到${txt}`,"levelup"),1600);save()}
 function openPark(){const p=P(),pk=parkDay(),night=new Date().getHours()>=19||new Date().getHours()<6;
   if(p.sleeping){toast("牠在睡覺，醒來再去散步吧");return}
   const left=Object.keys(SPOTS).filter(k=>!pk.done[k]).length;
-  const spots=Object.entries(SPOTS).map(([k,s])=>`<button class="spot${pk.done[k]?" done":""}" data-sp="${k}" style="left:${s.x}%;top:${s.y}%">${pk.done[k]?"✓ ":""}${s.n}</button>`).join("");
-  sheet("🌳 公園散步",`<div class="park">${parkSVG(night)}<div class="park-pet" id="parkPet">${petSVG(p.sp,"happy",false,p.wear)}</div>${spots}</div>
-<p class="hint" id="parkMsg">${left?`點地圖上的地方去探索，今天還可以去 <b>${left}</b> 個地方。`:"今天四個地方都去過了，明天再來散步吧！"}</p>`,()=>{
+  const spots=Object.entries(SPOTS).map(([k,s])=>{const [x,y]=PX(s.x,s.y);return`<button class="spot${pk.done[k]?" done":""}" data-sp="${k}" style="left:${x}%;top:${y}%">${pk.done[k]?"✓ ":""}${s.n}</button>`}).join("");
+  const [sx,sy]=PX(166,174);
+  sheet("🌳 公園散步",`<div class="park-scroll" id="parkScroll"><div class="park">${parkSVG(night)}<div class="park-pet" id="parkPet" style="left:${sx}%;top:${sy}%">${petSVG(p.sp,"happy",false,p.wear)}</div>${spots}</div></div>
+<p class="hint park-swipe">👉 往右滑還有鞦韆、冰淇淋車、沙坑、噴水池</p>
+<p class="hint" id="parkMsg">${left?`點地圖上的地方去探索，今天還可以去 <b>${left}</b> 個地方。`:"今天每個地方都去過了，明天再來散步吧！"}</p>`,()=>{
     document.querySelectorAll("[data-sp]").forEach(b=>b.onclick=()=>explore(b.dataset.sp))},"park");
 }
 let parkBusy=false;
 const RM=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}};
-function parkFx(cls,x,y,html,ms){const pk=document.querySelector(".park");if(!pk)return;const e=document.createElement("div");e.className="pkfx "+cls;e.style.left=x+"%";e.style.top=y+"%";if(html)e.innerHTML=html;pk.appendChild(e);setTimeout(()=>e.remove(),ms||1500)}
+function parkFx(cls,sx,sy,html,ms){const pk=document.querySelector(".park");if(!pk)return;const [x,y]=PX(sx,sy),e=document.createElement("div");e.className="pkfx "+cls;e.style.left=x+"%";e.style.top=y+"%";if(html)e.innerHTML=html;pk.appendChild(e);setTimeout(()=>e.remove(),ms||1500)}
 function petAnim(frames,ms,easing){const el=$("parkPet");if(!el)return Promise.resolve();if(RM())ms=Math.min(ms,150);
-  const T=(t)=>`translate(-50%,-50%) ${t||""}`;const kf=frames.map(f=>{const o={};if(f.x!=null)o.left=f.x+"%";if(f.y!=null)o.top=f.y+"%";o.transform=T(f.t);if(f.o!=null)o.opacity=f.o;if(f.off!=null)o.offset=f.off;return o});
+  const T=(t)=>`translate(-50%,-50%) ${t||""}`;const kf=frames.map(f=>{const o={};if(f.x!=null){const [x,y]=PX(f.x,f.y);o.left=x+"%";o.top=y+"%"}o.transform=T(f.t);if(f.o!=null)o.opacity=f.o;if(f.off!=null)o.offset=f.off;return o});
   const last=kf[kf.length-1],end=()=>{if(last.left)el.style.left=last.left;if(last.top)el.style.top=last.top;el.style.transform=last.transform;el.style.opacity=last.opacity!=null?last.opacity:""};
   if(!el.animate){end();return Promise.resolve()}
   return new Promise(r=>{let done=false;const fin=()=>{if(done)return;done=true;end();try{a.cancel()}catch(e){}r()};const a=el.animate(kf,{duration:ms,easing:easing||"ease-in-out",fill:"forwards"});a.onfinish=fin;setTimeout(fin,ms+250)})}
-function curPos(){const el=$("parkPet");return{x:parseFloat(el.style.left)||46,y:parseFloat(el.style.top)||58}}
-function walkTo(x,y,ms){const c=curPos(),n=4,f=[];for(let i=0;i<=n;i++){const t=i/n;f.push({x:c.x+(x-c.x)*t,y:c.y+(y-c.y)*t,t:i%2?"translateY(-8px) rotate(-4deg)":"rotate(4deg)"})}f[n].t="";return petAnim(f,ms||800,"linear")}
+function curPos(){const el=$("parkPet");return{x:(parseFloat(el.style.left)||23)/100*PW,y:(parseFloat(el.style.top)||58)/100*PH}}
+function walkTo(x,y,ms){const c=curPos(),n=Math.max(4,Math.round(Math.hypot(x-c.x,y-c.y)/40)),f=[];for(let i=0;i<=n;i++){const t=i/n;f.push({x:c.x+(x-c.x)*t,y:c.y+(y-c.y)*t,t:i%2?"translateY(-8px) rotate(-4deg)":"rotate(4deg)"})}f[n].t="";
+  return petAnim(f,ms||Math.min(1600,300+n*130),"linear")}
+function scrollPark(x){const sc=$("parkScroll");if(!sc)return;const w=sc.querySelector(".park").offsetWidth,target=x/PW*w-sc.clientWidth/2;
+  try{sc.scrollTo({left:Math.max(0,target),behavior:RM()?"auto":"smooth"})}catch(e){sc.scrollLeft=target}}
 const wait_=ms=>new Promise(r=>setTimeout(r,RM()?Math.min(ms,100):ms));
-async function spotAnim(k,icon){
-  if(k==="slide"){await walkTo(13,50,700);
-    await petAnim([{x:13,y:50},{x:12,y:44,t:"rotate(-6deg)"},{x:13,y:38,t:"rotate(6deg)"},{x:12,y:31,t:"rotate(-4deg)"}],800);
-    parkFx("txt",22,30,"咻～",1200);
-    await petAnim([{x:12,y:31,t:"rotate(0)"},{x:22,y:42,t:"rotate(25deg)"},{x:31,y:53,t:"rotate(30deg)"}],650,"ease-in");
-    for(let i=0;i<5;i++)parkFx("star",28+Math.random()*10,48+Math.random()*8,"",1200);
-    await petAnim([{x:31,y:53,t:"scale(1.15,.85)"},{x:33,y:47,t:"scale(.95,1.08)"},{x:34,y:54,t:""}],500)}
-  if(k==="bush"){await walkTo(66,57,800);
-    await petAnim([{x:66,y:57},{x:71,y:57,t:"scale(.7)",o:.25}],350);
-    {const bu=document.querySelector(".pk-bush");if(bu&&bu.animate)bu.animate([{transform:"rotate(0)"},{transform:"rotate(-4deg)"},{transform:"rotate(4deg)"},{transform:"rotate(-3deg)"},{transform:"rotate(0)"}],{duration:900,iterations:1});}for(let i=0;i<6;i++)setTimeout(()=>parkFx("leaf",66+Math.random()*12,48+Math.random()*8,"",1200),i*120);
+const FISH=`<svg viewBox="0 0 40 24"><ellipse cx="16" cy="12" rx="12" ry="8" fill="#ff8a1f" stroke="#2b3445" stroke-width="2.5"/><path d="M28 12 l10 -7 v14 z" fill="#ff8a1f" stroke="#2b3445" stroke-width="2.5" stroke-linejoin="round"/><circle cx="10" cy="10" r="1.8" fill="#2b3445"/></svg>`;
+async function spotAnim(k,icon){scrollPark(SPOTS[k].x);
+  if(k==="slide"){await walkTo(54,150);
+    await petAnim([{x:54,y:150},{x:51,y:132,t:"rotate(-6deg)"},{x:54,y:114,t:"rotate(6deg)"},{x:51,y:93,t:"rotate(-4deg)"}],800);
+    parkFx("txt",85,90,"咻～",1200);
+    await petAnim([{x:51,y:93,t:"rotate(0)"},{x:85,y:126,t:"rotate(25deg)"},{x:115,y:159,t:"rotate(30deg)"}],650,"ease-in");
+    for(let i=0;i<5;i++)parkFx("star",105+Math.random()*34,144+Math.random()*24,"",1200);
+    await petAnim([{x:115,y:159,t:"scale(1.15,.85)"},{x:122,y:141,t:"scale(.95,1.08)"},{x:126,y:162,t:""}],500)}
+  if(k==="bush"){await walkTo(234,171);
+    await petAnim([{x:234,y:171},{x:251,y:171,t:"scale(.7)",o:.25}],350);
+    {const bu=document.querySelector(".pk-bush");if(bu&&bu.animate)bu.animate([{transform:"rotate(0)"},{transform:"rotate(-4deg)"},{transform:"rotate(4deg)"},{transform:"rotate(-3deg)"},{transform:"rotate(0)"}],{duration:900})}
+    for(let i=0;i<6;i++)setTimeout(()=>parkFx("leaf",234+Math.random()*41,144+Math.random()*24,"",1200),i*120);
     await wait_(1000);
-    await petAnim([{x:71,y:57,t:"scale(.7)",o:.25},{x:71,y:42,t:"scale(1.12)",o:1},{x:71,y:46,t:""}],550);
-    parkFx("found",71,28,icon,1600);await wait_(700)}
-  if(k==="pond"){await walkTo(30,58,800);
-    await petAnim([{x:30,y:58,t:"scale(1.1,.85)"},{x:30,y:58,t:"scale(1.1,.85)"}],300);
-    for(let i=0;i<3;i++)setTimeout(()=>parkFx("ripple",20,70,"",1400),i*300);
-    setTimeout(()=>parkFx("fish",14,70,`<svg viewBox="0 0 40 24"><ellipse cx="16" cy="12" rx="12" ry="8" fill="#ff8a1f" stroke="#2b3445" stroke-width="2.5"/><path d="M28 12 l10 -7 v14 z" fill="#ff8a1f" stroke="#2b3445" stroke-width="2.5" stroke-linejoin="round"/><circle cx="10" cy="10" r="1.8" fill="#2b3445"/></svg>`,1300),500);
-    await wait_(1100);parkFx("found",30,40,icon,1500);
-    await petAnim([{x:30,y:58,t:""},{x:30,y:46,t:"scale(1.05)"},{x:30,y:58,t:"scale(1.1,.9)"},{x:30,y:58,t:""}],650)}
-  if(k==="bench"){await walkTo(70,36,700);
-    await petAnim([{x:70,y:36},{x:75,y:27,t:"scale(1.05)"}],450);
-    await petAnim([{x:75,y:27,t:"scale(1.08,.9)"},{x:75,y:27,t:"scale(1.08,.9)"}],200);
-    for(let i=0;i<3;i++)setTimeout(()=>parkFx("zz",80+i*3,18-i*4,"z",1300),i*350);
-    parkFx("sun",86,10,"",1800);await wait_(1300);
-    await petAnim([{x:75,y:27,t:"scale(1.08,.9)"},{x:75,y:25,t:"scale(.92,1.15)"},{x:75,y:27,t:""}],600);parkFx("found",75,12,icon,1400);await wait_(500)}
+    await petAnim([{x:251,y:171,t:"scale(.7)",o:.25},{x:251,y:126,t:"scale(1.12)",o:1},{x:251,y:138,t:""}],550);
+    parkFx("found",251,84,icon,1600);await wait_(700)}
+  if(k==="pond"){await walkTo(112,174);
+    await petAnim([{x:112,y:174,t:"scale(1.1,.85)"},{x:112,y:174,t:"scale(1.1,.85)"}],300);
+    for(let i=0;i<3;i++)setTimeout(()=>parkFx("ripple",78,210,"",1400),i*300);
+    setTimeout(()=>parkFx("fish",58,210,FISH,1300),500);
+    await wait_(1100);parkFx("found",112,120,icon,1500);
+    await petAnim([{x:112,y:174,t:""},{x:112,y:138,t:"scale(1.05)"},{x:112,y:174,t:"scale(1.1,.9)"},{x:112,y:174,t:""}],650)}
+  if(k==="bench"){await walkTo(248,108);
+    await petAnim([{x:248,y:108},{x:265,y:81,t:"scale(1.05)"}],450);
+    await petAnim([{x:265,y:81,t:"scale(1.08,.9)"},{x:265,y:81,t:"scale(1.08,.9)"}],200);
+    for(let i=0;i<3;i++)setTimeout(()=>parkFx("zz",282+i*10,54-i*12,"z",1300),i*350);
+    parkFx("sun",302,30,"",1800);await wait_(1300);
+    await petAnim([{x:265,y:81,t:"scale(1.08,.9)"},{x:265,y:75,t:"scale(.92,1.15)"},{x:265,y:81,t:""}],600);parkFx("found",265,36,icon,1400);await wait_(500)}
+  if(k==="swing"){await walkTo(435,170);
+    await petAnim([{x:435,y:170},{x:435,y:128,t:"scale(.9)"}],400);
+    const sw=document.querySelector(".pk-swing"),amp=[10,18,26,26,16],f=[];
+    amp.forEach(a=>{f.push({x:435-a*1.2,y:128-a*.35,t:`scale(.9) rotate(${a}deg)`});f.push({x:435+a*1.2,y:128-a*.35,t:`scale(.9) rotate(${-a}deg)`})});f.push({x:435,y:128,t:"scale(.9)"});
+    if(sw&&sw.animate)sw.animate(amp.flatMap(a=>[{transform:`rotate(${a}deg)`},{transform:`rotate(${-a}deg)`}]).concat([{transform:"rotate(0)"}]),{duration:2600,easing:"ease-in-out"});
+    setTimeout(()=>parkFx("txt",435,60,"哇～好高！",1300),1300);
+    await petAnim(f,2600);parkFx("found",435,80,icon,1400);
+    await petAnim([{x:435,y:128,t:"scale(.9)"},{x:445,y:150,t:"scale(1.1)"},{x:450,y:170,t:""}],450)}
+  if(k==="icecream"){await walkTo(530,170);
+    parkFx("txt",540,80,"叮咚～",1100);await wait_(600);
+    parkFx("cone",530,110,`<svg viewBox="0 0 30 44"><path d="M6 16 L15 42 L24 16 z" fill="#e0904a" stroke="#2b3445" stroke-width="2.5" stroke-linejoin="round"/><circle cx="15" cy="12" r="10" fill="#ff8fb1" stroke="#2b3445" stroke-width="2.5"/><circle cx="11" cy="8" r="2" fill="#fff"/></svg>`,2400);
+    await petAnim([{x:530,y:170},{x:530,y:158,t:"scale(1.05)"},{x:530,y:170,t:""}],400);
+    for(let i=0;i<3;i++){parkFx("txt",548,140,"舔～",700);await petAnim([{x:530,y:170,t:"rotate(-6deg)"},{x:530,y:166,t:"rotate(6deg)"},{x:530,y:170,t:""}],500)}
+    parkFx("found",530,120,"😋",1400);await wait_(500)}
+  if(k==="sand"){await walkTo(560,200);
+    for(let i=0;i<4;i++){for(let j=0;j<4;j++)parkFx("sandp",548+Math.random()*24,206,"",900);
+      await petAnim([{x:560,y:200,t:"rotate(-10deg) scale(1.05,.92)"},{x:560,y:204,t:"rotate(10deg) scale(1.05,.92)"},{x:560,y:200,t:""}],380)}
+    parkFx("txt",560,150,"挖到了！",1200);parkFx("found",560,150,icon,1600);
+    await petAnim([{x:560,y:200},{x:560,y:178,t:"scale(1.08)"},{x:560,y:200,t:""}],500)}
+  if(k==="fountain"){await walkTo(640,200);
+    parkFx("coin",640,170,"🪙",900);await wait_(700);
+    {const wt=document.querySelector(".pk-water");if(wt&&wt.animate)wt.animate([{transform:"translateY(0) scale(1)"},{transform:"translateY(-14px) scale(1.6)"},{transform:"translateY(0) scale(1)"}],{duration:900,iterations:2})}
+    for(let i=0;i<8;i++)setTimeout(()=>parkFx("drop",640+Math.random()*40,120+Math.random()*30,"",1000),i*90);
+    parkFx("txt",640,90,"許願中…",1500);
+    await petAnim([{x:640,y:200,t:"scale(1.05,.95)"},{x:640,y:200,t:"scale(1.05,.95)"}],900);
+    for(let i=0;i<5;i++)parkFx("star",620+Math.random()*50,110+Math.random()*40,"",1200);
+    await petAnim([{x:640,y:200},{x:640,y:184,t:"scale(1.06)"},{x:640,y:200,t:""}],450)}
 }
 async function explore(k){const p=P(),pk=parkDay();if(parkBusy)return;if(pk.done[k]){$("parkMsg").textContent=`今天已經去過${SPOTS[k].n}了，去別的地方看看吧！`;return}
   if(p.e<5){$("parkMsg").textContent=`${p.name} 走累了，回家睡一下吧。`;return}
-  pk.done[k]=1;p.e=clamp(p.e-3);const s=SPOTS[k];
-  let ev=PARK_EVENTS[k][Math.floor(Math.random()*PARK_EVENTS[k].length)](),rare=null;
-  if(Math.random()<.08){const pool=PARK_RARE.filter(id=>!S.owned[id]);if(pool.length){rare=pool[Math.floor(Math.random()*pool.length)];S.owned[rare]=1}}
-  const got=[];if(ev.c){S.coins+=ev.c;got.push(`金幣 +${ev.c}`)}if(ev.j){p.j=clamp(p.j+ev.j);got.push(`快樂 +${ev.j}`)}if(ev.e){p.e=clamp(p.e+ev.e);got.push(`精神 +${ev.e}`)}
+  const s=SPOTS[k];let ev=PARK_EVENTS[k][Math.floor(Math.random()*PARK_EVENTS[k].length)](),rare=null;
+  if(ev.pay&&S.coins<ev.pay){$("parkMsg").textContent=`${s.n}需要 ${ev.pay} 金幣，先去賺一點金幣再來吧！`;return}
+  pk.done[k]=1;p.e=clamp(p.e-3);if(ev.pay)S.coins-=ev.pay;
+  if(["bush","sand"].includes(k)&&Math.random()<.08){const pool=PARK_RARE.filter(id=>!S.owned[id]);if(pool.length){rare=pool[Math.floor(Math.random()*pool.length)];S.owned[rare]=1}}
+  const got=[];if(ev.pay)got.push(`金幣 -${ev.pay}`);if(ev.c){S.coins+=ev.c;got.push(`金幣 +${ev.c}`)}if(ev.j){p.j=clamp(p.j+ev.j);got.push(`快樂 +${ev.j}`)}if(ev.e){p.e=clamp(p.e+ev.e);got.push(`精神 +${ev.e}`)}
   if(ev.food){S.inv[ev.food]=(S.inv[ev.food]||0)+1;got.push(`${FOODS[ev.food].n} +1`)}
+  if(ev.wish){S.wish={date:today(),pid:p.id};got.push("明天會收到願望禮物")}
   gainXP(p,4);got.push("經驗 +4");if(Object.keys(pk.done).length===1)addAff(p,3);
   diary(p,"🌳",`去公園的${s.n}：${ev.x}`);if(rare)diary(p,"✨",`在公園撿到稀有的「${IT[rare].n}」！`);stat("walk");
-  checkStickers();save();
+  checkStickers();save();render();
   const icon=rare?"✨":ev.food?FOODS[ev.food].e:ev.c?"🪙":ev.e?"☀️":"💗";
   parkBusy=true;document.querySelectorAll(".spot").forEach(b=>b.classList.add("wait"));document.querySelector(".park")?.classList.add("busy");const m0=$("parkMsg");if(m0)m0.innerHTML=`${p.name} 跑去${s.n}了…`;
   try{await spotAnim(k,icon)}catch(e){}
