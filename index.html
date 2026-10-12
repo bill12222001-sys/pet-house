@@ -522,7 +522,13 @@ const SPECIES={
   cat:{n:"蘑菇貓",def:"菇菇",desc:"戴著紅點點蘑菇帽的貓咪"},
   peng:{n:"布丁企鵝",def:"噗噗",desc:"搖搖擺擺，最愛玩水"},
   dog:{n:"奶茶狗",def:"珍珠",desc:"耳朵垂垂的，頭上夾著骨頭髮夾"},
-  ele:{n:"泡泡象",def:"波波",desc:"短短的鼻子會吹出泡泡"}
+  ele:{n:"泡泡象",def:"波波",desc:"長鼻子捲捲的，會吹出泡泡"},
+  bear:{n:"蜂蜜熊",def:"蜜蜜",desc:"圓滾滾的小熊，頭上頂著一罐蜂蜜"},
+  panda:{n:"竹筍熊貓",def:"筍筍",desc:"黑白配色，頭上冒出一根小竹筍"},
+  ham:{n:"瓜子鼠",def:"豆豆",desc:"臉頰鼓鼓的，最愛抱著瓜子"},
+  turtle:{n:"草莓龜",def:"莓莓",desc:"背著小殼慢慢走，頭上有顆草莓"},
+  uni:{n:"彩虹小馬",def:"虹虹",desc:"頭上有彩虹角，鬃毛五顏六色"},
+  koala:{n:"抱抱熊",def:"抱抱",desc:"毛茸茸的大耳朵，抱著尤加利葉"}
 };
 const FOODS={
   rice:{n:"家常飯",e:"🍚",price:0,h:15,j:2,xp:2,d:"免費吃到飽，填飽肚子"},
@@ -667,23 +673,34 @@ const PAL={
   cat:{body:"#b9a6e8",dark:"#8f78cf",in:"#ffd0e0"},
   peng:{body:"#33507a",dark:"#22385a",in:"#f7f9fc"},
   dog:{body:"#e9c79a",dark:"#a8774a",in:"#fff4e2"},
-  ele:{body:"#a9c4e8",dark:"#7f9fd0",in:"#ffc4d6"}
+  ele:{body:"#a9c4e8",dark:"#7f9fd0",in:"#ffc4d6"},
+  bear:{body:"#c98d5c",dark:"#9c6538",in:"#f3dcc0"},
+  panda:{body:"#fbfbf8",dark:"#3b3f4a",in:"#ffd0dc"},
+  ham:{body:"#f4b56a",dark:"#d98f3e",in:"#fff6ea"},
+  turtle:{body:"#9fd47a",dark:"#6aa84f",in:"#fff3c4"},
+  uni:{body:"#fff5fb",dark:"#e8c9e0",in:"#ffc4d6"},
+  koala:{body:"#aeb3bf",dark:"#858b99",in:"#f4f4f6"}
 };
 function face(m,dirty,sp){
   const ink="#2b3445";let s="";
-  const ey=sp==="peng"?112:118;
-  if(m==="sleep"){s+=`<path d="M74 ${ey} q8 7 16 0 M110 ${ey} q8 7 16 0" stroke="${ink}" stroke-width="4" fill="none" stroke-linecap="round"/>`}
-  else if(m==="happy"){s+=`<path d="M74 ${ey+3} q8 -10 16 0 M110 ${ey+3} q8 -10 16 0" stroke="${ink}" stroke-width="4" fill="none" stroke-linecap="round"/>`}
-  else{s+=`<circle cx="82" cy="${ey}" r="8" fill="${ink}"/><circle cx="118" cy="${ey}" r="8" fill="${ink}"/><circle cx="85" cy="${ey-3}" r="3" fill="#fff"/><circle cx="121" cy="${ey-3}" r="3" fill="#fff"/>`;
+  const ey=sp==="peng"?112:118,pd=sp==="panda",li=pd?"#fff":ink;
+  if(pd)s+=`<ellipse cx="80" cy="${ey+2}" rx="14" ry="17" fill="#3b3f4a" transform="rotate(25 80 ${ey+2})"/><ellipse cx="120" cy="${ey+2}" rx="14" ry="17" fill="#3b3f4a" transform="rotate(-25 120 ${ey+2})"/>`;
+  if(m==="sleep"){s+=`<path d="M74 ${ey} q8 7 16 0 M110 ${ey} q8 7 16 0" stroke="${li}" stroke-width="4" fill="none" stroke-linecap="round"/>`}
+  else if(m==="happy"){s+=`<path d="M74 ${ey+3} q8 -10 16 0 M110 ${ey+3} q8 -10 16 0" stroke="${li}" stroke-width="4" fill="none" stroke-linecap="round"/>`}
+  else{s+=`<circle cx="82" cy="${ey}" r="8" fill="${ink}"${pd?' stroke="#fff" stroke-width="2.5"':""}/><circle cx="118" cy="${ey}" r="8" fill="${ink}"${pd?' stroke="#fff" stroke-width="2.5"':""}/><circle cx="85" cy="${ey-3}" r="3" fill="#fff"/><circle cx="121" cy="${ey-3}" r="3" fill="#fff"/>`;
     if(m==="sad")s+=`<path d="M72 ${ey-14} l14 5 M128 ${ey-14} l-14 5" stroke="${ink}" stroke-width="3.5" stroke-linecap="round"/>`}
   s+=`<ellipse cx="68" cy="${ey+14}" rx="9" ry="5" fill="#ff8fa8" opacity=".6"/><ellipse cx="132" cy="${ey+14}" rx="9" ry="5" fill="#ff8fa8" opacity=".6"/>`;
-  const my=ey+18+(sp==="ele"?17:0);
-  if(sp==="dog")s+=`<ellipse cx="100" cy="${my-5}" rx="7" ry="5" fill="${ink}"/><ellipse cx="98" cy="${my-7}" rx="2.5" ry="1.5" fill="#fff" opacity=".7"/>`;
+  const my=ey+18+(sp==="ele"?2:sp==="koala"?6:0),mdx=sp==="ele"?-22:0;
+  if(sp==="dog"||sp==="bear"||sp==="panda")s+=`<ellipse cx="100" cy="${my-5}" rx="7" ry="5" fill="${ink}"/><ellipse cx="98" cy="${my-7}" rx="2.5" ry="1.5" fill="#fff" opacity=".7"/>`;
+  if(sp==="koala")s+=`<ellipse cx="100" cy="${my-11}" rx="9" ry="11" fill="${ink}"/><ellipse cx="97" cy="${my-15}" rx="3" ry="2" fill="#fff" opacity=".6"/>`;
+  if(sp==="ham")s+=`<path d="M96 ${my-7} h8 l-4 4 z" fill="#ff8fa8" stroke="${ink}" stroke-width="2" stroke-linejoin="round"/>`;
   if(sp==="peng")s+=`<path d="M92 ${my-6} l8 9 l8 -9 z" fill="#ffb02e" stroke="${ink}" stroke-width="2.5" stroke-linejoin="round"/>`;
+  const s0=s.length;
   if(m==="happy")s+=`<path d="M91 ${my+2} q9 12 18 0 z" fill="#e2475b" stroke="${ink}" stroke-width="3" stroke-linejoin="round"/>`;
   else if(m==="sad")s+=`<path d="M92 ${my+8} q8 -7 16 0" stroke="${ink}" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
   else if(m==="sleep")s+=`<circle cx="100" cy="${my+4}" r="3.5" fill="${ink}"/>`;
   else s+=`<path d="M92 ${my+2} q4 5 8 0 q4 5 8 0" stroke="${ink}" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  if(mdx)s=s.slice(0,s0)+`<g transform="translate(${100+mdx} ${my}) scale(.85) translate(-100 ${-my})">`+s.slice(s0)+`</g>`;
   if(dirty)s+=`<g fill="#8a6a4a" opacity=".55"><circle cx="66" cy="150" r="6"/><circle cx="130" cy="160" r="8"/><circle cx="112" cy="146" r="4"/><circle cx="80" cy="165" r="4"/></g>`;
   return s;
 }
@@ -718,8 +735,36 @@ function petSVG(sp,m,dirty,wear){
     b+=`<circle cx="44" cy="116" r="34" fill="${c.body}" ${o}/><circle cx="46" cy="118" r="21" fill="${c.in}"/><circle cx="156" cy="116" r="34" fill="${c.body}" ${o}/><circle cx="154" cy="118" r="21" fill="${c.in}"/>`;
     b+=`<path d="M154 168 q14 2 16 -10" stroke="#2b3445" stroke-width="4" fill="none" stroke-linecap="round"/>`;
     b+=`<ellipse cx="100" cy="132" rx="58" ry="52" fill="${c.body}" ${o}/>`;
-    b+=`<path d="M100 116 q-1 18 4 24 q5 5 11 0" stroke="#2b3445" stroke-width="19" fill="none" stroke-linecap="round"/><path d="M100 116 q-1 18 4 24 q5 5 11 0" stroke="${c.body}" stroke-width="9" fill="none" stroke-linecap="round"/><ellipse cx="100" cy="112" rx="10" ry="7" fill="${c.body}"/>`;
+    b+=`<path d="M91 104 C88 132 93 149 112 152 L123 149 C123 141 119 140 115 138 C106 133 110 122 109 104 Z" fill="#bcd3f2"/><path d="M91 104 C88 132 93 149 112 152 L123 149 C123 141 119 140 115 138 C106 133 110 122 109 104" fill="none" stroke="#2b3445" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="119" cy="146" rx="3" ry="4" fill="#2b3445" transform="rotate(-35 119 146)"/><path d="M90 122 q8 3 16 0 M93 133 q7 3 14 0" stroke="${c.dark}" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
     b+=`<g fill="#e3f5ff" stroke="#7cc6ee" stroke-width="2.5"><circle cx="128" cy="76" r="8"/><circle cx="144" cy="62" r="5.5"/><circle cx="154" cy="50" r="3.5"/></g><circle cx="125" cy="73" r="2.2" fill="#fff"/>`;
+  }else if(sp==="bear"){
+    b+=`<circle cx="60" cy="86" r="18" fill="${c.body}" ${o}/><circle cx="60" cy="86" r="9" fill="${c.in}"/><circle cx="140" cy="86" r="18" fill="${c.body}" ${o}/><circle cx="140" cy="86" r="9" fill="${c.in}"/>`;
+    b+=`<ellipse cx="100" cy="132" rx="60" ry="52" fill="${c.body}" ${o}/><ellipse cx="100" cy="138" rx="24" ry="16" fill="${c.in}"/><ellipse cx="100" cy="166" rx="28" ry="14" fill="${c.in}" opacity=".7"/>`;
+    b+=`<path d="M84 78 q0 -14 16 -14 q16 0 16 14 q0 12 -16 12 q-16 0 -16 -12 z" fill="#ffb02e" stroke="#2b3445" stroke-width="3"/><rect x="88" y="58" width="24" height="8" rx="3" fill="#a0662f" stroke="#2b3445" stroke-width="2.5"/><path d="M90 70 q4 8 0 12" stroke="#ffd35c" stroke-width="3" fill="none" stroke-linecap="round"/><text x="100" y="84" font-size="9" font-weight="900" text-anchor="middle" fill="#a0662f">蜜</text>`;
+  }else if(sp==="panda"){
+    b+=`<circle cx="58" cy="88" r="18" fill="${c.dark}" ${o}/><circle cx="142" cy="88" r="18" fill="${c.dark}" ${o}/>`;
+    b+=`<ellipse cx="100" cy="132" rx="60" ry="52" fill="${c.body}" ${o}/><path d="M50 164 q-6 -16 10 -22 q8 14 2 26 z M150 164 q6 -16 -10 -22 q-8 14 -2 26 z" fill="${c.dark}"/>`;
+    b+=`<path d="M100 84 l-9 -6 q2 -14 9 -24 q7 10 9 24 z" fill="#c9b27a" stroke="#2b3445" stroke-width="3" stroke-linejoin="round"/><path d="M93 74 l14 -6 M94 66 l11 -5" stroke="#8a7440" stroke-width="2"/><path d="M100 54 q6 -6 12 -4 q-4 6 -12 4" fill="#7cc46a" stroke="#2b3445" stroke-width="2"/>`;
+  }else if(sp==="ham"){
+    b+=`<circle cx="66" cy="88" r="13" fill="${c.body}" ${o}/><circle cx="66" cy="89" r="6" fill="#ffc4d6"/><circle cx="134" cy="88" r="13" fill="${c.body}" ${o}/><circle cx="134" cy="89" r="6" fill="#ffc4d6"/>`;
+    b+=`<ellipse cx="100" cy="134" rx="58" ry="50" fill="${c.body}" ${o}/><path d="M60 120 q40 -30 80 0 q8 30 -8 52 q-32 18 -64 0 q-16 -22 -8 -52 z" fill="${c.in}"/>`;
+    b+=`<ellipse cx="64" cy="134" rx="16" ry="13" fill="${c.in}" stroke="${c.dark}" stroke-width="2"/><ellipse cx="136" cy="134" rx="16" ry="13" fill="${c.in}" stroke="${c.dark}" stroke-width="2"/>`;
+    b+=`<g transform="rotate(-10 100 166)"><path d="M100 152 q11 8 0 26 q-11 -18 0 -26 z" fill="#4a3b33" stroke="#2b3445" stroke-width="2"/><path d="M100 156 v18" stroke="#e8e0d4" stroke-width="2.5"/></g><ellipse cx="88" cy="166" rx="7" ry="5" fill="${c.body}" ${o}/><ellipse cx="112" cy="166" rx="7" ry="5" fill="${c.body}" ${o}/>`;
+  }else if(sp==="turtle"){
+    b+=`<ellipse cx="100" cy="128" rx="74" ry="58" fill="#b9773c" ${o}/><ellipse cx="100" cy="128" rx="65" ry="49" fill="#dca56a"/><g fill="#c98a4b" stroke="#8f5a2a" stroke-width="2.5" stroke-linejoin="round"><path d="M75.3 102.5 L64.0 109.0 L52.7 102.5 L52.7 89.5 L64.0 83.0 L75.3 89.5 Z"/><path d="M147.3 102.5 L136.0 109.0 L124.7 102.5 L124.7 89.5 L136.0 83.0 L147.3 89.5 Z"/><path d="M111.3 86.5 L100.0 93.0 L88.7 86.5 L88.7 73.5 L100.0 67.0 L111.3 73.5 Z"/><path d="M51.5 133.5 L42.0 139.0 L32.5 133.5 L32.5 122.5 L42.0 117.0 L51.5 122.5 Z"/><path d="M167.5 133.5 L158.0 139.0 L148.5 133.5 L148.5 122.5 L158.0 117.0 L167.5 122.5 Z"/></g>`;
+    b+=`<ellipse cx="68" cy="178" rx="13" ry="8" fill="${c.body}" ${o}/><ellipse cx="132" cy="178" rx="13" ry="8" fill="${c.body}" ${o}/>`;
+    b+=`<ellipse cx="100" cy="138" rx="50" ry="46" fill="${c.body}" ${o}/><ellipse cx="100" cy="166" rx="30" ry="16" fill="${c.in}"/><path d="M84 166 h32 M100 152 v28" stroke="#e6cf8a" stroke-width="2.5"/>`;
+    b+=`<path d="M100 92 q-14 -2 -12 -14 q2 -10 12 -8 q10 -2 12 8 q2 12 -12 14 z" fill="#ff5c6c" stroke="#2b3445" stroke-width="3"/><path d="M92 70 l8 4 l8 -4 l-3 -5 l-5 3 l-5 -3 z" fill="#4fae63" stroke="#2b3445" stroke-width="2" stroke-linejoin="round"/><g fill="#ffe08a"><circle cx="95" cy="80" r="1.6"/><circle cx="105" cy="80" r="1.6"/><circle cx="100" cy="86" r="1.6"/><circle cx="94" cy="87" r="1.4"/><circle cx="106" cy="87" r="1.4"/></g>`;
+  }else if(sp==="uni"){
+    b+=`<path d="M150 150 q30 6 26 32 q-12 -4 -18 -14 q-2 10 -10 14 q0 -18 2 -32 z" fill="#b9a6e8" ${o}/>`;
+    b+=`<path d="M62 100 L64 66 L88 86 z" fill="${c.body}" ${o}/><path d="M138 100 L136 66 L112 86 z" fill="${c.body}" ${o}/><path d="M68 92 L68 74 L80 86 z M132 92 L132 74 L120 86 z" fill="${c.in}"/>`;
+    b+=`<ellipse cx="100" cy="132" rx="60" ry="52" fill="${c.body}" ${o}/>`;
+    b+=`<g stroke="#2b3445" stroke-width="3"><circle cx="66" cy="94" r="12" fill="#ff8fb1"/><circle cx="80" cy="84" r="12" fill="#ffd35c"/><circle cx="58" cy="110" r="11" fill="#7cc6ee"/><circle cx="56" cy="126" r="9" fill="#b9a6e8"/></g>`;
+    b+=`<path d="M92 82 L100 44 L108 82 z" fill="#ffe08a" stroke="#2b3445" stroke-width="3" stroke-linejoin="round"/><path d="M95 70 l10 -3 M96 60 l8 -3 M94 76 l12 -2" stroke="#ff8fb1" stroke-width="2.5"/>`;
+  }else if(sp==="koala"){
+    b+=`<circle cx="50" cy="96" r="26" fill="${c.body}" ${o}/><circle cx="52" cy="98" r="14" fill="${c.in}"/><circle cx="150" cy="96" r="26" fill="${c.body}" ${o}/><circle cx="148" cy="98" r="14" fill="${c.in}"/>`;
+    b+=`<ellipse cx="100" cy="134" rx="58" ry="50" fill="${c.body}" ${o}/><ellipse cx="100" cy="166" rx="26" ry="14" fill="${c.in}" opacity=".8"/>`;
+    b+=`<path d="M100 88 q-18 -6 -16 -24 q16 2 16 24 z" fill="#7cc46a" stroke="#2b3445" stroke-width="3"/><path d="M100 88 q6 -16 18 -22 q2 18 -18 22 z" fill="#4fae63" stroke="#2b3445" stroke-width="3"/>`;
   }else{
     b+=`<path d="M46 120 q-16 20 -6 40 q14 -6 18 -22 z" fill="${c.body}" ${o}/><path d="M154 120 q16 20 6 40 q-14 -6 -18 -22 z" fill="${c.body}" ${o}/>`;
     b+=`<ellipse cx="82" cy="182" rx="14" ry="6" fill="#ffb02e" ${o}/><ellipse cx="118" cy="182" rx="14" ry="6" fill="#ffb02e" ${o}/>`;
@@ -732,7 +777,7 @@ function petSVG(sp,m,dirty,wear){
 
 /* ---------- accessories, room decor, toys ---------- */
 const INK="#2b3445",O=`stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"`,O3=`stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"`;
-const HEADY={bunny:84,fox:84,cat:88,peng:68,dog:86,ele:86};
+const HEADY={bunny:84,fox:84,cat:88,peng:68,dog:86,ele:86,bear:84,panda:86,ham:88,turtle:88,uni:86,koala:88};
 const quad=t=>{const a=1-t;return[a*a*66+2*a*t*100+t*t*134,a*a*146+2*a*t*164+t*t*146]};
 const band=(col,w=6)=>`<path d="M66 146 q34 18 68 0" stroke="${INK}" stroke-width="${w+5}" fill="none" stroke-linecap="round"/><path d="M66 146 q34 18 68 0" stroke="${col}" stroke-width="${w}" fill="none" stroke-linecap="round"/>`;
 const heart=(x,y,sc,col)=>`<path transform="translate(${x} ${y}) scale(${sc})" d="M0 5 C-3 -2 -12 -2 -12 6 C-12 12 -4 16 0 20 C4 16 12 12 12 6 C12 -2 3 -2 0 5 z" fill="${col}" stroke="${INK}" stroke-width="${(2.5/sc).toFixed(2)}" stroke-linejoin="round"/>`;
