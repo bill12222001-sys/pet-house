@@ -286,7 +286,9 @@ input[type=text]{font:inherit;border:2px solid var(--ink);border-radius:12px;pad
 .stk-card b{font-size:13px}.stk-card small{font-size:11px;color:var(--ink-soft);line-height:1.3}
 .stk-card:disabled{cursor:default;background:var(--panel-2)}
 .stk-card.onwall{border-color:var(--gold);background:#fff6dc}
-.wallstk{position:absolute;z-index:1;width:30px;height:30px;font-size:15px;border-width:3px;transform:rotate(-6deg);pointer-events:none}
+.cork{position:absolute;z-index:1;left:8px;top:88px;width:96px;height:66px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);place-items:center;padding:3px;background:#d2a46b radial-gradient(circle,rgba(138,90,43,.25) 1px,transparent 1.5px) 0 0/7px 7px;border:3px solid #8a5a2b;border-radius:6px;pointer-events:none}
+.wallstk{width:26px;height:26px;font-size:13px;border-width:3px;box-shadow:0 1px 0 rgba(43,52,69,.3)}
+.wallstk:nth-child(odd){transform:rotate(-6deg)}.wallstk:nth-child(even){transform:rotate(5deg)}
 .photo{display:flex;flex-direction:column;gap:10px}
 .ph-box{min-height:200px;display:grid;place-items:center;color:var(--ink-soft);font-weight:700}
 .ph-box img{width:100%;max-width:360px;border-radius:12px;box-shadow:0 6px 20px rgba(43,52,69,.2);transform:rotate(-1.5deg)}
@@ -1076,7 +1078,8 @@ const bookCount=()=>{const all=Object.keys(IT);return[all.filter(k=>S.owned[k]).
 function openBook(tab){tab=tab||"head";
   if(tab==="stk"){const [a,b]=bookCount();sheet("收藏圖鑑",`<div class="book-sum"><b>${a}</b> / ${b} 已收集<div class="tbar"><i style="width:${a/b*100}%"></i></div></div>${segHTML(BOOK_TABS,tab)}${stickerTab()}`,()=>{
     document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>openBook(b.dataset.tab));
-    document.querySelectorAll("[data-stk]").forEach(b=>b.onclick=()=>{toggleWall(b.dataset.stk);openBook("stk")})},"book");return}
+    document.querySelectorAll("[data-stk]").forEach(b=>b.onclick=()=>{toggleWall(b.dataset.stk);openBook("stk")});
+    const wc=$("wallClear");if(wc)wc.onclick=()=>{S.wall=[];wallKey=null;save();render();toast("貼紙都撕下來了，還留在貼紙簿裡喔");openBook("stk")}},"book");return}
   const list=Object.keys(IT).filter(k=>IT[k].cat===tab).sort((a,b)=>(!!IT[a].hol)-(!!IT[b].hol));
   const cards=list.map(k=>{const it=IT[k],has=S.owned[k],h=it.hol&&HOLN[it.hol];
     const how=h?`${h.e} ${h.n}限定`:it.gift?"🎁 驚喜禮物機":it.code?"🔑 通關密碼":it.trait?"🌱 性格專屬（Lv.20）":it.park?"🌳 公園稀有":`商店 ${it.price} 金幣`;
@@ -1373,20 +1376,18 @@ const STICKERS=[
   {id:"artist",e:"🎨",n:"小畫家",d:"在畫架上畫 5 幅畫",c:"#ff7a59",ok:()=>st_("paint")>=5}];
 let stkT=0;
 function checkStickers(){S.stickers=S.stickers||{};const got=STICKERS.filter(s=>!S.stickers[s.id]&&s.ok());
-  got.forEach(s=>{S.stickers[s.id]=Date.now();diary(P(),"🏅",`得到貼紙「${s.n}」！`);
-    if(!S.wall)S.wall=[];if(S.wall.length<6)S.wall.push(s.id)});
-  if(got.length){clearTimeout(stkT);stkT=setTimeout(()=>{toast(`🏅 得到新貼紙：${got.map(s=>s.n).join("、")}！`,"levelup");sfx("level")},600);wallKey="";quickKey="";save()}}
+  got.forEach(s=>{S.stickers[s.id]=Date.now();diary(P(),"🏅",`得到貼紙「${s.n}」！`)});
+  if(got.length){clearTimeout(stkT);stkT=setTimeout(()=>{toast(`🏅 得到新貼紙：${got.map(s=>s.n).join("、")}！想貼的話到「圖鑑 → 貼紙」`,"levelup");sfx("level")},600);wallKey=null;quickKey="";save()}}
 const stickerHTML=(s,on)=>`<span class="stk${on?"":" off"}" style="--c:${s.c}">${on?s.e:"？"}</span>`;
-let wallKey="";
+let wallKey=null;
 function renderWall(){const w=(S.wall||[]).filter(id=>STICKERS.find(s=>s.id===id)),k=w.join();if(k===wallKey)return;wallKey=k;
-  const st=$("stage");st.querySelectorAll(".wallstk").forEach(e=>e.remove());
-  const POS=[["left:8px;top:92px"],["left:40px;top:118px"],["left:8px;top:146px"],["right:8px;top:92px"],["right:40px;top:118px"],["right:8px;top:146px"]];
-  w.forEach((id,i)=>{const s=STICKERS.find(x=>x.id===id),el=document.createElement("span");el.className="wallstk stk";el.style.cssText=POS[i]+`;--c:${s.c}`;el.textContent=s.e;st.insertBefore(el,$("petWrap"))});
+  const st=$("stage");st.querySelectorAll(".wallstk,.cork").forEach(e=>e.remove());if(!w.length)return;
+  const b=document.createElement("div");b.className="cork";b.innerHTML=w.map(id=>{const s=STICKERS.find(x=>x.id===id);return`<span class="stk wallstk" style="--c:${s.c}">${s.e}</span>`}).join("");st.insertBefore(b,$("petWrap"));
 }
 function stickerTab(){S.stickers=S.stickers||{};S.wall=S.wall||[];const n=Object.keys(S.stickers).length;
-  return`<p class="hint">貼紙 ${n}/${STICKERS.length}。點已經得到的貼紙，可以貼到小屋牆上（最多 6 張），再點一次撕下來。</p><div class="stk-grid">${STICKERS.map(s=>{const on=!!S.stickers[s.id],w=S.wall.includes(s.id);
+  return`<p class="hint">貼紙 ${n}/${STICKERS.length}。點已經得到的貼紙，可以貼到牆上的軟木板（最多 6 張），再點一次撕下來。</p>${S.wall.length?`<button class="btn ghost" id="wallClear">牆上不貼（全部撕下）</button>`:""}<div class="stk-grid">${STICKERS.map(s=>{const on=!!S.stickers[s.id],w=S.wall.includes(s.id);
     return`<button class="stk-card${w?" onwall":""}" data-stk="${s.id}" ${on?"":"disabled"}>${stickerHTML(s,on)}<b>${s.n}</b><small>${on?(w?"貼在牆上":"已得到"):s.d}</small></button>`}).join("")}</div>`}
-function toggleWall(id){S.wall=S.wall||[];const i=S.wall.indexOf(id);if(i>=0)S.wall.splice(i,1);else{if(S.wall.length>=6){toast("牆上最多貼 6 張，先撕下一張吧");return}S.wall.push(id)}wallKey="";save();render()}
+function toggleWall(id){S.wall=S.wall||[];const i=S.wall.indexOf(id);if(i>=0)S.wall.splice(i,1);else{if(S.wall.length>=6){toast("軟木板最多貼 6 張，先撕下一張吧");return}S.wall.push(id)}wallKey=null;save();render()}
 
 /* ---------- polaroid photo ---------- */
 const TH_COL={wood:["#bfe3f0","#f2c29a"],garden:["#ffe1ea","#9fd48c"],beach:["#c9ecff","#f5dca8"],starry:["#25306a","#5b4f9e"]};
@@ -1414,9 +1415,9 @@ function photoSVG(mem,fr){const p=P(),[wall,floor]=TH_COL[S.theme||"wood"]||TH_C
   const ps=(fr?290:330)*STAGES[stageOf(p.lv)].sc,cx=fr?px+pw*.64:px+pw/2;
   if(fr){const fs=250*STAGES[stageOf(fr.lv)].sc,fx=px+pw*.27;g+=nest(petSVG(fr.sp,"happy",false,fr.wear),fx-fs/2,py+ph-fs-10,fs,fs)+heart(px+pw*.46,py+ph-ps-4,1.3,"#ff4f7b")}
   g+=nest(petSVG(p.sp,"happy",false,p.wear),cx-ps/2,py+ph-ps-6,ps,ps);
-  const SPOS=[[8,92],[40,118],[8,146],[-8,92],[-40,118],[-8,146]];
-  let stk=(S.wall||[]).slice(0,6).map((id,i)=>{const s=STICKERS.find(x=>x.id===id);if(!s)return"";const [ox,oy]=SPOS[i],x=ox>=0?px+(ox+15)*sc:px+pw+(ox-15)*sc,y=py+(oy+15)*vs;
-    return`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="22" fill="#fff" stroke="${s.c}" stroke-width="5"/><text x="${x.toFixed(1)}" y="${(y+8).toFixed(1)}" text-anchor="middle" font-size="22">${s.e}</text>`}).join("");
+  const wl=(S.wall||[]).slice(0,6).map(id=>STICKERS.find(x=>x.id===id)).filter(Boolean),bx=px+8*sc,by=py+88*vs,bw=96*sc,bh=66*vs;
+  let stk=wl.length?`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="6" fill="#d2a46b" stroke="#8a5a2b" stroke-width="5"/>`+wl.map((s,i)=>{const x=bx+bw*(i%3*2+1)/6,y=by+bh*(Math.floor(i/3)*2+1)/4;
+    return`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(13*sc).toFixed(1)}" fill="#fff" stroke="${s.c}" stroke-width="4"/><text x="${x.toFixed(1)}" y="${(y+7).toFixed(1)}" text-anchor="middle" font-size="19">${s.e}</text>`}).join(""):"";
   if(partyOn){stk+=`<rect x="${px}" y="${py}" width="${pw}" height="${ph}" fill="#140a28" opacity=".35"/>`+[["#ff4f7b",-30],["#6cb8f0",0],["#ffd35c",30]].map(([c,a])=>`<path d="M${px+pw/2} ${py+30} L${px+pw/2-90} ${py+ph} L${px+pw/2+90} ${py+ph} z" fill="${c}" opacity=".28" transform="rotate(${a} ${px+pw/2} ${py+30})"/>`).join("")+Array.from({length:30},()=>`<rect x="${rnd(px,px+pw).toFixed(1)}" y="${rnd(py,py+ph).toFixed(1)}" width="8" height="5" fill="${["#ff7a59","#ffd35c","#4fae63","#6cb8f0","#ff8fb1"][Math.floor(Math.random()*5)]}" transform="rotate(${rnd(0,90).toFixed(0)})" transform-origin="center" style="transform-box:fill-box"/>`).join("")}
   if(activeHol().some(i=>i.h.id==="xmas"))for(let i=0;i<40;i++)stk+=`<circle cx="${rnd(px,px+pw).toFixed(1)}" cy="${rnd(py,py+ph).toFixed(1)}" r="${rnd(2.5,5).toFixed(1)}" fill="#fff" stroke="#c9d8f2" stroke-width="1"/>`;
   const title=fr?`${esc(p.name)} 和 ${esc(fr.n)}`:`${esc(p.name)} Lv.${p.lv}・${STAGES[stageOf(p.lv)].n}`,sub=fr?`${partyOn?"一起開派對":"好朋友來家裡玩"}・${fmtDate(Date.now())}`:partyOn?`🪩 派對時間・${fmtDate(Date.now())}`:`${esc(SPECIES[p.sp].n)}・一起生活 ${daysWith(p)} 天・${fmtDate(Date.now())}`;
