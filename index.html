@@ -303,7 +303,7 @@ input[type=text]{font:inherit;border:2px solid var(--ink);border-radius:12px;pad
 .spot{position:absolute;transform:translate(-50%,-50%);border:2px solid var(--ink);background:#fff;border-radius:999px;padding:4px 12px;font:inherit;font-weight:900;font-size:14px;color:var(--ink);cursor:pointer;box-shadow:0 3px 0 var(--ink);z-index:2;animation:bob 1.6s ease-in-out infinite}
 .spot.done{background:#eaf7ec;color:var(--leaf);border-color:var(--leaf);box-shadow:none;animation:none}
 .spot:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
-.park-pet{position:absolute;left:46%;top:58%;width:78px;height:78px;transform:translate(-50%,-50%);transition:left .5s ease-in-out,top .5s ease-in-out;z-index:1}
+.park-pet{position:absolute;left:46%;top:58%;width:78px;height:78px;transform:translate(-50%,-50%);z-index:1}
 .park-pet svg{width:100%;height:100%}
 .vcard{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
 .vhead{display:flex;align-items:center;gap:10px;text-align:left}.vhead svg{width:56px;height:56px}.vhead small{display:block;color:var(--ink-soft);font-size:12px}
@@ -363,6 +363,23 @@ input[type=text]{font:inherit;border:2px solid var(--ink);border-radius:12px;pad
 .gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .gthumb{border:3px solid #c98d4a;border-radius:4px;padding:0;background:#fff;cursor:pointer;aspect-ratio:5/4;overflow:hidden}.gthumb svg{width:100%;height:100%;display:block}
 .gthumb.on{outline:3px solid var(--gold);outline-offset:1px}
+.spot.wait{pointer-events:none;opacity:.15}
+.park.busy .park-pet{z-index:4}
+.pkfx{position:absolute;z-index:3;pointer-events:none;transform:translate(-50%,-50%)}
+.pkfx.txt{font-weight:900;font-size:20px;color:#fff;text-shadow:0 2px 0 #2b3445;animation:pkup 1.2s ease-out forwards}
+.pkfx.star{width:16px;height:16px;background:var(--gold);clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);animation:pkup 1.2s ease-out forwards}
+@keyframes pkup{from{opacity:1;transform:translate(-50%,-50%) scale(.6)}to{opacity:0;transform:translate(-50%,-160%) scale(1.2)}}
+.pk-bush{transform-box:fill-box;transform-origin:50% 100%}
+.pkfx.leaf{width:12px;height:7px;border-radius:70% 0;background:#4fae63;border:1px solid #2b3445;animation:leaf 1.2s ease-out forwards}
+@keyframes leaf{to{transform:translate(calc(-50% + 30px),-200%) rotate(260deg);opacity:0}}
+.pkfx.found{font-size:34px;line-height:1;animation:found 1.6s ease-out forwards}
+@keyframes found{0%{transform:translate(-50%,-20%) scale(.3);opacity:0}25%{transform:translate(-50%,-70%) scale(1.2);opacity:1}70%{transform:translate(-50%,-80%) scale(1);opacity:1}100%{transform:translate(-50%,-110%) scale(.9);opacity:0}}
+.pkfx.ripple{width:30px;height:12px;border:3px solid #fff;border-radius:50%;animation:ripple 1.4s ease-out forwards}
+@keyframes ripple{to{width:120px;height:44px;opacity:0}}
+.pkfx.fish{width:40px;height:24px;animation:fish 1.3s ease-in-out forwards}.pkfx.fish svg{width:100%;height:100%}
+@keyframes fish{0%{transform:translate(-50%,-50%) rotate(-30deg);opacity:0}15%{opacity:1}50%{transform:translate(20%,-260%) rotate(0deg)}100%{transform:translate(90%,-40%) rotate(40deg);opacity:0}}
+.pkfx.zz{font-family:var(--f-num);font-weight:800;font-size:20px;color:#fff;text-shadow:0 2px 0 #2b3445;animation:pkup 1.3s ease-out forwards}
+.pkfx.sun{width:70px;height:70px;border-radius:50%;background:radial-gradient(circle,rgba(255,227,110,.8),rgba(255,227,110,0) 70%);animation:tw 1.8s ease-in-out}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}.bub{animation-duration:4s!important}}
 </style>
 
@@ -1488,7 +1505,7 @@ function parkSVG(night){return`<svg viewBox="0 0 360 300" class="park-svg" prese
 <path d="M150 300 q20 -80 60 -150" stroke="#e8d3a6" stroke-width="26" fill="none" stroke-linecap="round"/>
 <g stroke="#2b3445" stroke-width="3" stroke-linejoin="round"><path d="M40 160 V92 h20 V160" fill="none"/><path d="M60 92 l50 68" stroke-width="14" stroke="#ff7a59"/><path d="M60 92 l50 68" fill="none"/><path d="M40 108 h20 M40 124 h20 M40 140 h20"/></g>
 <g stroke="#2b3445" stroke-width="3"><ellipse cx="80" cy="210" rx="62" ry="26" fill="#6cb8f0"/><path d="M60 206 q8 -6 16 0 M92 216 q8 -6 16 0" stroke="#fff" fill="none"/></g>
-<g stroke="#2b3445" stroke-width="3"><circle cx="240" cy="168" r="26" fill="#4fae63"/><circle cx="270" cy="160" r="22" fill="#5cc173"/><circle cx="256" cy="148" r="20" fill="#3f9a52"/></g>
+<g stroke="#2b3445" stroke-width="3" class="pk-bush"><circle cx="240" cy="168" r="26" fill="#4fae63"/><circle cx="270" cy="160" r="22" fill="#5cc173"/><circle cx="256" cy="148" r="20" fill="#3f9a52"/></g>
 <g stroke="#2b3445" stroke-width="3" stroke-linejoin="round"><rect x="232" y="88" width="78" height="10" rx="3" fill="#c98d4a"/><rect x="232" y="102" width="78" height="10" rx="3" fill="#c98d4a"/><path d="M240 112 v18 M302 112 v18" /></g>
 <g stroke="#2b3445" stroke-width="3"><path d="M330 150 v-40" /><circle cx="330" cy="100" r="22" fill="#4fae63"/></g></svg>`}
 const PARK_EVENTS={
@@ -1505,19 +1522,60 @@ function openPark(){const p=P(),pk=parkDay(),night=new Date().getHours()>=19||ne
 <p class="hint" id="parkMsg">${left?`點地圖上的地方去探索，今天還可以去 <b>${left}</b> 個地方。`:"今天四個地方都去過了，明天再來散步吧！"}</p>`,()=>{
     document.querySelectorAll("[data-sp]").forEach(b=>b.onclick=()=>explore(b.dataset.sp))},"park");
 }
-function explore(k){const p=P(),pk=parkDay();if(pk.done[k]){$("parkMsg").textContent=`今天已經去過${SPOTS[k].n}了，去別的地方看看吧！`;return}
+let parkBusy=false;
+const RM=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}};
+function parkFx(cls,x,y,html,ms){const pk=document.querySelector(".park");if(!pk)return;const e=document.createElement("div");e.className="pkfx "+cls;e.style.left=x+"%";e.style.top=y+"%";if(html)e.innerHTML=html;pk.appendChild(e);setTimeout(()=>e.remove(),ms||1500)}
+function petAnim(frames,ms,easing){const el=$("parkPet");if(!el)return Promise.resolve();if(RM())ms=Math.min(ms,150);
+  const T=(t)=>`translate(-50%,-50%) ${t||""}`;const kf=frames.map(f=>{const o={};if(f.x!=null)o.left=f.x+"%";if(f.y!=null)o.top=f.y+"%";o.transform=T(f.t);if(f.o!=null)o.opacity=f.o;if(f.off!=null)o.offset=f.off;return o});
+  const last=kf[kf.length-1],end=()=>{if(last.left)el.style.left=last.left;if(last.top)el.style.top=last.top;el.style.transform=last.transform;el.style.opacity=last.opacity!=null?last.opacity:""};
+  if(!el.animate){end();return Promise.resolve()}
+  return new Promise(r=>{let done=false;const fin=()=>{if(done)return;done=true;end();try{a.cancel()}catch(e){}r()};const a=el.animate(kf,{duration:ms,easing:easing||"ease-in-out",fill:"forwards"});a.onfinish=fin;setTimeout(fin,ms+250)})}
+function curPos(){const el=$("parkPet");return{x:parseFloat(el.style.left)||46,y:parseFloat(el.style.top)||58}}
+function walkTo(x,y,ms){const c=curPos(),n=4,f=[];for(let i=0;i<=n;i++){const t=i/n;f.push({x:c.x+(x-c.x)*t,y:c.y+(y-c.y)*t,t:i%2?"translateY(-8px) rotate(-4deg)":"rotate(4deg)"})}f[n].t="";return petAnim(f,ms||800,"linear")}
+const wait_=ms=>new Promise(r=>setTimeout(r,RM()?Math.min(ms,100):ms));
+async function spotAnim(k,icon){
+  if(k==="slide"){await walkTo(13,50,700);
+    await petAnim([{x:13,y:50},{x:12,y:44,t:"rotate(-6deg)"},{x:13,y:38,t:"rotate(6deg)"},{x:12,y:31,t:"rotate(-4deg)"}],800);
+    parkFx("txt",22,30,"咻～",1200);
+    await petAnim([{x:12,y:31,t:"rotate(0)"},{x:22,y:42,t:"rotate(25deg)"},{x:31,y:53,t:"rotate(30deg)"}],650,"ease-in");
+    for(let i=0;i<5;i++)parkFx("star",28+Math.random()*10,48+Math.random()*8,"",1200);
+    await petAnim([{x:31,y:53,t:"scale(1.15,.85)"},{x:33,y:47,t:"scale(.95,1.08)"},{x:34,y:54,t:""}],500)}
+  if(k==="bush"){await walkTo(66,57,800);
+    await petAnim([{x:66,y:57},{x:71,y:57,t:"scale(.7)",o:.25}],350);
+    {const bu=document.querySelector(".pk-bush");if(bu&&bu.animate)bu.animate([{transform:"rotate(0)"},{transform:"rotate(-4deg)"},{transform:"rotate(4deg)"},{transform:"rotate(-3deg)"},{transform:"rotate(0)"}],{duration:900,iterations:1});}for(let i=0;i<6;i++)setTimeout(()=>parkFx("leaf",66+Math.random()*12,48+Math.random()*8,"",1200),i*120);
+    await wait_(1000);
+    await petAnim([{x:71,y:57,t:"scale(.7)",o:.25},{x:71,y:42,t:"scale(1.12)",o:1},{x:71,y:46,t:""}],550);
+    parkFx("found",71,28,icon,1600);await wait_(700)}
+  if(k==="pond"){await walkTo(30,58,800);
+    await petAnim([{x:30,y:58,t:"scale(1.1,.85)"},{x:30,y:58,t:"scale(1.1,.85)"}],300);
+    for(let i=0;i<3;i++)setTimeout(()=>parkFx("ripple",20,70,"",1400),i*300);
+    setTimeout(()=>parkFx("fish",14,70,`<svg viewBox="0 0 40 24"><ellipse cx="16" cy="12" rx="12" ry="8" fill="#ff8a1f" stroke="#2b3445" stroke-width="2.5"/><path d="M28 12 l10 -7 v14 z" fill="#ff8a1f" stroke="#2b3445" stroke-width="2.5" stroke-linejoin="round"/><circle cx="10" cy="10" r="1.8" fill="#2b3445"/></svg>`,1300),500);
+    await wait_(1100);parkFx("found",30,40,icon,1500);
+    await petAnim([{x:30,y:58,t:""},{x:30,y:46,t:"scale(1.05)"},{x:30,y:58,t:"scale(1.1,.9)"},{x:30,y:58,t:""}],650)}
+  if(k==="bench"){await walkTo(70,36,700);
+    await petAnim([{x:70,y:36},{x:75,y:27,t:"scale(1.05)"}],450);
+    await petAnim([{x:75,y:27,t:"scale(1.08,.9)"},{x:75,y:27,t:"scale(1.08,.9)"}],200);
+    for(let i=0;i<3;i++)setTimeout(()=>parkFx("zz",80+i*3,18-i*4,"z",1300),i*350);
+    parkFx("sun",86,10,"",1800);await wait_(1300);
+    await petAnim([{x:75,y:27,t:"scale(1.08,.9)"},{x:75,y:25,t:"scale(.92,1.15)"},{x:75,y:27,t:""}],600);parkFx("found",75,12,icon,1400);await wait_(500)}
+}
+async function explore(k){const p=P(),pk=parkDay();if(parkBusy)return;if(pk.done[k]){$("parkMsg").textContent=`今天已經去過${SPOTS[k].n}了，去別的地方看看吧！`;return}
   if(p.e<5){$("parkMsg").textContent=`${p.name} 走累了，回家睡一下吧。`;return}
-  pk.done[k]=1;p.e=clamp(p.e-3);const s=SPOTS[k],pet=$("parkPet");if(pet){pet.style.left=s.x+"%";pet.style.top=(s.y-6)+"%"}
+  pk.done[k]=1;p.e=clamp(p.e-3);const s=SPOTS[k];
   let ev=PARK_EVENTS[k][Math.floor(Math.random()*PARK_EVENTS[k].length)](),rare=null;
   if(Math.random()<.08){const pool=PARK_RARE.filter(id=>!S.owned[id]);if(pool.length){rare=pool[Math.floor(Math.random()*pool.length)];S.owned[rare]=1}}
   const got=[];if(ev.c){S.coins+=ev.c;got.push(`金幣 +${ev.c}`)}if(ev.j){p.j=clamp(p.j+ev.j);got.push(`快樂 +${ev.j}`)}if(ev.e){p.e=clamp(p.e+ev.e);got.push(`精神 +${ev.e}`)}
   if(ev.food){S.inv[ev.food]=(S.inv[ev.food]||0)+1;got.push(`${FOODS[ev.food].n} +1`)}
   gainXP(p,4);got.push("經驗 +4");if(Object.keys(pk.done).length===1)addAff(p,3);
   diary(p,"🌳",`去公園的${s.n}：${ev.x}`);if(rare)diary(p,"✨",`在公園撿到稀有的「${IT[rare].n}」！`);stat("walk");
-  setTimeout(()=>{const m=$("parkMsg");if(!m)return;const b=document.querySelector(`[data-sp="${k}"]`);if(b){b.classList.add("done");b.textContent="✓ "+s.n}
-    const left=Object.keys(SPOTS).filter(x=>!pk.done[x]).length;
-    m.innerHTML=`<b>${s.n}</b>：${ev.x}<br>${got.join("・")}${rare?`<br>✨ 撿到稀有的「${IT[rare].n}」！放進衣櫥了`:""}${left?"":"<br>今天的散步完成了！"}`;sfx(rare?"level":"coin")},500);
   checkStickers();save();
+  const icon=rare?"✨":ev.food?FOODS[ev.food].e:ev.c?"🪙":ev.e?"☀️":"💗";
+  parkBusy=true;document.querySelectorAll(".spot").forEach(b=>b.classList.add("wait"));document.querySelector(".park")?.classList.add("busy");const m0=$("parkMsg");if(m0)m0.innerHTML=`${p.name} 跑去${s.n}了…`;
+  try{await spotAnim(k,icon)}catch(e){}
+  parkBusy=false;document.querySelectorAll(".spot").forEach(b=>b.classList.remove("wait"));document.querySelector(".park")?.classList.remove("busy");
+  const m=$("parkMsg");if(!m)return;const b=document.querySelector(`[data-sp="${k}"]`);if(b){b.classList.add("done");b.textContent="✓ "+s.n}
+  const left=Object.keys(SPOTS).filter(x=>!pk.done[x]).length;
+  m.innerHTML=`<b>${s.n}</b>：${ev.x}<br>${got.join("・")}${rare?`<br>✨ 撿到稀有的「${IT[rare].n}」！放進衣櫥了`:""}${left?"":"<br>今天的散步完成了！"}`;sfx(rare?"level":"coin");
 }
 
 /* ---------- QR visit cards (no server: the pet rides in the link) ---------- */
