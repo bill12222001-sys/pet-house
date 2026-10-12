@@ -1497,10 +1497,10 @@ const learned=p=>TRICKS.filter(t=>p.lv>=t.lv);
 let trickBusy=0;
 function doTrick(id){const p=P(),el=$("pet");if(busy||p.sleeping||Date.now()<trickBusy)return;trickBusy=Date.now()+1300;
   const A=(k,o)=>el.animate(k,Object.assign({duration:900,easing:"ease-in-out"},o));
-  ({spin:()=>A([{transform:"rotate(0)"},{transform:"rotate(360deg)"}]),
+  ({spin:()=>A([{transform:"rotateY(0)"},{transform:"rotateY(180deg) translateY(-6px)",offset:.25},{transform:"rotateY(360deg)",offset:.5},{transform:"rotateY(540deg) translateY(-6px)",offset:.75},{transform:"rotateY(720deg)"}],{duration:1100,easing:"linear"}),
     jump:()=>A([{transform:"none"},{transform:"translateY(-70px) scale(1.05)",offset:.45},{transform:"scale(1.1,.9)",offset:.75},{transform:"none"}],{duration:800}),
     wiggle:()=>A([{transform:"rotate(0)"},{transform:"rotate(-14deg)"},{transform:"rotate(14deg)"},{transform:"rotate(-14deg)"},{transform:"rotate(14deg)"},{transform:"rotate(0)"}],{duration:1000}),
-    flip:()=>A([{transform:"none"},{transform:"translateY(-60px) rotate(180deg)",offset:.5},{transform:"translateY(0) rotate(360deg)"}],{duration:900}),
+    flip:()=>A([{transform:"none"},{transform:"scale(1.12,.82)",offset:.15},{transform:"translateY(-95px) rotate(0deg)",offset:.38},{transform:"translateY(-115px) rotate(-180deg)",offset:.55},{transform:"translateY(-60px) rotate(-360deg)",offset:.75},{transform:"translateY(0) scale(1.15,.85) rotate(-360deg)",offset:.88},{transform:"none"}].map(k=>Object.assign(k,{transformOrigin:"50% 55%"})),{duration:1200}),
     hearts:()=>{A([{transform:"scale(1)"},{transform:"scale(1.12)"},{transform:"scale(1)"}],{duration:600});for(let i=0;i<6;i++)setTimeout(()=>sparkle("heart"),i*120)},
     rainbow:()=>{A([{transform:"translate(-50px,0)"},{transform:"translate(0,-80px)",offset:.5},{transform:"translate(50px,0)",offset:.85},{transform:"none"}],{duration:1200});sparkle("rainbow")},
     star:()=>{A([{transform:"rotate(0) scale(1)"},{transform:"rotate(360deg) scale(1.15)",offset:.6},{transform:"none"}],{duration:1200});for(let i=0;i<8;i++)setTimeout(()=>sparkle("star"),i*90)}})[id]();
