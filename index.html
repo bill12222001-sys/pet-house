@@ -1294,8 +1294,17 @@ let photoSolo=false;
 function photoSVG(mem,fr){const p=P(),[wall,floor]=TH_COL[S.theme||"wood"]||TH_COL.wood,W=600,H=760,px=30,py=30,pw=540,ph=420,fy=py+ph*.66;
   const esc=t=>String(t).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"})[c]);
   let g=`<rect x="${px}" y="${py}" width="${pw}" height="${ph}" fill="${wall}"/><rect x="${px}" y="${fy}" width="${pw}" height="${py+ph-fy}" fill="${floor}"/><path d="M${px} ${fy}H${px+pw}" stroke="#2b3445" stroke-width="4"/>`;
-  g+=`<rect x="${px+26}" y="${py+26}" width="104" height="92" rx="12" fill="${S.theme==="starry"?"#141b44":"#fff7d6"}" stroke="#2b3445" stroke-width="4"/><path d="M${px+78} ${py+26}v92M${px+26} ${py+72}h104" stroke="#2b3445" stroke-width="4"/>`;
-  const R=S.room||{},sc=pw/358;
+  const th=S.theme||"wood",sc=pw/358,vs=ph/270,rnd=(a,b)=>a+Math.random()*(b-a);
+  const lines={wood:"#e3a97c",starry:"#4c4288",garden:"#8cc879"}[th];
+  if(lines)for(let x=px+46*sc;x<px+pw;x+=48*sc)g+=`<path d="M${x.toFixed(1)} ${fy}V${py+ph}" stroke="${lines}" stroke-width="3"/>`;
+  if(th==="beach")for(let i=0;i<40;i++)g+=`<circle cx="${rnd(px,px+pw).toFixed(1)}" cy="${rnd(fy+6,py+ph).toFixed(1)}" r="3" fill="#e9c98f"/>`;
+  if(th==="starry")for(let i=0;i<34;i++)g+=`<circle cx="${rnd(px,px+pw).toFixed(1)}" cy="${rnd(py,fy-10).toFixed(1)}" r="${rnd(1.5,3.2).toFixed(1)}" fill="#fff" opacity="${rnd(.5,1).toFixed(2)}"/>`;
+  if(th==="garden")for(let i=0;i<14;i++)g+=`<ellipse cx="${rnd(px,px+pw).toFixed(1)}" cy="${rnd(py,fy).toFixed(1)}" rx="8" ry="5" fill="#ff9db8" transform="rotate(${rnd(0,180).toFixed(0)})" transform-origin="center" style="transform-box:fill-box"/>`;
+  const win={starry:"#141b44",garden:"#d6f5c9"}[th]||"#fff7d6";
+  g+=`<rect x="${px+26}" y="${py+26}" width="104" height="92" rx="12" fill="${win}"/>`+(th==="beach"?`<rect x="${px+26}" y="${py+26+52}" width="104" height="40" fill="#3da7d9"/><rect x="${px+26}" y="${py+26}" width="104" height="52" fill="#bfe8ff"/>`:"")+(th==="starry"?`<circle cx="${px+112}" cy="${py+44}" r="11" fill="#f4f1c6"/>`:`<circle cx="${px+112}" cy="${py+44}" r="11" fill="#f2b51f"/>`);
+  g+=`<rect x="${px+26}" y="${py+26}" width="104" height="92" rx="12" fill="none" stroke="#2b3445" stroke-width="4"/><path d="M${px+78} ${py+26}v92M${px+26} ${py+72}h104" stroke="#2b3445" stroke-width="4"/>`;
+  if(th==="beach")g+=`<path d="M${px+300} ${py+70} q12 -10 24 0 q12 -10 24 0" stroke="#2b3445" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  const R=S.room||{};
   if(R.rug&&IT[R.rug])g+=nest(IT[R.rug].art(),px+pw/2-115*sc*.9,py+ph-60,230*sc*.9,46*sc*.9);
   if(R.top&&IT[R.top])g+=nest(IT[R.top].art(),px+146,py+60,pw-170,86);
   if(R.floorL&&IT[R.floorL])g+=nest(IT[R.floorL].art(),px+10,py+ph-15-104*sc,68*sc,104*sc);
@@ -1303,7 +1312,10 @@ function photoSVG(mem,fr){const p=P(),[wall,floor]=TH_COL[S.theme||"wood"]||TH_C
   const ps=(fr?290:330)*STAGES[stageOf(p.lv)].sc,cx=fr?px+pw*.64:px+pw/2;
   if(fr){const fs=250*STAGES[stageOf(fr.lv)].sc,fx=px+pw*.27;g+=nest(petSVG(fr.sp,"happy",false,fr.wear),fx-fs/2,py+ph-fs-10,fs,fs)+heart(px+pw*.46,py+ph-ps-4,1.3,"#ff4f7b")}
   g+=nest(petSVG(p.sp,"happy",false,p.wear),cx-ps/2,py+ph-ps-6,ps,ps);
-  const stk=(S.wall||[]).slice(0,3).map((id,i)=>{const s=STICKERS.find(x=>x.id===id);return s?`<circle cx="${px+pw-40-i*52}" cy="${py+40}" r="20" fill="#fff" stroke="${s.c}" stroke-width="5"/><text x="${px+pw-40-i*52}" y="${py+48}" text-anchor="middle" font-size="22">${s.e}</text>`:""}).join("");
+  const SPOS=[[8,92],[40,118],[8,146],[-8,92],[-40,118],[-8,146]];
+  let stk=(S.wall||[]).slice(0,6).map((id,i)=>{const s=STICKERS.find(x=>x.id===id);if(!s)return"";const [ox,oy]=SPOS[i],x=ox>=0?px+(ox+15)*sc:px+pw+(ox-15)*sc,y=py+(oy+15)*vs;
+    return`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="22" fill="#fff" stroke="${s.c}" stroke-width="5"/><text x="${x.toFixed(1)}" y="${(y+8).toFixed(1)}" text-anchor="middle" font-size="22">${s.e}</text>`}).join("");
+  if(activeHol().some(i=>i.h.id==="xmas"))for(let i=0;i<40;i++)stk+=`<circle cx="${rnd(px,px+pw).toFixed(1)}" cy="${rnd(py,py+ph).toFixed(1)}" r="${rnd(2.5,5).toFixed(1)}" fill="#fff" stroke="#c9d8f2" stroke-width="1"/>`;
   const title=fr?`${esc(p.name)} 和 ${esc(fr.n)}`:`${esc(p.name)} Lv.${p.lv}・${STAGES[stageOf(p.lv)].n}`,sub=fr?`好朋友來家裡玩・${fmtDate(Date.now())}`:`${esc(SPECIES[p.sp].n)}・一起生活 ${daysWith(p)} 天・${fmtDate(Date.now())}`;
   const memDeco=mem?`<rect x="8" y="8" width="${W-16}" height="${H-16}" rx="14" fill="none" stroke="#f2b51f" stroke-width="10"/>`+[[40,40],[W-40,40],[40,H-40],[W-40,H-40]].map(([x,y])=>heart(x,y-10,1.4,"#ff4f7b")).join("")+`<text x="${W/2}" y="${py+ph+190}" text-anchor="middle" font-family="PingFang TC,Noto Sans TC,Microsoft JhengHei,sans-serif" font-size="26" font-weight="900" fill="#ff4f7b">💞 最好的朋友・親密度 100</text>`:"";
   return`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" rx="18" fill="${mem?"#fff6dc":"#fffdf8"}"/>${memDeco}<rect x="1" y="1" width="${W-2}" height="${H-2}" rx="18" fill="none" stroke="#e6ddd0" stroke-width="2"/><clipPath id="cp"><rect x="${px}" y="${py}" width="${pw}" height="${ph}" rx="10"/></clipPath><g clip-path="url(#cp)">${g}${stk}</g><rect x="${px}" y="${py}" width="${pw}" height="${ph}" rx="10" fill="none" stroke="#2b3445" stroke-width="4"/>
