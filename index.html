@@ -1311,14 +1311,18 @@ function makePhoto(mem){return new Promise((res,rej)=>{const svg=photoSVG(mem),i
   img.onload=()=>{try{const c=document.createElement("canvas");c.width=1200;c.height=1520;const x=c.getContext("2d");x.scale(2,2);x.drawImage(img,0,0);c.toBlob(b=>b?res(b):rej(),"image/png")}catch(e){rej(e)}};
   img.onerror=rej;img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg)})}
 async function openPhoto(mem){const p=P();let url="";const canMem=(p.aff||0)>=100;
-  sheet("寵物拍立得",`<div class="photo"><div id="phBox" class="ph-box">拍照中…</div><p class="hint">手機可以<b>長按照片</b>存到相簿，或按下面的按鈕下載。</p>${canMem?`<div class="seg"><button data-pm="" aria-pressed="${!mem}">一般照片</button><button data-pm="1" aria-pressed="${!!mem}">💞 紀念照</button></div>`:`<p class="hint">親密度到 100 會解鎖金框「紀念照」（目前 ${Math.floor(p.aff||0)}）。</p>`}<div class="btn-row"><button class="btn" id="phSave" disabled>下載照片</button><button class="btn ghost" id="phAgain">再拍一張</button></div></div>`,()=>{
+  sheet("寵物拍立得",`<div class="photo"><div id="phBox" class="ph-box">拍照中…</div><p class="hint">按「存到相簿」後選<b>「儲存影像」</b>就會存進相簿，也可以直接傳到 LINE。或是<b>長按照片</b>選「加入照片」。</p>${canMem?`<div class="seg"><button data-pm="" aria-pressed="${!mem}">一般照片</button><button data-pm="1" aria-pressed="${!!mem}">💞 紀念照</button></div>`:`<p class="hint">親密度到 100 會解鎖金框「紀念照」（目前 ${Math.floor(p.aff||0)}）。</p>`}<div class="btn-row"><button class="btn" id="phSave" disabled>存到相簿／分享</button><button class="btn ghost" id="phAgain">再拍一張</button></div></div>`,()=>{
     document.querySelectorAll("[data-pm]").forEach(b=>b.onclick=()=>openPhoto(!!b.dataset.pm));
     $("phAgain").onclick=()=>{cheer();setTimeout(()=>openPhoto(mem),300)};
     return()=>{if(url)setTimeout(()=>URL.revokeObjectURL(url),1000)}},"photo");
   try{const blob=await makePhoto(mem&&canMem);url=URL.createObjectURL(blob);const box=$("phBox");if(!box)return;
     box.innerHTML=`<img src="${url}" alt="${p.name}的拍立得照片">`;sfx("coin");
     stat("photo");if(st_("photo")===1)diary(p,"📸","第一次拍了拍立得！");checkStickers();save();
-    const b=$("phSave");b.disabled=false;b.onclick=()=>{const a=document.createElement("a");a.href=url;a.download=`${p.name}_拍立得_${fmtDate(Date.now())}.png`;document.body.appendChild(a);a.click();a.remove();toast("照片已下載！")};
+    const name=`${p.name}_拍立得_${fmtDate(Date.now())}.png`,file=new File([blob],name,{type:"image/png"});
+    const dl=()=>{const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();toast("照片已下載！")};
+    const canShare=!!(navigator.canShare&&navigator.share&&(()=>{try{return navigator.canShare({files:[file]})}catch(e){return false}})());
+    const b=$("phSave");b.disabled=false;if(!canShare)b.textContent="下載照片";
+    b.onclick=()=>{if(!canShare)return dl();navigator.share({files:[file],title:`${p.name}的拍立得`}).catch(e=>{if(e&&e.name!=="AbortError")dl()})};
   }catch(e){const box=$("phBox");if(box)box.textContent="這支手機拍不了照片，請截圖代替。"}}
 
 /* ---------- secret codes ---------- */
