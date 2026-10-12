@@ -1408,21 +1408,25 @@ function qrSVG(text){if(typeof qrcode!=="function")return"";const q=qrcode(0,"M"
   for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))d+=`M${c+m} ${r+m}h1v1h-1z`;
   return`<svg viewBox="0 0 ${n+m*2} ${n+m*2}" class="qr" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="#fff"/><path d="${d}" fill="#2b3445"/></svg>`}
 function openVisitCard(){const p=P(),url=visitURL(),qr=qrSVG(url);
-  sheet("邀請朋友來玩",`<div class="vcard"><div class="vhead">${petSVG(p.sp,"happy",false,p.wear)}<div><b>${p.name}</b><small>${SPECIES[p.sp].n}・Lv.${p.lv}${p.trait?"・"+TRAITS[p.trait].n:""}</small></div></div>
+  sheet("邀請朋友・朋友來玩",`<div class="vcard"><div class="vhead">${petSVG(p.sp,"happy",false,p.wear)}<div><b>${p.name}</b><small>${SPECIES[p.sp].n}・Lv.${p.lv}${p.trait?"・"+TRAITS[p.trait].n:""}</small></div></div>
 ${qr||`<p class="hint">這裡產生不了 QR Code，請改用下面的連結。</p>`}
 <p class="hint">請同學用<b>手機相機</b>掃描，${p.name} 就會跑去同學的小屋作客！也可以複製連結用 LINE 傳。卡片裡只有寵物的名字和外觀，沒有你的個人資料。</p>
-<button class="btn" id="vCopy">複製邀請連結</button></div>`,()=>{
-    $("vCopy").onclick=()=>{try{navigator.clipboard.writeText(url).then(()=>toast("連結已複製！"),()=>toast(url))}catch(e){toast(url)}}},"visit");
+<button class="btn" id="vCopy">複製邀請連結</button></div>
+<div class="sec"><h3>收到朋友的邀請連結？</h3><p class="hint">在 LINE 收到同學的連結時，<b>長按連結選「拷貝」</b>，再貼到下面，同學的寵物就會來你的小屋，不會跑到別的瀏覽器。</p>
+<textarea id="vIn" rows="2" placeholder="把邀請連結貼在這裡"></textarea><button class="btn ghost" id="vGo">讓朋友的寵物進來</button><p class="hint" id="vMsg" aria-live="polite"></p></div>`,()=>{
+    $("vCopy").onclick=()=>{try{navigator.clipboard.writeText(url).then(()=>toast("連結已複製！"),()=>toast(url))}catch(e){toast(url)}};
+    $("vGo").onclick=()=>{const t=$("vIn").value.trim(),m=t.match(/#?v=([\w-]+)/)||t.match(/^([\w-]{20,})$/);
+      if(!m||!acceptVisit(m[1],false)){$("vMsg").innerHTML=`<span class="warn">看不懂這個連結，請確認有完整貼上（裡面有「#v=」）。</span>`;return}}},"visit");
 }
 let visitor=null;
 function readVisit(){const m=location.hash.match(/^#v=([\w-]+)/);if(!m)return;
-  const v=b64u.dec(m[1]);try{history.replaceState(null,"",location.pathname)}catch(e){}
-  if(!v||!SPECIES[v.sp]||typeof v.n!=="string")return;
+  try{history.replaceState(null,"",location.pathname)}catch(e){}acceptVisit(m[1],true)}
+function acceptVisit(code,fromLink){const v=b64u.dec(code);
+  if(!v||!SPECIES[v.sp]||typeof v.n!=="string")return false;
   v.n=v.n.slice(0,8);v.lv=Math.max(1,Math.min(99,+v.lv||1));v.wear={head:IT[v.h]&&IT[v.h].cat==="head"?v.h:null,neck:IT[v.k]&&IT[v.k].cat==="neck"?v.k:null};
-  if(S.pets.some(p=>Math.round(p.id%1e9)===v.id))return toast("這是你自己的寵物的邀請卡喔！");
+  if(S.pets.some(p=>Math.round(p.id%1e9)===v.id)){toast("這是你自己的寵物的邀請卡喔！");return true}
   visitor=v;renderVisitor();
-  setTimeout(()=>{if(openSheet)return;sheet("有客人來了！",`<div class="result"><div class="pv big">${petSVG(v.sp,"happy",false,v.wear)}</div><b>朋友的 ${v.n} 來拜訪了！</b><p class="hint">${SPECIES[v.sp].n}・Lv.${v.lv}${TRAITS[v.t]?"・"+TRAITS[v.t].n:""}。點小屋裡的牠打個招呼吧！</p></div><button class="btn" id="vOk">歡迎歡迎！</button>`,c=>{$("vOk").onclick=c},"visitor")},700);
-}
+  setTimeout(()=>{if(fromLink&&openSheet)return;sheet("有客人來了！",`<div class="result"><div class="pv big">${petSVG(v.sp,"happy",false,v.wear)}</div><b>朋友的 ${v.n} 來拜訪了！</b><p class="hint">${SPECIES[v.sp].n}・Lv.${v.lv}${TRAITS[v.t]?"・"+TRAITS[v.t].n:""}。點小屋裡的牠打個招呼吧！</p></div><button class="btn" id="vOk">歡迎歡迎！</button>`,c=>{$("vOk").onclick=c},"visitor")},fromLink?700:50);return true}
 function renderVisitor(){const st=$("stage");let el=st.querySelector(".visitor");if(!visitor){if(el)el.remove();return}
   if(!el){el=document.createElement("button");el.className="visitor";el.setAttribute("aria-label","客人");st.appendChild(el);el.onclick=greetVisitor}
   el.innerHTML=petSVG(visitor.sp,"happy",false,visitor.wear)+`<span class="vtag">${visitor.n}</span>`}
