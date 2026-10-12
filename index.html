@@ -338,6 +338,29 @@ input[type=text]{font:inherit;border:2px solid var(--ink);border-radius:12px;pad
 .r-judge.pop{animation:jpop .7s ease-out forwards}
 @keyframes jpop{0%{opacity:1;transform:translateX(-50%) scale(1.3)}100%{opacity:0;transform:translateX(-50%) translateY(-14px) scale(1)}}
 .r-hit{position:absolute;inset:0;border:0;background:transparent;z-index:5;cursor:pointer}
+.act-btn{position:absolute;z-index:3;border:2px solid var(--ink);background:#fff;border-radius:999px;padding:2px 9px;font:inherit;font-size:12px;font-weight:900;color:var(--ink);cursor:pointer;box-shadow:0 2px 0 var(--ink);white-space:nowrap}
+.act-btn:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.ab-floorL{left:4px;bottom:118px}.ab-floorR{right:4px;bottom:132px}.ab-rug{left:50%;bottom:2px;transform:translateX(-50%)}
+.rbub{position:absolute;bottom:60px;border-radius:50%;border:2px solid rgba(43,52,69,.45);background:radial-gradient(circle at 30% 30%,#fff 0 18%,rgba(173,222,255,.55) 20% 100%);padding:0;cursor:pointer;z-index:4;animation:rbub linear forwards}
+@keyframes rbub{to{transform:translate(var(--dx),-200px)}}
+.rbub.popd{animation:none;transform:scale(1.5);opacity:0;transition:transform .15s,opacity .15s}
+.piano-bar{position:absolute;z-index:6;left:6px;right:6px;bottom:6px;background:rgba(255,255,255,.95);border:2px solid var(--ink);border-radius:14px;padding:6px;display:flex;flex-direction:column;gap:6px}
+.keys{display:grid;grid-template-columns:repeat(8,1fr);gap:3px}
+.pkey{height:54px;border:2px solid var(--ink);border-radius:0 0 8px 8px;background:hsl(var(--h) 85% 92%);font:inherit;font-size:11px;font-weight:900;color:var(--ink);padding:0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;cursor:pointer;touch-action:manipulation}
+.pkey.on{background:hsl(var(--h) 80% 70%);transform:translateY(2px)}
+.prow{display:flex;gap:6px;justify-content:center}.prow .btn{font-size:13px;padding:4px 12px}
+.tv-show{position:absolute;z-index:1;left:15px;bottom:47px;width:42px;height:38px;border-radius:5px;overflow:hidden;background:#7cc6ee}
+.tv-show i{position:absolute;width:14px;height:14px;border-radius:50%;animation:tvmove 2s ease-in-out infinite alternate}
+.tv-show i:nth-child(1){background:#ff8fb1;left:2px;top:4px}.tv-show i:nth-child(2){background:#ffd35c;left:20px;top:18px;animation-delay:-.7s}.tv-show i:nth-child(3){background:#6fcf86;left:10px;top:22px;animation-delay:-1.3s}
+@keyframes tvmove{to{transform:translate(14px,-10px)}}
+.oven-glow{position:absolute;z-index:1;right:31px;bottom:42px;width:32px;height:28px;border-radius:3px;background:radial-gradient(circle,#ffe36e,#ff8a1f);display:grid;place-items:center;animation:tw 1s ease-in-out infinite}
+.oven-glow b{font-family:var(--f-num);color:#5a3a24;font-size:14px}
+.wall-art{position:absolute;z-index:0;left:100px;top:40px;width:56px;height:44px;border:3px solid #c98d4a;outline:2px solid var(--ink);border-radius:3px;overflow:hidden;background:#fff}
+.wall-art svg{width:100%;height:100%;display:block}
+.art-frame{width:220px;max-width:100%;border:8px solid #c98d4a;outline:3px solid var(--ink);border-radius:4px;background:#fff}.art-frame svg{display:block;width:100%;height:auto}
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.gthumb{border:3px solid #c98d4a;border-radius:4px;padding:0;background:#fff;cursor:pointer;aspect-ratio:5/4;overflow:hidden}.gthumb svg{width:100%;height:100%;display:block}
+.gthumb.on{outline:3px solid var(--gold);outline-offset:1px}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}.bub{animation-duration:4s!important}}
 </style>
 
@@ -397,7 +420,8 @@ const FOODS={
   fruit:{n:"水果盤",e:"🍓",price:4,h:14,j:10,xp:5,d:"酸酸甜甜心情好"},
   chicken:{n:"雞腿排",e:"🍗",price:8,h:30,j:12,xp:10,d:"外皮酥脆、多汁的雞腿排"},
   iberico:{n:"伊比利豬",e:"🥓",price:15,h:40,j:18,xp:16,d:"西班牙橡果豬，油花香甜"},
-  wagyu:{n:"A5 和牛",e:"🥩",price:30,h:50,j:35,xp:30,d:"最高等級和牛，入口即化",lux:1}
+  wagyu:{n:"A5 和牛",e:"🥩",price:30,h:50,j:35,xp:30,d:"最高等級和牛，入口即化",lux:1},
+  cookie:{n:"手工餅乾",e:"🍪",price:0,h:12,j:14,xp:6,d:"小烤箱烤出來的",noShop:1}
 };
 const KEY="pocketpet-v1";
 const clamp=v=>Math.max(0,Math.min(100,v));
@@ -601,7 +625,19 @@ const IT={
   t_duck:{n:"黃色小鴨",cat:"toy",price:12,bonus:2,svg:`<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M6 24 q0 12 14 12 h6 q10 0 10 -10 q-4 3 -8 2 q-2 -6 -10 -6 q-8 0 -12 2 z" fill="#ffd35c" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/><circle cx="16" cy="15" r="8" fill="#ffd35c" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/><path d="M6 14 l-5 2 l5 2 z" fill="#ff8a1f" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/><circle cx="13" cy="13" r="1.8" fill="${INK}"/><path d="M14 27 q5 3 10 0" stroke="#f2b51f" stroke-width="2" fill="none"/></svg>`},
 
 
+
+  /* --- interactive room toys (tap the label in the room) --- */
+  d_bubbler:{n:"泡泡機",cat:"deco",slot:"floorL",price:60,act:"bubbles",al:"吹泡泡",art:()=>svgBox(FL,`<rect x="10" y="60" width="48" height="40" rx="8" fill="#ff9db8" ${O}/><circle cx="34" cy="80" r="11" fill="#fff" ${O3}/><path d="M34 80 l6 -6 M34 80 l-6 6 M34 80 l6 6 M34 80 l-6 -6" stroke="#ff7a59" stroke-width="2.5"/><path d="M34 60 V40" stroke="${INK}" stroke-width="3"/><circle cx="34" cy="32" r="9" fill="#e3f5ff" ${O3}/><circle cx="18" cy="20" r="6" fill="#e3f5ff" ${O3} class="twinkle"/><circle cx="52" cy="14" r="5" fill="#e3f5ff" ${O3} class="twinkle" style="animation-delay:.6s"/>`)},
+  d_piano:{n:"小鋼琴",cat:"deco",slot:"floorR",price:120,act:"piano",al:"彈鋼琴",art:()=>svgBox(FR,`<rect x="6" y="34" width="60" height="70" rx="6" fill="#3a2f5b" ${O}/><rect x="6" y="62" width="60" height="16" fill="#fff" ${O3}/><g stroke="${INK}" stroke-width="1.5">${[0,1,2,3,4,5,6].map(i=>`<path d="M${14.5+i*7.5} 62 V78"/>`).join("")}</g><g fill="${INK}">${[0,1,3,4,5].map(i=>`<rect x="${12+i*7.5}" y="62" width="4.5" height="9"/>`).join("")}</g><rect x="10" y="104" width="6" height="12" fill="#3a2f5b" ${O3}/><rect x="56" y="104" width="6" height="12" fill="#3a2f5b" ${O3}/><path d="M22 20 q6 -10 12 0 v10" stroke="#ffd35c" stroke-width="3" fill="none" class="twinkle"/><circle cx="20" cy="30" r="4" fill="#ffd35c" class="twinkle"/>`)},
+  d_tv:{n:"小電視",cat:"deco",slot:"floorL",price:150,act:"tv",al:"看卡通",art:()=>svgBox(FL,`<path d="M22 22 l-10 -16 M46 22 l10 -16" stroke="${INK}" stroke-width="3" stroke-linecap="round"/><rect x="2" y="22" width="64" height="52" rx="10" fill="#ffb02e" ${O}/><rect x="9" y="29" width="42" height="38" rx="6" fill="#7cc6ee" ${O3}/><circle cx="58" cy="38" r="3.5" fill="${INK}"/><circle cx="58" cy="52" r="3.5" fill="${INK}"/><path d="M16 104 L24 74 M52 104 L44 74" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`)},
+  d_tramp:{n:"跳跳床",cat:"deco",slot:"rug",price:90,act:"tramp",al:"跳跳床",art:()=>svgBox("0 0 230 46",`<path d="M30 30 L22 46 M200 30 L208 46 M115 32 V46" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><ellipse cx="115" cy="22" rx="108" ry="18" fill="#3d9bd6" ${O}/><ellipse cx="115" cy="21" rx="88" ry="12" fill="#2b3445"/><ellipse cx="115" cy="20" rx="84" ry="10" fill="#4b6fa8"/>`)},
+  d_oven:{n:"小烤箱",cat:"deco",slot:"floorR",price:100,act:"oven",al:"烤餅乾",art:()=>svgBox(FR,`<rect x="4" y="44" width="64" height="58" rx="8" fill="#f2f4f7" ${O}/><rect x="11" y="54" width="40" height="36" rx="5" fill="#5a3a24" ${O3}/><rect x="15" y="58" width="32" height="28" rx="3" fill="#ffb02e" opacity=".55" class="glow"/><circle cx="59" cy="60" r="4" fill="#e5484d" ${O3}/><circle cx="59" cy="76" r="4" fill="#ffd35c" ${O3}/><rect x="10" y="102" width="8" height="14" fill="#c9d3da" ${O3}/><rect x="54" y="102" width="8" height="14" fill="#c9d3da" ${O3}/>`)},
+  d_easel:{n:"畫架",cat:"deco",slot:"floorL",price:80,act:"paint",al:"畫畫",art:()=>svgBox(FL,`<path d="M34 10 L10 104 M34 10 L58 104 M34 30 V104" stroke="#a0662f" stroke-width="5" stroke-linecap="round"/><rect x="8" y="22" width="52" height="44" rx="3" fill="#fff" ${O}/><circle cx="24" cy="38" r="7" fill="#ff8fb1"/><path d="M14 56 q14 -14 24 -2 q8 -8 16 2" stroke="#4fae63" stroke-width="4" fill="none"/><circle cx="46" cy="34" r="5" fill="#ffd35c"/><path d="M6 70 h56" stroke="#a0662f" stroke-width="5" stroke-linecap="round"/>`)},
+  /* --- party outfits --- */
+  h_shades:{n:"派對墨鏡",cat:"head",price:15,art:()=>`<g ${O3}><path d="M66 112 h68" stroke-width="3"/><rect x="68" y="108" width="28" height="18" rx="7" fill="#2b3445"/><rect x="104" y="108" width="28" height="18" rx="7" fill="#2b3445"/></g><path d="M73 112 l8 0 M109 112 l8 0" stroke="#ff8fb1" stroke-width="3" stroke-linecap="round"/>${star(64,100,6,"#ffd35c")}${star(138,100,6,"#7cc6ee","animation-delay:.5s")}`},
+  t_glow:{n:"螢光棒",cat:"toy",price:10,bonus:2,svg:`<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><rect x="16" y="3" width="8" height="34" rx="4" fill="#7cf0a5" stroke="${INK}" stroke-width="2.5" transform="rotate(30 20 20)"/><rect x="18" y="6" width="3" height="20" rx="1.5" fill="#fff" opacity=".8" transform="rotate(30 20 20)"/></svg>`},
   /* --- surprise gift machine only --- */
+  n_sequin:{n:"亮片領結",cat:"neck",gift:1,art:()=>`<path d="M100 156 L82 145 L82 167 z M100 156 L118 145 L118 167 z" fill="#b9a6e8" ${O3}/><circle cx="100" cy="156" r="5" fill="#ffd35c" ${O3}/><g fill="#fff">${[[88,151],[90,161],[112,151],[110,161],[86,156],[114,156]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="1.6"/>`).join("")}</g>`},
   h_unicorn:{n:"獨角獸角",cat:"head",gift:1,art:hy=>`<path d="M92 ${hy+4} L100 ${hy-40} L108 ${hy+4} z" fill="#fff4b8" ${O}/><path d="M94 ${hy-6} l13 -5 M96 ${hy-18} l10 -4 M98 ${hy-29} l7 -3" stroke="#f2b51f" stroke-width="3"/><ellipse cx="86" cy="${hy+4}" rx="7" ry="4" fill="#ff9db8" ${O3}/><ellipse cx="114" cy="${hy+4}" rx="7" ry="4" fill="#b9a6e8" ${O3}/>`},
   h_sunflower:{n:"向日葵髮夾",cat:"head",gift:1,art:hy=>{let s="";for(let i=0;i<10;i++){const a=i*36*Math.PI/180;s+=`<ellipse cx="${(126+11*Math.cos(a)).toFixed(1)}" cy="${(hy-4+11*Math.sin(a)).toFixed(1)}" rx="6" ry="3.6" fill="#ffd35c" ${O3} transform="rotate(${i*36} ${(126+11*Math.cos(a)).toFixed(1)} ${(hy-4+11*Math.sin(a)).toFixed(1)})"/>`}return s+`<circle cx="126" cy="${hy-4}" r="7.5" fill="#a0662f" ${O3}/>`}},
   h_beret:{n:"小畫家帽",cat:"head",gift:1,art:hy=>`<path d="M70 ${hy+4} q-4 -24 34 -26 q36 2 26 22 q-30 10 -60 4 z" fill="#e5484d" ${O}/><path d="M102 ${hy-22} q2 -8 6 -9" stroke="${INK}" stroke-width="4" fill="none" stroke-linecap="round"/><g ${O3}><circle cx="86" cy="${hy-6}" r="3.5" fill="#ffd35c"/><circle cx="100" cy="${hy-12}" r="3.5" fill="#7cc6ee"/><circle cx="114" cy="${hy-6}" r="3.5" fill="#4fae63"/></g>`},
@@ -774,7 +810,7 @@ function render(){
   $("pName").textContent=p.name;$("pSpecies").textContent=SPECIES[p.sp].n+"・"+STAGES[si].n+(traitLabel(p)?"・"+traitLabel(p):"");
   const af=Math.floor(p.aff||0),ab=$("affBar");if(ab.dataset.v!==String(af)){ab.dataset.v=af;ab.style.width=af+"%";$("affNum").textContent=af+"/100"}$("pLv").textContent="Lv."+p.lv;
   const pw=$("petWrap");if(pw.dataset.st!==String(si)){pw.dataset.st=si;pw.style.setProperty("--sc",STAGES[si].sc)}
-  renderQuick();renderTheme();renderTricks();renderWall();renderDisco();renderTut();
+  renderQuick();renderTheme();renderTricks();renderWall();renderDisco();renderActs();renderPainting();renderTut();
   const mn=mealNow();const mb=$("mealBadge");
   mb.classList.toggle("on",!!mn&&!p.meals[mn]);
   mb.textContent=mn?(p.meals[mn]?`${MEAL[mn]}吃過了 ✓`:`現在是${MEAL[mn]}時間！`):`下一餐：${nextMeal()}`;
@@ -892,7 +928,7 @@ function openCloset(tab){
 }
 function openShop(tab){
   tab=tab||"food";if(tab==="gift"){openGift();return}const tabs={food:"美食",...CATS,theme:"房間主題",gift:"🎁 禮物機"};let body;
-  if(tab==="food")body=Object.entries(FOODS).filter(([k])=>k!=="rice").map(([k,f])=>`<div class="item${f.lux?" lux":""}"><span class="emo">${f.e}</span><span class="t">${f.n}</span><span class="d">${f.d}</span><div class="row"><span class="price"><span class="coin">$</span>${f.price}</span><button data-b="${k}" ${S.coins<f.price?"disabled":""}>買</button></div><span class="own">背包裡有 ${S.inv[k]||0} 個</span></div>`).join("");
+  if(tab==="food")body=Object.entries(FOODS).filter(([k,f])=>k!=="rice"&&!f.noShop).map(([k,f])=>`<div class="item${f.lux?" lux":""}"><span class="emo">${f.e}</span><span class="t">${f.n}</span><span class="d">${f.d}</span><div class="row"><span class="price"><span class="coin">$</span>${f.price}</span><button data-b="${k}" ${S.coins<f.price?"disabled":""}>買</button></div><span class="own">背包裡有 ${S.inv[k]||0} 個</span></div>`).join("");
   else if(tab==="theme")body=Object.entries(THEMES).filter(([k])=>k!=="wood").map(([k,t])=>{const has=S.themes[k];return`<div class="item lux">${themeSwatch(k)}<span class="t">${t.n}</span><span class="d">${t.d}</span><div class="row"><span class="price"><span class="coin">$</span>${t.price}</span><button data-th="${k}" ${has||S.coins<t.price?"disabled":""}>${has?"已擁有":"買"}</button></div></div>`}).join("");
   else body=Object.entries(IT).filter(([k,it])=>it.cat===tab&&!it.hol&&!it.gift&&!it.code&&!it.trait&&!it.park).map(([k,it])=>{const has=S.owned[k];return`<div class="item${it.lux?" lux":""}"><div class="pv">${pv(k)}</div><span class="t">${it.n}</span><div class="row"><span class="price"><span class="coin">$</span>${it.price}</span><button data-a="${k}" ${has||S.coins<it.price?"disabled":""}>${has?"已擁有":"買"}</button></div></div>`}).join("");
   sheet("商店",`${segHTML(tabs,tab)}<p class="hint">你有 <b>${S.coins}</b> 金幣。寵物每升 1 級就送 10 金幣。${tab==="theme"?"買了之後到衣櫥的「主題」切換。":tab!=="food"?"節慶限定款不賣，要在節日時免費領；還有些東西只有禮物機轉得到。":""}</p><div class="items">${body}</div>`,()=>{
@@ -1299,8 +1335,10 @@ function openDiary(filter){S.dnew=0;quickKey="";const list=(S.diary||[]).filter(
       :`<div class="dent"><span class="de">${e.e}</span><p>${p?`<b>${p.name}</b> `:""}${e.x}</p></div>`});
   const chips=`<div class="seg"><button data-df="" aria-pressed="${!filter}">全部</button>${S.pets.map(p=>`<button data-df="${p.id}" aria-pressed="${filter===p.id}">${p.name}</button>`).join("")}</div>`;
   const head=S.pets.map(p=>`<span class="dlife">${p.name}：一起生活 <b>${daysWith(p)}</b> 天</span>`).join("");
-  sheet("寵物日記",`<div class="dlives">${head}</div>${chips}${list.length?`<div class="dlist">${html}</div>`:`<p class="hint">還沒有日記。照顧寵物、升級、過節，都會自動寫進來喔！</p>`}`,()=>{
-    document.querySelectorAll("[data-df]").forEach(b=>b.onclick=()=>openDiary(b.dataset.df?+b.dataset.df:null))},"diary");
+  const gal=(S.gallery||[]).slice().reverse();const galH=gal.length?`<h3 class="dday">🎨 畫冊（點一幅畫可以掛到牆上）</h3><div class="gallery">${gal.map(g=>`<button class="gthumb${S.painting===g.seed?" on":""}" data-gs="${g.seed}">${paintingSVG(g.seed)}</button>`).join("")}</div>`:"";
+  sheet("寵物日記",`<div class="dlives">${head}</div>${galH}${chips}${list.length?`<div class="dlist">${html}</div>`:`<p class="hint">還沒有日記。照顧寵物、升級、過節，都會自動寫進來喔！</p>`}`,()=>{
+    document.querySelectorAll("[data-df]").forEach(b=>b.onclick=()=>openDiary(b.dataset.df?+b.dataset.df:null));
+    document.querySelectorAll("[data-gs]").forEach(b=>b.onclick=()=>{const v=+b.dataset.gs;S.painting=S.painting===v?null:v;paintKey="";save();render();openDiary(filter);toast(S.painting?"掛到牆上了！":"從牆上拿下來了")})},"diary");
 }
 
 /* ---------- stickers (achievements) ---------- */
@@ -1329,7 +1367,10 @@ const STICKERS=[
   {id:"walk",e:"🌳",n:"公園探險家",d:"在公園探索 20 次",c:"#3f9a52",ok:()=>st_("walk")>=20},
   {id:"friend",e:"🤝",n:"交朋友",d:"朋友的寵物來家裡玩",c:"#3d9bd6",ok:()=>st_("visit")>=1},
   {id:"party",e:"🪩",n:"派對動物",d:"在家裡開 10 次派對",c:"#9a6fd6",ok:()=>st_("party")>=10},
-  {id:"rhythm",e:"🎵",n:"節奏大師",d:"派對節奏拿到 30 分",c:"#ff4f7b",ok:()=>best("rhythm")>=30}];
+  {id:"rhythm",e:"🎵",n:"節奏大師",d:"派對節奏拿到 30 分",c:"#ff4f7b",ok:()=>best("rhythm")>=30},
+  {id:"musician",e:"🎹",n:"小音樂家",d:"用小鋼琴彈 50 個音",c:"#3a2f5b",ok:()=>st_("piano")>=50},
+  {id:"baker",e:"🍪",n:"小廚師",d:"用小烤箱烤 5 次餅乾",c:"#c98d4a",ok:()=>st_("bake")>=5},
+  {id:"artist",e:"🎨",n:"小畫家",d:"在畫架上畫 5 幅畫",c:"#ff7a59",ok:()=>st_("paint")>=5}];
 let stkT=0;
 function checkStickers(){S.stickers=S.stickers||{};const got=STICKERS.filter(s=>!S.stickers[s.id]&&s.ok());
   got.forEach(s=>{S.stickers[s.id]=Date.now();diary(P(),"🏅",`得到貼紙「${s.n}」！`);
@@ -1364,6 +1405,7 @@ function photoSVG(mem,fr){const p=P(),[wall,floor]=TH_COL[S.theme||"wood"]||TH_C
   g+=`<rect x="${px+26}" y="${py+26}" width="104" height="92" rx="12" fill="${win}"/>`+(th==="beach"?`<rect x="${px+26}" y="${py+26+52}" width="104" height="40" fill="#3da7d9"/><rect x="${px+26}" y="${py+26}" width="104" height="52" fill="#bfe8ff"/>`:"")+(th==="starry"?`<circle cx="${px+112}" cy="${py+44}" r="11" fill="#f4f1c6"/>`:`<circle cx="${px+112}" cy="${py+44}" r="11" fill="#f2b51f"/>`);
   g+=`<rect x="${px+26}" y="${py+26}" width="104" height="92" rx="12" fill="none" stroke="#2b3445" stroke-width="4"/><path d="M${px+78} ${py+26}v92M${px+26} ${py+72}h104" stroke="#2b3445" stroke-width="4"/>`;
   if(th==="beach")g+=`<path d="M${px+300} ${py+70} q12 -10 24 0 q12 -10 24 0" stroke="#2b3445" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  if(S.painting)g+=`<rect x="${px+100*sc-3}" y="${py+40*vs-3}" width="${56*sc+6}" height="${44*sc+6}" rx="4" fill="#c98d4a" stroke="#2b3445" stroke-width="3"/>`+nest(paintingSVG(S.painting),px+100*sc,py+40*vs,56*sc,44*sc);
   const R=S.room||{};
   if(R.rug&&IT[R.rug])g+=nest(IT[R.rug].art(),px+pw/2-115*sc*.9,py+ph-60,230*sc*.9,46*sc*.9);
   if(R.top&&IT[R.top])g+=nest(IT[R.top].art(),px+146,py+60,pw-170,86);
@@ -1538,6 +1580,62 @@ function renderDisco(){const on=S.room&&S.room.top==="d_disco",k=String(on);if(k
   if(!on){if(b)b.remove();if(partyOn)stopParty(true);return}
   if(!b){b=document.createElement("button");b.className="disco-btn";b.setAttribute("aria-label","開派對");b.innerHTML=`<span>點我開派對</span>`;b.onclick=startParty;st.appendChild(b)}
 }
+
+/* ---------- interactive room toys ---------- */
+const actCd={};let actKey="";
+function renderActs(){const R=S.room||{},list=["floorL","floorR","rug"].filter(sl=>R[sl]&&IT[R[sl]]&&IT[R[sl]].act).map(sl=>sl+":"+R[sl]),k=list.join();if(k===actKey)return;actKey=k;
+  const st=$("stage");st.querySelectorAll(".act-btn").forEach(e=>e.remove());
+  list.forEach(x=>{const [sl,id]=x.split(":"),b=document.createElement("button");b.className="act-btn ab-"+sl;b.textContent="▶ "+IT[id].al;b.onclick=()=>useAct(id);st.appendChild(b)})}
+function useAct(id){const p=P(),it=IT[id];if(busy||partyOn)return;if(p.sleeping){toast("牠在睡覺，醒來再玩吧");return}
+  if(Date.now()<(actCd[id]||0)){toast(`${it.n}休息一下，等等再玩`);return}
+  ({bubbles:actBubbles,piano:actPiano,tv:actTV,tramp:actTramp,oven:actOven,paint:actPaint})[it.act](p,id);
+  stat("act_"+it.act);firstTime(p,"act_"+it.act,"✨",`第一次玩了${it.n}！`);checkStickers();save()}
+function petWalkTo(xPct){const pw=$("petWrap");pw.style.transition="left .7s ease-in-out";pw.style.left=xPct+"%";setTimeout(()=>{pw.style.left="";setTimeout(()=>pw.style.transition="",800)},2600)}
+function actBubbles(p,id){actCd[id]=Date.now()+6000;const st=$("stage");let popped=0;
+  for(let i=0;i<12;i++)setTimeout(()=>{const b=document.createElement("button");b.className="rbub";b.setAttribute("aria-label","泡泡");const s=18+Math.random()*20;
+    b.style.cssText=`left:${8+Math.random()*30}%;width:${s}px;height:${s}px;animation-duration:${3+Math.random()*2}s;--dx:${(60+Math.random()*160).toFixed(0)}px`;
+    b.addEventListener("pointerdown",e=>{e.preventDefault();if(b._p)return;b._p=1;popped++;b.classList.add("popd");sfx("pop");p.j=clamp(p.j+1);setTimeout(()=>b.remove(),160)});
+    b.addEventListener("animationend",()=>b.remove());st.appendChild(b)},i*160);
+  petWalkTo(35);setTimeout(()=>petWalkTo(62),1300);p.j=clamp(p.j+4);addAff(p,.5);floatTxt("🫧 追泡泡！");cheer()}
+const NOTES_P=["C5","D5","E5","F5","G5","A5","B5","C6"],SONG="C5 C5 G5 G5 A5 A5 G5 - F5 F5 E5 E5 D5 D5 C5 -".split(" ");
+function actPiano(p,id){busy=true;const st=$("stage"),bar=document.createElement("div");bar.className="piano-bar";
+  bar.innerHTML=`<div class="keys">${NOTES_P.map((n,i)=>`<button class="pkey" data-n="${n}" style="--h:${i*40}">${"Do Re Mi Fa So La Si Do".split(" ")[i]}</button>`).join("")}</div><div class="prow"><button class="btn" id="pSong">彈「小星星」</button><button class="btn ghost" id="pClose">好了</button></div>`;
+  st.appendChild(bar);audioInit();let notes=0,songT=[];
+  const play=n=>{if(actx){tone(hz(n),actx.currentTime+.01,.5,"triangle",.22,master,1)}floatTxt("♪");notes++;stat("piano");
+    $("pet").animate([{transform:"translateY(0) rotate(0)"},{transform:"translateY(-10px) rotate(-6deg)"},{transform:"translateY(0) rotate(0)"}],{duration:300})};
+  bar.querySelectorAll(".pkey").forEach(k=>k.addEventListener("pointerdown",e=>{e.preventDefault();play(k.dataset.n);k.classList.add("on");setTimeout(()=>k.classList.remove("on"),180)}));
+  $("pSong").onclick=()=>{songT.forEach(clearTimeout);songT=SONG.map((n,i)=>setTimeout(()=>{if(n==="-")return;play(n);const k=bar.querySelector(`[data-n="${n}"]`);if(k){k.classList.add("on");setTimeout(()=>k.classList.remove("on"),250)}},i*480));
+    setTimeout(()=>petSay(`${p.name}：一閃一閃亮晶晶～ 🎵`),SONG.length*480+200)};
+  $("pClose").onclick=()=>{songT.forEach(clearTimeout);bar.remove();busy=false;if(notes>=5){p.j=clamp(p.j+6);addAff(p,1)}cheer();save();render()};
+}
+function actTV(p,id){actCd[id]=Date.now()+30*60*1000;busy=true;const st=$("stage"),scr=document.createElement("div");scr.className="tv-show";scr.innerHTML=`<i></i><i></i><i></i>`;st.appendChild(scr);
+  petSay(`${p.name}：卡通好好看～`);let t=0;const iv=setInterval(()=>{t++;p.e=clamp(p.e+1);if(t===8){clearInterval(iv);scr.remove();busy=false;p.j=clamp(p.j+5);addAff(p,.5);toast(`${p.name} 看完卡通，精神好多了！`);cheer();save()}},1000);
+  toast("看一小段卡通，休息一下（每 30 分鐘一次）")}
+function actTramp(p,id){actCd[id]=Date.now()+4000;const el=$("pet");
+  el.animate([{transform:"none"},{transform:"translateY(-40px)",offset:.15},{transform:"none",offset:.3},{transform:"translateY(-70px)",offset:.48},{transform:"none",offset:.62},{transform:"translateY(-110px) rotate(360deg)",offset:.85},{transform:"none"}],{duration:2200,easing:"ease-in-out"});
+  for(let i=0;i<6;i++)setTimeout(()=>sparkle("star"),1300+i*80);p.j=clamp(p.j+4);p.e=clamp(p.e-2);addAff(p,.5);floatTxt("🤸 彈彈彈！");sfx("pop");setTimeout(()=>sfx("level"),1800)}
+const OVEN_PRICE=3,OVEN_DAY=3;
+function actOven(p,id){const d=daily();d.bake=d.bake||0;if(d.bake>=OVEN_DAY){toast(`今天已經烤了 ${OVEN_DAY} 次，明天再烤吧！`);return}
+  if(S.coins<OVEN_PRICE){toast(`烤餅乾要 ${OVEN_PRICE} 金幣材料費`);return}
+  S.coins-=OVEN_PRICE;d.bake++;busy=true;actCd[id]=Date.now()+1000;const st=$("stage"),glow=document.createElement("div");glow.className="oven-glow";glow.innerHTML=`<b>10</b>`;st.appendChild(glow);
+  petSay(`${p.name}：好香喔～`);let t=10;const iv=setInterval(()=>{t--;glow.querySelector("b").textContent=t;if(t<=0){clearInterval(iv);glow.remove();busy=false;
+    S.inv.cookie=(S.inv.cookie||0)+2;stat("bake");sfx("level");toast("🍪 烤好了！得到 2 片手工餅乾（在餵食裡）","levelup");cheer();save();render()}},1000);render()}
+function paintingSVG(seed){let x=seed||1;const R=()=>(x=(x*16807)%2147483647)/2147483647;const C=["#ff7a59","#ffd35c","#4fae63","#6cb8f0","#b9a6e8","#ff8fb1","#3d9bd6"];
+  let s=`<rect width="100" height="80" fill="${["#fff8e7","#eef6f9","#fdf0f5"][Math.floor(R()*3)]}"/>`;
+  for(let i=0;i<6;i++){const c=C[Math.floor(R()*C.length)],k=Math.floor(R()*3);
+    if(k===0)s+=`<circle cx="${(R()*100).toFixed(0)}" cy="${(R()*80).toFixed(0)}" r="${(6+R()*16).toFixed(0)}" fill="${c}" opacity=".85"/>`;
+    else if(k===1)s+=`<path d="M${(R()*30).toFixed(0)} ${(20+R()*50).toFixed(0)} q${(20+R()*30).toFixed(0)} ${(-30+R()*60).toFixed(0)} ${(50+R()*40).toFixed(0)} ${(-20+R()*40).toFixed(0)}" stroke="${c}" stroke-width="${(4+R()*5).toFixed(0)}" fill="none" stroke-linecap="round"/>`;
+    else s+=`<rect x="${(R()*80).toFixed(0)}" y="${(R()*60).toFixed(0)}" width="${(10+R()*24).toFixed(0)}" height="${(10+R()*20).toFixed(0)}" rx="4" fill="${c}" opacity=".8"/>`}
+  return`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">${s}</svg>`}
+function actPaint(p,id){actCd[id]=Date.now()+5000;busy=true;petSay(`${p.name}：我要畫一幅畫！`);
+  const el=$("pet");el.animate([{transform:"rotate(0)"},{transform:"rotate(-6deg)"},{transform:"rotate(6deg)"},{transform:"rotate(0)"}],{duration:500,iterations:5});
+  setTimeout(()=>{busy=false;const seed=Math.floor(Math.random()*2147483646)+1;S.gallery=S.gallery||[];S.gallery.push({seed,t:Date.now(),pid:p.id});if(S.gallery.length>24)S.gallery.shift();
+    stat("paint");diary(p,"🎨","畫了一幅畫！");p.j=clamp(p.j+5);addAff(p,1);save();sfx("level");
+    sheet(`${p.name} 的畫`,`<div class="result"><div class="art-frame">${paintingSVG(seed)}</div><p class="hint">要把這幅畫掛在小屋牆上嗎？（會換掉原本掛的畫）</p></div><div class="btn-row"><button class="btn" id="hang">掛起來</button><button class="btn ghost" id="keep">收進畫冊</button></div>`,c=>{
+      $("hang").onclick=()=>{S.painting=seed;paintKey="";save();c();cheer()};$("keep").onclick=()=>{c();toast(`已經收進畫冊（在日記裡）`)}},"art")},2600)}
+let paintKey="";
+function renderPainting(){const k=String(S.painting||"");if(k===paintKey)return;paintKey=k;const st=$("stage");st.querySelectorAll(".wall-art").forEach(e=>e.remove());
+  if(!S.painting)return;const d=document.createElement("div");d.className="wall-art";d.innerHTML=paintingSVG(S.painting);st.insertBefore(d,$("petWrap"))}
 
 /* ---------- loop ---------- */
 $("musicBtn").onclick=()=>{if(musicOn&&!actx){setMusic(true);render();return}setMusic(!musicOn);render()};
