@@ -450,7 +450,7 @@ input[type=text]{font:inherit;border:2px solid var(--ink);border-radius:12px;pad
 .wq{display:flex;flex-direction:column;align-items:center}.wpic{font-size:72px;line-height:1.1}.wq small{font-weight:700}
 .wopts{display:flex;flex-direction:column;gap:8px;width:80%}
 .wopt{border:2px solid var(--ink);border-radius:14px;background:#fff;padding:10px;font:inherit;font-size:20px;font-weight:900;color:var(--ink);box-shadow:0 3px 0 var(--ink);cursor:pointer}
-.wopt.ok{background:#dff3e2;border-color:var(--leaf)}.wopt.wrong{opacity:.45}
+.wopt.zy{letter-spacing:2px}.wopt.ok{background:#dff3e2;border-color:var(--leaf)}.wopt.wrong{opacity:.45}
 .wans{font-weight:900;color:var(--coral);min-height:1.4em}
 /* clean */
 .g-clean{background:linear-gradient(var(--wall) 0 45%,#e9c9a3 45%)}
@@ -1279,6 +1279,7 @@ function startGame(id){const g=GAMES.find(x=>x.id===id);busy=true;gaming=true;cu
 const buzz=pat=>{try{if(navigator.vibrate)navigator.vibrate(pat)}catch(e){}};
 const timers=()=>{const ts=[],is=[];return{t:(f,ms)=>{const x=setTimeout(f,ms);ts.push(x);return x},i:(f,ms)=>{const x=setInterval(f,ms);is.push(x);return x},clear:()=>{ts.forEach(clearTimeout);is.forEach(clearInterval)}}};
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const WORDS=[["🍎","蘋果","ㄆㄧㄥˊ ㄍㄨㄛˇ","apple","f"],["🍌","香蕉","ㄒㄧㄤ ㄐㄧㄠ","banana","f"],["🍇","葡萄","ㄆㄨˊ ㄊㄠˊ","grape","f"],["🍓","草莓","ㄘㄠˇ ㄇㄟˊ","strawberry","f"],["🍉","西瓜","ㄒㄧ ㄍㄨㄚ","watermelon","f"],["🍊","橘子","ㄐㄩˊ ˙ㄗ","orange","f"],["🍋","檸檬","ㄋㄧㄥˊ ㄇㄥˊ","lemon","f"],["🍑","桃子","ㄊㄠˊ ˙ㄗ","peach","f"],["🍐","梨子","ㄌㄧˊ ˙ㄗ","pear","f"],["🍍","鳳梨","ㄈㄥˋ ㄌㄧˊ","pineapple","f"],["🥭","芒果","ㄇㄤˊ ㄍㄨㄛˇ","mango","f"],["🍒","櫻桃","ㄧㄥ ㄊㄠˊ","cherry","f"],["🥝","奇異果","ㄑㄧˊ ㄧˋ ㄍㄨㄛˇ","kiwi","f"],["🥥","椰子","ㄧㄝˊ ˙ㄗ","coconut","f"],["🐱","貓","ㄇㄠ","cat","a"],["🐶","狗","ㄍㄡˇ","dog","a"],["🐟","魚","ㄩˊ","fish","a"],["🐦","鳥","ㄋㄧㄠˇ","bird","a"],["🐰","兔子","ㄊㄨˋ ˙ㄗ","rabbit","a"],["🐻","熊","ㄒㄩㄥˊ","bear","a"],["🐯","老虎","ㄌㄠˇ ㄏㄨˇ","tiger","a"],["🦁","獅子","ㄕ ˙ㄗ","lion","a"],["🐘","大象","ㄉㄚˋ ㄒㄧㄤˋ","elephant","a"],["🐵","猴子","ㄏㄡˊ ˙ㄗ","monkey","a"],["🐷","豬","ㄓㄨ","pig","a"],["🐮","牛","ㄋㄧㄡˊ","cow","a"],["🐴","馬","ㄇㄚˇ","horse","a"],["🐑","羊","ㄧㄤˊ","sheep","a"],["🐔","雞","ㄐㄧ","chicken","a"],["🦆","鴨子","ㄧㄚ ˙ㄗ","duck","a"],["🐸","青蛙","ㄑㄧㄥ ㄨㄚ","frog","a"],["🐢","烏龜","ㄨ ㄍㄨㄟ","turtle","a"],["🐍","蛇","ㄕㄜˊ","snake","a"],["🐭","老鼠","ㄌㄠˇ ㄕㄨˇ","mouse","a"],["🐼","熊貓","ㄒㄩㄥˊ ㄇㄠ","panda","a"],["🦒","長頸鹿","ㄔㄤˊ ㄐㄧㄥˇ ㄌㄨˋ","giraffe","a"],["🐧","企鵝","ㄑㄧˋ ㄜˊ","penguin","a"],["🦋","蝴蝶","ㄏㄨˊ ㄉㄧㄝˊ","butterfly","a"],["🐝","蜜蜂","ㄇㄧˋ ㄈㄥ","bee","a"],["🐳","鯨魚","ㄐㄧㄥ ㄩˊ","whale","a"],["🦀","螃蟹","ㄆㄤˊ ㄒㄧㄝˋ","crab","a"],["🐙","章魚","ㄓㄤ ㄩˊ","octopus","a"],["🦊","狐狸","ㄏㄨˊ ˙ㄌㄧ","fox","a"],["🐨","無尾熊","ㄨˊ ㄨㄟˇ ㄒㄩㄥˊ","koala","a"],["🦉","貓頭鷹","ㄇㄠ ㄊㄡˊ ㄧㄥ","owl","a"],["🐌","蝸牛","ㄨㄛ ㄋㄧㄡˊ","snail","a"],["🍞","麵包","ㄇㄧㄢˋ ㄅㄠ","bread","d"],["🥚","蛋","ㄉㄢˋ","egg","d"],["🥛","牛奶","ㄋㄧㄡˊ ㄋㄞˇ","milk","d"],["🍚","飯","ㄈㄢˋ","rice","d"],["🍜","麵","ㄇㄧㄢˋ","noodles","d"],["🎂","蛋糕","ㄉㄢˋ ㄍㄠ","cake","d"],["🍪","餅乾","ㄅㄧㄥˇ ㄍㄢ","cookie","d"],["🍦","冰淇淋","ㄅㄧㄥ ㄑㄧˊ ㄌㄧㄣˊ","ice cream","d"],["🍕","披薩","ㄆㄧ ㄙㄚˋ","pizza","d"],["🍔","漢堡","ㄏㄢˋ ㄅㄠˇ","hamburger","d"],["🍬","糖果","ㄊㄤˊ ㄍㄨㄛˇ","candy","d"],["🍫","巧克力","ㄑㄧㄠˇ ㄎㄜˋ ㄌㄧˋ","chocolate","d"],["🧀","起司","ㄑㄧˇ ㄙ","cheese","d"],["💧","水","ㄕㄨㄟˇ","water","d"],["🥕","紅蘿蔔","ㄏㄨㄥˊ ㄌㄨㄛˊ ˙ㄅㄛ","carrot","d"],["🌽","玉米","ㄩˋ ㄇㄧˇ","corn","d"],["🍅","番茄","ㄈㄢ ㄑㄧㄝˊ","tomato","d"],["🥔","馬鈴薯","ㄇㄚˇ ㄌㄧㄥˊ ㄕㄨˇ","potato","d"],["🍄","香菇","ㄒㄧㄤ ㄍㄨ","mushroom","d"],["🥟","水餃","ㄕㄨㄟˇ ㄐㄧㄠˇ","dumpling","d"],["🍵","茶","ㄔㄚˊ","tea","d"],["🍯","蜂蜜","ㄈㄥ ㄇㄧˋ","honey","d"],["🚗","汽車","ㄑㄧˋ ㄔㄜ","car","t"],["🚌","公車","ㄍㄨㄥ ㄔㄜ","bus","t"],["🚲","腳踏車","ㄐㄧㄠˇ ㄊㄚˋ ㄔㄜ","bike","t"],["✈️","飛機","ㄈㄟ ㄐㄧ","airplane","t"],["🚂","火車","ㄏㄨㄛˇ ㄔㄜ","train","t"],["🚢","船","ㄔㄨㄢˊ","ship","t"],["🚀","火箭","ㄏㄨㄛˇ ㄐㄧㄢˋ","rocket","t"],["🚁","直升機","ㄓˊ ㄕㄥ ㄐㄧ","helicopter","t"],["🚒","消防車","ㄒㄧㄠ ㄈㄤˊ ㄔㄜ","fire truck","t"],["🚑","救護車","ㄐㄧㄡˋ ㄏㄨˋ ㄔㄜ","ambulance","t"],["🚓","警車","ㄐㄧㄥˇ ㄔㄜ","police car","t"],["🛵","機車","ㄐㄧ ㄔㄜ","scooter","t"],["☀️","太陽","ㄊㄞˋ ㄧㄤˊ","sun","n"],["🌙","月亮","ㄩㄝˋ ˙ㄌㄧㄤ","moon","n"],["⭐","星星","ㄒㄧㄥ ㄒㄧㄥ","star","n"],["☁️","雲","ㄩㄣˊ","cloud","n"],["🌧️","雨","ㄩˇ","rain","n"],["❄️","雪","ㄒㄩㄝˇ","snow","n"],["🌈","彩虹","ㄘㄞˇ ㄏㄨㄥˊ","rainbow","n"],["🌸","花","ㄏㄨㄚ","flower","n"],["🌳","樹","ㄕㄨˋ","tree","n"],["🍃","葉子","ㄧㄝˋ ˙ㄗ","leaf","n"],["⛰️","山","ㄕㄢ","mountain","n"],["🌊","海","ㄏㄞˇ","sea","n"],["🔥","火","ㄏㄨㄛˇ","fire","n"],["⚡","閃電","ㄕㄢˇ ㄉㄧㄢˋ","lightning","n"],["🌍","地球","ㄉㄧˋ ㄑㄧㄡˊ","earth","n"],["📖","書","ㄕㄨ","book","h"],["✏️","鉛筆","ㄑㄧㄢ ㄅㄧˇ","pencil","h"],["🎒","書包","ㄕㄨ ㄅㄠ","schoolbag","h"],["☂️","雨傘","ㄩˇ ㄙㄢˇ","umbrella","h"],["⏰","鬧鐘","ㄋㄠˋ ㄓㄨㄥ","clock","h"],["🔑","鑰匙","ㄧㄠˋ ˙ㄕ","key","h"],["🛏️","床","ㄔㄨㄤˊ","bed","h"],["🪑","椅子","ㄧˇ ˙ㄗ","chair","h"],["🚪","門","ㄇㄣˊ","door","h"],["👕","衣服","ㄧ ˙ㄈㄨ","clothes","h"],["👟","鞋子","ㄒㄧㄝˊ ˙ㄗ","shoes","h"],["🧦","襪子","ㄨㄚˋ ˙ㄗ","socks","h"],["🎩","帽子","ㄇㄠˋ ˙ㄗ","hat","h"],["👓","眼鏡","ㄧㄢˇ ㄐㄧㄥˋ","glasses","h"],["📱","手機","ㄕㄡˇ ㄐㄧ","phone","h"],["📺","電視","ㄉㄧㄢˋ ㄕˋ","TV","h"],["💡","燈","ㄉㄥ","light","h"],["🎁","禮物","ㄌㄧˇ ㄨˋ","gift","h"],["🎈","氣球","ㄑㄧˋ ㄑㄧㄡˊ","balloon","h"],["⚽","足球","ㄗㄨˊ ㄑㄧㄡˊ","soccer","h"],["🏀","籃球","ㄌㄢˊ ㄑㄧㄡˊ","basketball","h"],["🧸","玩具熊","ㄨㄢˊ ㄐㄩˋ ㄒㄩㄥˊ","teddy bear","h"],["🖍️","蠟筆","ㄌㄚˋ ㄅㄧˇ","crayon","h"],["✂️","剪刀","ㄐㄧㄢˇ ㄉㄠ","scissors","h"],["🏠","房子","ㄈㄤˊ ˙ㄗ","house","h"],["🏫","學校","ㄒㄩㄝˊ ㄒㄧㄠˋ","school","h"],["👀","眼睛","ㄧㄢˇ ˙ㄐㄧㄥ","eye","b"],["👂","耳朵","ㄦˇ ˙ㄉㄨㄛ","ear","b"],["👃","鼻子","ㄅㄧˊ ˙ㄗ","nose","b"],["👄","嘴巴","ㄗㄨㄟˇ ˙ㄅㄚ","mouth","b"],["✋","手","ㄕㄡˇ","hand","b"],["🦶","腳","ㄐㄧㄠˇ","foot","b"],["🦷","牙齒","ㄧㄚˊ ㄔˇ","tooth","b"],["❤️","心","ㄒㄧㄣ","heart","b"]];
 const GAME_FN={
   fruit(area,hud,done){const T=timers(),p=P();let left=30,score=0,hearts=3,px=50,raf=0,items=[],last=performance.now(),spawnT=0,ended=false;
     area.innerHTML=`<div class="f-pet" id="fPet">${petSVG(p.sp,"happy",false,p.wear)}</div><div class="f-ctl"><button class="f-l" aria-label="往左">◀</button><button class="f-r" aria-label="往右">▶</button></div>`;
@@ -1364,12 +1365,21 @@ const GAME_FN={
         [order[sel],order[i]]=[order[i],order[sel]];sel=null;moves++;sfx("pop");upd();draw();
         if(order.every((v,k)=>v===k)&&!ended){ended=true;cheer();T.t(()=>done(Math.max(6,30-Math.max(0,moves-8))+Math.floor(left/10)),700)}}))};
     draw();upd();T.i(()=>{left--;upd();if(left<=0&&!ended){ended=true;done(order.filter((v,i)=>v===i).length)}},1000);return()=>T.clear()},
-  math(area,hud,done){const T=timers();let level=null,q=0,score=0,combo=0,ans=0,lock=false;const N=10;
-    area.innerHTML=`<div class="lv-pick"><p>選一個難度</p><button class="btn" data-lv="1">10 以內加法</button><button class="btn" data-lv="2">20 以內加減</button><button class="btn" data-lv="3">九九乘法</button></div>`;
-    const make=()=>{let a,b,t;if(level===1){a=1+Math.floor(Math.random()*5);b=1+Math.floor(Math.random()*5);ans=a+b;t=`${a} ＋ ${b}`}
-      else if(level===2){a=2+Math.floor(Math.random()*15);b=1+Math.floor(Math.random()*9);if(Math.random()<.5&&a>b){ans=a-b;t=`${a} − ${b}`}else{ans=a+b;t=`${a} ＋ ${b}`}}
-      else{a=2+Math.floor(Math.random()*8);b=2+Math.floor(Math.random()*8);ans=a*b;t=`${a} × ${b}`}
-      const opts=new Set([ans]);while(opts.size<4){const d=ans+Math.floor(Math.random()*9)-4;if(d>=0&&d!==ans)opts.add(d)}return{t,opts:shuffle([...opts])}};
+  math(area,hud,done){const T=timers();let level=null,q=0,score=0,combo=0,ans=0,lock=false,used=new Set();const N=10;
+    const LV=[["10 以內加減","1"],["20 以內加減","2"],["九九乘法","3"],["100 以內加減","4"],["除法（九九）","5"]];
+    area.innerHTML=`<div class="lv-pick"><p>選一個難度</p>${LV.map(([n,v])=>`<button class="btn" data-lv="${v}">${n}</button>`).join("")}</div>`;
+    const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+    const gen=()=>{let a,b,t;
+      if(level===1){if(Math.random()<.5){a=R(0,10);b=R(0,10-a);ans=a+b;t=`${a} ＋ ${b}`}else{a=R(1,10);b=R(0,a);ans=a-b;t=`${a} − ${b}`}}
+      else if(level===2){const k=R(0,3);if(k===0){a=R(2,9);b=R(11-a,9);ans=a+b;t=`${a} ＋ ${b}`}else if(k===1){a=R(10,17);b=R(1,20-a);ans=a+b;t=`${a} ＋ ${b}`}else if(k===2){a=R(11,18);b=R(a%10+1,9);ans=a-b;t=`${a} − ${b}`}else{a=R(11,20);b=R(1,a-10);ans=a-b;t=`${a} − ${b}`}}
+      else if(level===3){a=R(2,9);b=R(1,9);ans=a*b;t=`${a} × ${b}`}
+      else if(level===4){if(Math.random()<.5){a=R(10,89);b=R(1,99-a);ans=a+b;t=`${a} ＋ ${b}`}else{a=R(20,99);b=R(1,a);ans=a-b;t=`${a} − ${b}`}}
+      else{b=R(2,9);ans=R(1,9);a=b*ans;t=`${a} ÷ ${b}`}
+      return t};
+    const make=()=>{let t,k=0;do{t=gen();k++}while(used.has(t)&&k<30);used.add(t);
+      const spread=level===4?12:level===3?10:5,opts=new Set([ans]);let g=0;
+      while(opts.size<4&&g<200){g++;const d=ans+R(-spread,spread);if(d>=0&&d!==ans)opts.add(d)}
+      for(let x=ans+1;opts.size<4;x++)opts.add(x);return{t,opts:shuffle([...opts])}};
     const upd=()=>{hud.textContent=`第 ${Math.min(q+1,N)}/${N} 題・${score} 分${combo>=3?`・連對 ${combo}`:""}`};
     const ask=()=>{if(q>=N){T.t(()=>done(score),300);return}const m=make();lock=false;
       area.innerHTML=`<div class="mq">${m.t} ＝ ？</div>${m.opts.map((v,i)=>`<button class="balloon" style="--c:${["#ff7a59","#6cb8f0","#ffd35c","#b9a6e8"][i]};left:${8+i*23}%;animation-delay:${-i*.4}s" data-v="${v}">${v}</button>`).join("")}`;
@@ -1378,16 +1388,21 @@ const GAME_FN={
         else{combo=0;b.classList.add("wrong");sfx("wake");upd()}}));upd()};
     area.querySelectorAll("[data-lv]").forEach(b=>b.onclick=()=>{level=+b.dataset.lv;ask()});
     return()=>T.clear()},
-  word(area,hud,done){const T=timers();const W=[["🍎","蘋果","ㄆㄧㄥˊ ㄍㄨㄛˇ","apple"],["🍌","香蕉","ㄒㄧㄤ ㄐㄧㄠ","banana"],["🐱","貓","ㄇㄠ","cat"],["🐶","狗","ㄍㄡˇ","dog"],["🐟","魚","ㄩˊ","fish"],["🐦","鳥","ㄋㄧㄠˇ","bird"],["🌸","花","ㄏㄨㄚ","flower"],["🌳","樹","ㄕㄨˋ","tree"],["☀️","太陽","ㄊㄞˋ ㄧㄤˊ","sun"],["🌙","月亮","ㄩㄝˋ ㄌㄧㄤˋ","moon"],["⭐","星星","ㄒㄧㄥ ㄒㄧㄥ","star"],["🚗","汽車","ㄑㄧˋ ㄔㄜ","car"],["📖","書","ㄕㄨ","book"],["⚽","球","ㄑㄧㄡˊ","ball"],["🎂","蛋糕","ㄉㄢˋ ㄍㄠ","cake"],["☂️","雨傘","ㄩˇ ㄙㄢˇ","umbrella"],["🥛","牛奶","ㄋㄧㄡˊ ㄋㄞˇ","milk"],["🍓","草莓","ㄘㄠˇ ㄇㄟˊ","strawberry"],["🍉","西瓜","ㄒㄧ ㄍㄨㄚ","watermelon"],["🐰","兔子","ㄊㄨˋ ㄗ˙","rabbit"]];
-    let mode=null,q=0,score=0,list=[],lock=false;const N=10;
-    area.innerHTML=`<div class="lv-pick"><p>想練習什麼？</p><button class="btn" data-m="2">注音</button><button class="btn" data-m="3">英文</button></div>`;
+  word(area,hud,done){const T=timers();let mode=null,q=0,score=0,list=[],lock=false;const N=10;
+    const MODES=[["注音",2,"這是什麼？選出正確的注音"],["國字",1,"這是什麼？選出正確的國字"],["英文",3,"What is it? 選出正確的英文"]];
+    area.innerHTML=`<div class="lv-pick"><p>想練習什麼？（共 ${WORDS.length} 個單字）</p>${MODES.map(([n,m])=>`<button class="btn" data-m="${m}">${n}</button>`).join("")}</div>`;
     const upd=()=>{hud.textContent=`第 ${Math.min(q+1,N)}/${N} 題・${score} 分`};
-    const ask=()=>{if(q>=N){T.t(()=>done(score),300);return}const w=list[q],others=shuffle(W.filter(x=>x!==w)).slice(0,2),opts=shuffle([w,...others]);lock=false;let tries=0;
-      area.innerHTML=`<div class="wq"><span class="wpic">${w[0]}</span><small>這是什麼？</small></div><div class="wopts">${opts.map(o=>`<button class="wopt" data-a="${o===w?1:0}">${o[mode]}</button>`).join("")}</div><div class="wans" id="wAns"></div>`;
+    const pickList=()=>{S.wseen=S.wseen||[];const seen=new Set(S.wseen),fresh=shuffle(WORDS.filter(w=>!seen.has(w[1]))),old=shuffle(WORDS.filter(w=>seen.has(w[1])));
+      const l=fresh.concat(old).slice(0,N);S.wseen=S.wseen.concat(l.map(w=>w[1])).slice(-Math.floor(WORDS.length*.7));return l};
+    const ask=()=>{if(q>=N){T.t(()=>done(score),300);return}const w=list[q];
+      const same=shuffle(WORDS.filter(x=>x!==w&&x[4]===w[4]&&x[mode]!==w[mode])),other=shuffle(WORDS.filter(x=>x!==w&&x[4]!==w[4]&&x[mode]!==w[mode]));
+      const opts=shuffle([w,...same.concat(other).filter((x,i,a)=>a.findIndex(y=>y[mode]===x[mode])===i).slice(0,2)]);lock=false;let tries=0;
+      const tip=MODES.find(m=>m[1]===mode)[2];
+      area.innerHTML=`<div class="wq"><span class="wpic">${w[0]}</span><small>${tip}</small></div><div class="wopts">${opts.map(o=>`<button class="wopt${mode===2?" zy":""}" data-a="${o===w?1:0}">${o[mode]}</button>`).join("")}</div><div class="wans" id="wAns"></div>`;
       area.querySelectorAll(".wopt").forEach(b=>b.addEventListener("pointerdown",e=>{e.preventDefault();if(lock)return;
-        if(b.dataset.a==="1"){lock=true;score+=tries?1:2;b.classList.add("ok");sfx("pop");area.querySelector("#wAns").textContent=`${w[1]}・${w[2]}・${w[3]}`;q++;upd();T.t(ask,1100)}
+        if(b.dataset.a==="1"){lock=true;score+=tries?1:2;b.classList.add("ok");sfx("pop");area.querySelector("#wAns").textContent=`${w[1]}・${w[2]}・${w[3]}`;q++;upd();T.t(ask,1300)}
         else{tries++;b.classList.add("wrong");sfx("wake")}}));upd()};
-    area.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{mode=+b.dataset.m;list=shuffle(W.slice()).slice(0,N);ask()});
+    area.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{mode=+b.dataset.m;list=pickList();save();ask()});
     return()=>T.clear()},
   clean(area,hud,done){const T=timers();let left=20,score=0,ended=false;const DIRT=["dust","paper","hair","dust"];
     area.innerHTML=`<div class="cn-floor"></div>`;
