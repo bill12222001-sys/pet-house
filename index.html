@@ -520,7 +520,9 @@ const SPECIES={
   bunny:{n:"雲朵兔",def:"棉棉",desc:"耳朵軟綿綿，頭上頂著一朵小雲"},
   fox:{n:"橘子狐",def:"小橘",desc:"尾巴蓬蓬，頭上長了一片葉子"},
   cat:{n:"蘑菇貓",def:"菇菇",desc:"戴著紅點點蘑菇帽的貓咪"},
-  peng:{n:"布丁企鵝",def:"噗噗",desc:"搖搖擺擺，最愛玩水"}
+  peng:{n:"布丁企鵝",def:"噗噗",desc:"搖搖擺擺，最愛玩水"},
+  dog:{n:"奶茶狗",def:"珍珠",desc:"耳朵垂垂的，頭上夾著骨頭髮夾"},
+  ele:{n:"泡泡象",def:"波波",desc:"短短的鼻子會吹出泡泡"}
 };
 const FOODS={
   rice:{n:"家常飯",e:"🍚",price:0,h:15,j:2,xp:2,d:"免費吃到飽，填飽肚子"},
@@ -663,7 +665,9 @@ const PAL={
   bunny:{body:"#f4f8ff",dark:"#c9d8f2",in:"#ffc4d6"},
   fox:{body:"#ff9a3c",dark:"#d9711d",in:"#ffe0bf"},
   cat:{body:"#b9a6e8",dark:"#8f78cf",in:"#ffd0e0"},
-  peng:{body:"#33507a",dark:"#22385a",in:"#f7f9fc"}
+  peng:{body:"#33507a",dark:"#22385a",in:"#f7f9fc"},
+  dog:{body:"#e9c79a",dark:"#a8774a",in:"#fff4e2"},
+  ele:{body:"#a9c4e8",dark:"#7f9fd0",in:"#ffc4d6"}
 };
 function face(m,dirty,sp){
   const ink="#2b3445";let s="";
@@ -673,7 +677,8 @@ function face(m,dirty,sp){
   else{s+=`<circle cx="82" cy="${ey}" r="8" fill="${ink}"/><circle cx="118" cy="${ey}" r="8" fill="${ink}"/><circle cx="85" cy="${ey-3}" r="3" fill="#fff"/><circle cx="121" cy="${ey-3}" r="3" fill="#fff"/>`;
     if(m==="sad")s+=`<path d="M72 ${ey-14} l14 5 M128 ${ey-14} l-14 5" stroke="${ink}" stroke-width="3.5" stroke-linecap="round"/>`}
   s+=`<ellipse cx="68" cy="${ey+14}" rx="9" ry="5" fill="#ff8fa8" opacity=".6"/><ellipse cx="132" cy="${ey+14}" rx="9" ry="5" fill="#ff8fa8" opacity=".6"/>`;
-  const my=ey+18;
+  const my=ey+18+(sp==="ele"?17:0);
+  if(sp==="dog")s+=`<ellipse cx="100" cy="${my-5}" rx="7" ry="5" fill="${ink}"/><ellipse cx="98" cy="${my-7}" rx="2.5" ry="1.5" fill="#fff" opacity=".7"/>`;
   if(sp==="peng")s+=`<path d="M92 ${my-6} l8 9 l8 -9 z" fill="#ffb02e" stroke="${ink}" stroke-width="2.5" stroke-linejoin="round"/>`;
   if(m==="happy")s+=`<path d="M91 ${my+2} q9 12 18 0 z" fill="#e2475b" stroke="${ink}" stroke-width="3" stroke-linejoin="round"/>`;
   else if(m==="sad")s+=`<path d="M92 ${my+8} q8 -7 16 0" stroke="${ink}" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
@@ -703,6 +708,18 @@ function petSVG(sp,m,dirty,wear){
     b+=`<ellipse cx="100" cy="134" rx="60" ry="50" fill="${c.body}" ${o}/>`;
     b+=`<path d="M62 92 q38 -62 76 0 z" fill="#e5484d" ${o}/><g fill="#fff"><circle cx="86" cy="74" r="6"/><circle cx="110" cy="66" r="5"/><circle cx="122" cy="82" r="4"/></g>`;
     b+=`<g stroke="#2b3445" stroke-width="2.5" stroke-linecap="round"><path d="M44 128 l18 2 M44 140 l18 -2 M156 128 l-18 2 M156 140 l-18 -2"/></g>`;
+  }else if(sp==="dog"){
+    b+=`<path d="M150 160 q24 -4 20 -26 q-2 -8 -8 -4 q4 14 -14 20 z" fill="${c.body}" ${o}/>`;
+    b+=`<ellipse cx="100" cy="132" rx="60" ry="52" fill="${c.body}" ${o}/><ellipse cx="100" cy="160" rx="30" ry="20" fill="${c.in}"/>`;
+    b+=`<ellipse cx="124" cy="112" rx="16" ry="13" fill="${c.in}" opacity=".9"/>`;
+    b+=`<path d="M58 92 q-26 4 -24 40 q2 18 16 14 q10 -4 12 -24 q2 -18 8 -26 z" fill="${c.dark}" ${o}/><path d="M142 92 q26 4 24 40 q-2 18 -16 14 q-10 -4 -12 -24 q-2 -18 -8 -26 z" fill="${c.dark}" ${o}/>`;
+    b+=`<g transform="rotate(-14 100 82)"><rect x="86" y="78" width="28" height="9" rx="4" fill="#fff" stroke="#2b3445" stroke-width="2.5"/><g fill="#fff" stroke="#2b3445" stroke-width="2.5"><circle cx="85" cy="78" r="5"/><circle cx="85" cy="87" r="5"/><circle cx="115" cy="78" r="5"/><circle cx="115" cy="87" r="5"/></g><rect x="86" y="79.5" width="28" height="6" fill="#fff"/></g>`;
+  }else if(sp==="ele"){
+    b+=`<circle cx="44" cy="116" r="34" fill="${c.body}" ${o}/><circle cx="46" cy="118" r="21" fill="${c.in}"/><circle cx="156" cy="116" r="34" fill="${c.body}" ${o}/><circle cx="154" cy="118" r="21" fill="${c.in}"/>`;
+    b+=`<path d="M154 168 q14 2 16 -10" stroke="#2b3445" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+    b+=`<ellipse cx="100" cy="132" rx="58" ry="52" fill="${c.body}" ${o}/>`;
+    b+=`<path d="M100 116 q-1 18 4 24 q5 5 11 0" stroke="#2b3445" stroke-width="19" fill="none" stroke-linecap="round"/><path d="M100 116 q-1 18 4 24 q5 5 11 0" stroke="${c.body}" stroke-width="9" fill="none" stroke-linecap="round"/><ellipse cx="100" cy="112" rx="10" ry="7" fill="${c.body}"/>`;
+    b+=`<g fill="#e3f5ff" stroke="#7cc6ee" stroke-width="2.5"><circle cx="128" cy="76" r="8"/><circle cx="144" cy="62" r="5.5"/><circle cx="154" cy="50" r="3.5"/></g><circle cx="125" cy="73" r="2.2" fill="#fff"/>`;
   }else{
     b+=`<path d="M46 120 q-16 20 -6 40 q14 -6 18 -22 z" fill="${c.body}" ${o}/><path d="M154 120 q16 20 6 40 q-14 -6 -18 -22 z" fill="${c.body}" ${o}/>`;
     b+=`<ellipse cx="82" cy="182" rx="14" ry="6" fill="#ffb02e" ${o}/><ellipse cx="118" cy="182" rx="14" ry="6" fill="#ffb02e" ${o}/>`;
@@ -715,7 +732,7 @@ function petSVG(sp,m,dirty,wear){
 
 /* ---------- accessories, room decor, toys ---------- */
 const INK="#2b3445",O=`stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"`,O3=`stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"`;
-const HEADY={bunny:84,fox:84,cat:88,peng:68};
+const HEADY={bunny:84,fox:84,cat:88,peng:68,dog:86,ele:86};
 const quad=t=>{const a=1-t;return[a*a*66+2*a*t*100+t*t*134,a*a*146+2*a*t*164+t*t*146]};
 const band=(col,w=6)=>`<path d="M66 146 q34 18 68 0" stroke="${INK}" stroke-width="${w+5}" fill="none" stroke-linecap="round"/><path d="M66 146 q34 18 68 0" stroke="${col}" stroke-width="${w}" fill="none" stroke-linecap="round"/>`;
 const heart=(x,y,sc,col)=>`<path transform="translate(${x} ${y}) scale(${sc})" d="M0 5 C-3 -2 -12 -2 -12 6 C-12 12 -4 16 0 20 C4 16 12 12 12 6 C12 -2 3 -2 0 5 z" fill="${col}" stroke="${INK}" stroke-width="${(2.5/sc).toFixed(2)}" stroke-linejoin="round"/>`;
