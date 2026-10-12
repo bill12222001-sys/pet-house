@@ -522,11 +522,10 @@ const SPECIES={
   cat:{n:"蘑菇貓",def:"菇菇",desc:"戴著紅點點蘑菇帽的貓咪"},
   peng:{n:"布丁企鵝",def:"噗噗",desc:"搖搖擺擺，最愛玩水"},
   dog:{n:"奶茶狗",def:"珍珠",desc:"耳朵垂垂的，頭上夾著骨頭髮夾"},
-  ele:{n:"泡泡象",def:"波波",desc:"長鼻子捲捲的，會吹出泡泡"},
+  ele:{n:"泡泡象",def:"波波",desc:"長鼻子捲捲的，會吹出泡泡",hide:1},
   bear:{n:"蜂蜜熊",def:"蜜蜜",desc:"圓滾滾的小熊，頭上頂著一罐蜂蜜"},
   panda:{n:"竹筍熊貓",def:"筍筍",desc:"黑白配色，頭上冒出一根小竹筍"},
   ham:{n:"瓜子鼠",def:"豆豆",desc:"臉頰鼓鼓的，最愛抱著瓜子"},
-  turtle:{n:"草莓龜",def:"莓莓",desc:"背著小殼慢慢走，頭上有顆草莓"},
   uni:{n:"彩虹小馬",def:"虹虹",desc:"頭上有彩虹角，鬃毛五顏六色"},
   koala:{n:"抱抱熊",def:"抱抱",desc:"毛茸茸的大耳朵，抱著尤加利葉"}
 };
@@ -677,13 +676,12 @@ const PAL={
   bear:{body:"#c98d5c",dark:"#9c6538",in:"#f3dcc0"},
   panda:{body:"#fbfbf8",dark:"#3b3f4a",in:"#ffd0dc"},
   ham:{body:"#f4b56a",dark:"#d98f3e",in:"#fff6ea"},
-  turtle:{body:"#9fd47a",dark:"#6aa84f",in:"#fff3c4"},
   uni:{body:"#fff5fb",dark:"#e8c9e0",in:"#ffc4d6"},
   koala:{body:"#aeb3bf",dark:"#858b99",in:"#f4f4f6"}
 };
 function face(m,dirty,sp){
   const ink="#2b3445";let s="";
-  const ey=sp==="peng"?112:sp==="turtle"?93:118,pd=sp==="panda",li=pd?"#fff":ink;
+  const ey=sp==="peng"?112:118,pd=sp==="panda",li=pd?"#fff":ink;
   if(pd)s+=`<ellipse cx="80" cy="${ey+2}" rx="14" ry="17" fill="#3b3f4a" transform="rotate(25 80 ${ey+2})"/><ellipse cx="120" cy="${ey+2}" rx="14" ry="17" fill="#3b3f4a" transform="rotate(-25 120 ${ey+2})"/>`;
   if(m==="sleep"){s+=`<path d="M74 ${ey} q8 7 16 0 M110 ${ey} q8 7 16 0" stroke="${li}" stroke-width="4" fill="none" stroke-linecap="round"/>`}
   else if(m==="happy"){s+=`<path d="M74 ${ey+3} q8 -10 16 0 M110 ${ey+3} q8 -10 16 0" stroke="${li}" stroke-width="4" fill="none" stroke-linecap="round"/>`}
@@ -750,11 +748,6 @@ function petSVG(sp,m,dirty,wear){
     b+=`<ellipse cx="100" cy="134" rx="58" ry="50" fill="${c.body}" ${o}/><path d="M60 120 q40 -30 80 0 q8 30 -8 52 q-32 18 -64 0 q-16 -22 -8 -52 z" fill="${c.in}"/>`;
     b+=`<ellipse cx="64" cy="134" rx="16" ry="13" fill="${c.in}" stroke="${c.dark}" stroke-width="2"/><ellipse cx="136" cy="134" rx="16" ry="13" fill="${c.in}" stroke="${c.dark}" stroke-width="2"/>`;
     b+=`<g transform="rotate(-10 100 166)"><path d="M100 152 q11 8 0 26 q-11 -18 0 -26 z" fill="#4a3b33" stroke="#2b3445" stroke-width="2"/><path d="M100 156 v18" stroke="#e8e0d4" stroke-width="2.5"/></g><ellipse cx="88" cy="166" rx="7" ry="5" fill="${c.body}" ${o}/><ellipse cx="112" cy="166" rx="7" ry="5" fill="${c.body}" ${o}/>`;
-  }else if(sp==="turtle"){
-    b+=`<ellipse cx="62" cy="181" rx="15" ry="8" fill="${c.body}" ${o}/><ellipse cx="138" cy="181" rx="15" ry="8" fill="${c.body}" ${o}/><ellipse cx="30" cy="150" rx="10" ry="15" fill="${c.body}" ${o} transform="rotate(-35 30 150)"/><ellipse cx="170" cy="150" rx="10" ry="15" fill="${c.body}" ${o} transform="rotate(35 170 150)"/>`;
-    b+=`<circle cx="100" cy="100" r="40" fill="${c.body}" ${o}/>`;
-    b+=`<path d="M26 170 C26 104 174 104 174 170 Z" fill="#4f9a45" ${o}/><g fill="#7cc46a" stroke="#3d7a35" stroke-width="2.5" stroke-linejoin="round"><path d="M113.0 149.5 L100.0 157.0 L87.0 149.5 L87.0 134.5 L100.0 127.0 L113.0 134.5 Z"/><path d="M78.4 156.0 L68.0 162.0 L57.6 156.0 L57.6 144.0 L68.0 138.0 L78.4 144.0 Z"/><path d="M142.4 156.0 L132.0 162.0 L121.6 156.0 L121.6 144.0 L132.0 138.0 L142.4 144.0 Z"/><path d="M51.9 162.0 L45.0 166.0 L38.1 162.0 L38.1 154.0 L45.0 150.0 L51.9 154.0 Z"/><path d="M161.9 162.0 L155.0 166.0 L148.1 162.0 L148.1 154.0 L155.0 150.0 L161.9 154.0 Z"/></g><rect x="20" y="164" width="160" height="16" rx="8" fill="#ffe08a" ${o}/><path d="M48 164 v16 M76 164 v16 M100 164 v16 M124 164 v16 M152 164 v16" stroke="#e0b84a" stroke-width="2.5"/>`;
-    b+=`<g transform="translate(0 -30)"><path d="M100 92 q-14 -2 -12 -14 q2 -10 12 -8 q10 -2 12 8 q2 12 -12 14 z" fill="#ff5c6c" stroke="#2b3445" stroke-width="3"/><path d="M92 70 l8 4 l8 -4 l-3 -5 l-5 3 l-5 -3 z" fill="#4fae63" stroke="#2b3445" stroke-width="2" stroke-linejoin="round"/><g fill="#ffe08a"><circle cx="95" cy="80" r="1.6"/><circle cx="105" cy="80" r="1.6"/><circle cx="100" cy="86" r="1.6"/><circle cx="94" cy="87" r="1.4"/><circle cx="106" cy="87" r="1.4"/></g></g>`;
   }else if(sp==="uni"){
     b+=`<path d="M150 150 q30 6 26 32 q-12 -4 -18 -14 q-2 10 -10 14 q0 -18 2 -32 z" fill="#b9a6e8" ${o}/>`;
     b+=`<path d="M62 100 L64 66 L88 86 z" fill="${c.body}" ${o}/><path d="M138 100 L136 66 L112 86 z" fill="${c.body}" ${o}/><path d="M68 92 L68 74 L80 86 z M132 92 L132 74 L120 86 z" fill="${c.in}"/>`;
@@ -777,7 +770,7 @@ function petSVG(sp,m,dirty,wear){
 
 /* ---------- accessories, room decor, toys ---------- */
 const INK="#2b3445",O=`stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"`,O3=`stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"`;
-const HEADY={bunny:84,fox:84,cat:88,peng:68,dog:86,ele:86,bear:84,panda:86,ham:88,turtle:64,uni:86,koala:88};
+const HEADY={bunny:84,fox:84,cat:88,peng:68,dog:86,ele:86,bear:84,panda:86,ham:88,uni:86,koala:88};
 const quad=t=>{const a=1-t;return[a*a*66+2*a*t*100+t*t*134,a*a*146+2*a*t*164+t*t*146]};
 const band=(col,w=6)=>`<path d="M66 146 q34 18 68 0" stroke="${INK}" stroke-width="${w+5}" fill="none" stroke-linecap="round"/><path d="M66 146 q34 18 68 0" stroke="${col}" stroke-width="${w}" fill="none" stroke-linecap="round"/>`;
 const heart=(x,y,sc,col)=>`<path transform="translate(${x} ${y}) scale(${sc})" d="M0 5 C-3 -2 -12 -2 -12 6 C-12 12 -4 16 0 20 C4 16 12 12 12 6 C12 -2 3 -2 0 5 z" fill="${col}" stroke="${INK}" stroke-width="${(2.5/sc).toFixed(2)}" stroke-linejoin="round"/>`;
@@ -1130,7 +1123,7 @@ function openShop(tab){
 }
 function openAdopt(){
   let pick="fox";
-  const grid=()=>Object.entries(SPECIES).map(([k,s])=>`<button class="pick" data-s="${k}" aria-pressed="${k===pick}">${petSVG(k,"happy",false)}<b>${s.n}</b><small>${s.desc}</small></button>`).join("");
+  const grid=()=>Object.entries(SPECIES).filter(([k,s])=>!s.hide).map(([k,s])=>`<button class="pick" data-s="${k}" aria-pressed="${k===pick}">${petSVG(k,"happy",false)}<b>${s.n}</b><small>${s.desc}</small></button>`).join("");
   sheet("領養新寵物",`<div class="adopt-grid" id="ag">${grid()}</div><label class="f">幫牠取名字<input type="text" id="petName" maxlength="8" placeholder="${SPECIES[pick].def}"></label><button class="btn" id="doAdopt">帶牠回家</button>`,close=>{
     const bind=()=>document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{pick=b.dataset.s;$("ag").innerHTML=grid();$("petName").placeholder=SPECIES[pick].def;bind()});bind();
     $("doAdopt").onclick=()=>{const n=$("petName").value.trim();S.pets.push(newPet(pick,n));S.cur=S.pets.length-1;diary(P(),"🏠",`來到我們家了！請多多指教～`);lastKey="";save();close();renderTabs();render();toast(`歡迎 ${P().name} 加入！`,"levelup")};
