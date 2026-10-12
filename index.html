@@ -391,6 +391,82 @@ input[type=text]{font:inherit;border:2px solid var(--ink);border-radius:12px;pad
 .pkfx.coin{font-size:20px;animation:coin .9s ease-in forwards}
 @keyframes coin{0%{transform:translate(-50%,-50%)}50%{transform:translate(0,-200%)}100%{transform:translate(60%,-30%) scale(.6);opacity:.3}}
 .pkfx.drop{width:7px;height:9px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:#7cc6ee;animation:pkup 1s ease-out forwards}
+.gcat{font-size:14px;font-weight:900;margin:12px 2px 6px;color:var(--ink)}.gcat:first-of-type{margin-top:4px}
+/* fruit */
+.g-fruit{background:linear-gradient(#cfeefc 0 78%,#a8d98f 78%)}
+.f-pet{position:absolute;left:50%;top:60%;width:72px;height:72px;transform:translateX(-50%);z-index:2;pointer-events:none}.f-pet svg{width:100%;height:100%}
+.f-item{position:absolute;top:-8%;font-size:30px;transform:translateX(-50%);pointer-events:none;line-height:1;z-index:1}
+.f-ctl{position:absolute;inset:auto 0 0 0;display:flex;justify-content:space-between;padding:6px;z-index:3;pointer-events:none}
+.f-ctl button{pointer-events:auto;width:30%;height:44px;border:2px solid var(--ink);border-radius:14px;background:rgba(255,255,255,.85);font-size:20px;color:var(--ink);box-shadow:0 3px 0 var(--ink);touch-action:none}
+.f-ctl button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+/* fishing */
+.g-fishing{background:linear-gradient(#cfeefc 0 30%,#a8d98f 30% 38%,#5fb4e0 38%)}
+.fi-water{position:absolute;inset:38% 0 0 0;background:repeating-linear-gradient(170deg,transparent 0 22px,rgba(255,255,255,.18) 22px 26px)}
+.fi-float{position:absolute;top:58%;width:22px;height:30px;margin-left:-11px;border-radius:50% 50% 45% 45%;background:linear-gradient(#e5484d 0 50%,#fff 50%);border:2px solid var(--ink);animation:bob 1.4s ease-in-out infinite}
+.fi-float.bite{animation:dip .25s ease-in-out 3}
+@keyframes bob{50%{transform:translateY(-4px)}}@keyframes dip{50%{transform:translateY(14px)}}
+.fi-msg{position:absolute;left:8px;right:8px;top:10px;text-align:center;font-weight:900;background:rgba(255,255,255,.9);border:2px solid var(--ink);border-radius:999px;padding:4px 10px;font-size:14px}
+.fi-btn{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);min-width:140px}
+.fi-catch{position:absolute;top:50%;width:60px;margin-left:-30px;animation:jump 1.2s ease-out forwards;pointer-events:none}
+@keyframes jump{0%{transform:translateY(20px) scale(.6);opacity:0}30%{transform:translateY(-70px) scale(1.1);opacity:1}100%{transform:translateY(-90px) scale(1);opacity:0}}
+/* cloud */
+.g-cloud{background:linear-gradient(#9fd6f7,#e4f4ff)}
+.cl-base,.cl-next{position:absolute;width:110px;height:34px;border-radius:999px;background:#fff;border:2px solid #c9d8f2;transform:translateX(-50%);box-shadow:-30px 6px 0 -8px #fff,30px 6px 0 -8px #fff}
+.cl-base{left:50%;bottom:26px}.cl-next{left:50%;top:92px}
+.cl-pet{position:absolute;left:50%;bottom:52px;width:84px;height:84px;transform:translateX(-50%);z-index:2;pointer-events:none}.cl-pet svg{width:100%;height:100%}
+.g-cloud.cl-up .cl-base{animation:clin .35s ease-out}@keyframes clin{from{transform:translate(-50%,-110px)}}
+/* simon */
+.g-simon{background:#eef0f7;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.si-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:240px}
+.si-pad{aspect-ratio:1;border:3px solid var(--ink);border-radius:22px;background:var(--c);opacity:.55;box-shadow:0 4px 0 var(--ink);cursor:pointer;transition:opacity .1s,transform .1s}
+.si-pad.on{opacity:1;transform:scale(1.06)}
+.si-msg{font-weight:900;min-height:1.4em}
+/* diff */
+.g-diff{height:auto;padding:8px;background:#fff7ec;display:flex;flex-direction:column;align-items:center;gap:6px}
+.df-tip{margin:0;font-size:13px;font-weight:700;text-align:center}
+.df-pic{display:block;width:62%;max-width:240px;border:2px solid var(--ink);border-radius:10px}
+.df-wrap{position:relative;width:62%;max-width:240px}.df-wrap .df-pic{width:100%}
+.df-hot{position:absolute;border:0;background:transparent;border-radius:50%;cursor:pointer;padding:0;margin:-4px;box-sizing:content-box;border:4px solid transparent}
+.df-hot.ok{border-color:var(--coral)}
+/* puzzle */
+.g-puzzle{height:auto;padding:10px;background:#fff0f4;display:flex;gap:10px;align-items:flex-start;justify-content:center}
+.pz-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;width:222px;background:var(--ink);border:3px solid var(--ink);border-radius:10px;overflow:hidden}
+.pz{aspect-ratio:1;padding:0;border:0;background:#ffe1ea;cursor:pointer;position:relative}.pz svg{width:100%;height:100%;display:block}
+.pz.sel{outline:4px solid var(--gold);outline-offset:-4px;z-index:1}
+.pz-peek{width:64px;text-align:center;font-size:11px;color:var(--ink-soft)}.pz-peek svg{width:64px;height:64px;background:#ffe1ea;border:2px solid var(--ink);border-radius:8px}
+/* math & word */
+.g-math{background:linear-gradient(#bfe6ff,#eaf7ff)}
+.lv-pick{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}.lv-pick p{margin:0;font-weight:900}.lv-pick .btn{min-width:180px}
+.mq{position:absolute;left:50%;top:14px;transform:translateX(-50%);background:#fff;border:3px solid var(--ink);border-radius:16px;padding:6px 18px;font-size:26px;font-weight:900;white-space:nowrap;font-variant-numeric:tabular-nums}
+.balloon{position:absolute;top:110px;width:21%;aspect-ratio:4/5;border:3px solid var(--ink);border-radius:50% 50% 48% 48%;background:var(--c);font:inherit;font-size:24px;font-weight:900;color:var(--ink);cursor:pointer;animation:sway 2.4s ease-in-out infinite}
+.balloon::after{content:"";position:absolute;left:50%;top:100%;width:2px;height:60px;background:var(--ink)}
+@keyframes sway{50%{transform:translateY(-12px)}}
+.balloon.popb{animation:none;transform:scale(1.4);opacity:0;transition:.2s}
+.balloon.wrong,.wopt.wrong,.ch-b.wrong{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.g-word{background:#f4f0ff;height:auto;min-height:300px;display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px}
+.wq{display:flex;flex-direction:column;align-items:center}.wpic{font-size:72px;line-height:1.1}.wq small{font-weight:700}
+.wopts{display:flex;flex-direction:column;gap:8px;width:80%}
+.wopt{border:2px solid var(--ink);border-radius:14px;background:#fff;padding:10px;font:inherit;font-size:20px;font-weight:900;color:var(--ink);box-shadow:0 3px 0 var(--ink);cursor:pointer}
+.wopt.ok{background:#dff3e2;border-color:var(--leaf)}.wopt.wrong{opacity:.45}
+.wans{font-weight:900;color:var(--coral);min-height:1.4em}
+/* clean */
+.g-clean{background:linear-gradient(var(--wall) 0 45%,#e9c9a3 45%)}
+.dirt{position:absolute;width:44px;height:44px;margin:-22px;border:0;padding:0;cursor:pointer;background:none}
+.dirt::before{content:"";position:absolute;inset:6px;border-radius:50%}
+.d-dust::before{background:radial-gradient(circle,#9a8f84 0 30%,rgba(154,143,132,.5) 31% 60%,transparent 61%)}
+.d-hair::before{background:radial-gradient(circle,#c9a27a 0 40%,transparent 41%);box-shadow:inset 0 0 0 3px #a8835e}
+.d-paper::before{inset:10px;border-radius:4px;background:#fff;border:2px solid #b8c0cc;transform:rotate(12deg)}
+.dirt.poof{transform:scale(1.5);opacity:0;transition:.25s}
+.g-clean.sparkle::after{content:"✨ 亮晶晶！ ✨";position:absolute;inset:0;display:grid;place-items:center;font-size:26px;font-weight:900;color:var(--ink)}
+/* chef */
+.g-chef{background:#fff6e5;height:auto;padding:10px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.ch-recipe{background:#fff;border:2px solid var(--ink);border-radius:12px;padding:4px 8px;font-size:22px;display:flex;align-items:center;gap:2px;flex-wrap:wrap;justify-content:center}
+.ch-recipe i{font-style:normal;font-size:12px;color:var(--ink-soft)}.ch-recipe .done{opacity:.3}
+.ch-plate{position:relative;width:150px;height:120px}.ch-plate::before{content:"";position:absolute;left:5px;right:5px;bottom:0;height:24px;border-radius:50%;background:#fff;border:3px solid #c9d3da;box-shadow:0 3px 0 rgba(43,52,69,.15)}
+.ch-plate span{position:absolute;left:50%;transform:translateX(-50%);font-size:38px;margin-bottom:10px}
+.ch-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}
+.ch-b{border:2px solid var(--ink);border-radius:12px;background:#fff;font-size:28px;padding:6px 0;box-shadow:0 3px 0 var(--ink);cursor:pointer}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}.bub{animation-duration:4s!important}}
 </style>
 
@@ -1139,17 +1215,29 @@ ${left?`<p class="hint">今天還有 ${left} 個任務可以做。</p>`:""}<butt
 }
 
 /* ---------- mini games ---------- */
+const GAME_CATS=[["react","⚡ 反應"],["mind","🧠 記憶・動腦"],["learn","📚 學習"],["care","🏠 照顧"],["party","🎉 派對"]];
 const GAMES=[
-  {id:"catch",n:"接球",d:"點掉跳出來的球或玩具",e:"🎾",rate:.5},
-  {id:"memory",n:"翻牌配對",d:"記住位置，把一樣的兩張翻出來",e:"🃏",rate:.5},
-  {id:"whack",n:"躲貓貓",d:"寵物從洞裡探頭，快點牠！",e:"🕳️",rate:.35},
-  {id:"bubble",n:"戳泡泡",d:"戳指定顏色，連續戳對有連擊加分",e:"🫧",rate:.3},
-  {id:"cups",n:"猜杯子",d:"盯緊球在哪個杯子下面",e:"🥤",rate:1},
-  {id:"rhythm",n:"派對節奏",d:"圈圈縮到中間時點一下，跟著音樂跳舞",e:"🎵",rate:.4,need:"d_disco"}];
+  {id:"catch",c:"react",n:"接球",d:"點掉跳出來的球或玩具",e:"🎾",rate:.5},
+  {id:"whack",c:"react",n:"躲貓貓",d:"寵物從洞裡探頭，快點牠！",e:"🕳️",rate:.35},
+  {id:"bubble",c:"react",n:"戳泡泡",d:"戳指定顏色，連續戳對有連擊加分",e:"🫧",rate:.3},
+  {id:"fruit",c:"react",n:"接水果",d:"左右移動接水果，小心石頭",e:"🍎",rate:.3},
+  {id:"fishing",c:"react",n:"釣魚",d:"浮標沉下去時快拉！有稀有金魚",e:"🎣",rate:.5},
+  {id:"cloud",c:"react",n:"跳跳雲",d:"雲飄到正上方時點一下跳上去",e:"☁️",rate:.4},
+  {id:"memory",c:"mind",n:"翻牌配對",d:"記住位置，把一樣的兩張翻出來",e:"🃏",rate:.5},
+  {id:"cups",c:"mind",n:"猜杯子",d:"盯緊球在哪個杯子下面",e:"🥤",rate:1},
+  {id:"simon",c:"mind",n:"顏色記憶",d:"記住燈亮的順序，照著點",e:"🎨",rate:.5},
+  {id:"diff",c:"mind",n:"找不同",d:"兩張圖有 3 個地方不一樣",e:"🔍",rate:.5},
+  {id:"puzzle",c:"mind",n:"寵物拼圖",d:"交換拼圖塊，拼出自己的寵物",e:"🧩",rate:.4},
+  {id:"math",c:"learn",n:"數學氣球",d:"戳中答案正確的氣球",e:"🎈",rate:.5},
+  {id:"word",c:"learn",n:"注音／英文",d:"看圖選出正確的注音或英文",e:"🔤",rate:.5},
+  {id:"clean",c:"care",n:"打掃小屋",d:"把灰塵、紙屑、毛球清乾淨",e:"🧹",rate:.4},
+  {id:"chef",c:"care",n:"小廚師",d:"照食譜順序疊三明治",e:"🍳",rate:.6},
+  {id:"rhythm",c:"party",n:"派對節奏",d:"圈圈縮到中間時點一下，跟著音樂跳舞",e:"🎵",rate:.4,need:"d_disco"}];
 function openGames(){const p=P(),d=daily();
   if(p.sleeping){toast("噓，牠在睡覺");return}
-  const cards=GAMES.map(g=>{const lock=g.need&&!S.owned[g.need];return`<button class="gcard${lock?" locked":""}" data-g="${g.id}" ${lock?"disabled":""}><span class="ge">${g.e}</span><b>${g.n}</b><small>${g.d}</small><small class="best">${lock?`需要「${IT[g.need].n}」（商店 ${IT[g.need].price} 金幣）`:`最高分 ${(S.best&&S.best[g.id])||0}`}</small></button>`}).join("");
-  sheet(`和 ${p.name} 玩什麼？`,`${resting()?`<p class="hint warn">🥤 ${p.name}在休息喝水，再 ${restLeft()} 分鐘。現在玩不會拿金幣和經驗，要不要先去喝杯水、動一動？</p>`:""}<p class="hint">玩小遊戲可以賺金幣、經驗和快樂。今天小遊戲金幣 <b>${d.gc}/${GAME_CAP}</b>・經驗 <b>${d.gx||0}/${GAME_XP_CAP}</b>${d.gc>=GAME_CAP&&(d.gx||0)>=GAME_XP_CAP?"（今天都拿滿了，還是可以玩）":""}</p><div class="glist">${cards}</div>`,close=>{
+  const card=g=>{const lock=g.need&&!S.owned[g.need];return`<button class="gcard${lock?" locked":""}" data-g="${g.id}" ${lock?"disabled":""}><span class="ge">${g.e}</span><b>${g.n}</b><small>${g.d}</small><small class="best">${lock?`需要「${IT[g.need].n}」（商店 ${IT[g.need].price} 金幣）`:`最高分 ${(S.best&&S.best[g.id])||0}`}</small></button>`},
+    cards=GAME_CATS.map(([c,t])=>`<h4 class="gcat">${t}</h4><div class="glist">${GAMES.filter(g=>g.c===c).map(card).join("")}</div>`).join("");
+  sheet(`和 ${p.name} 玩什麼？`,`${resting()?`<p class="hint warn">🥤 ${p.name}在休息喝水，再 ${restLeft()} 分鐘。現在玩不會拿金幣和經驗，要不要先去喝杯水、動一動？</p>`:""}<p class="hint">玩小遊戲可以賺金幣、經驗和快樂。今天小遊戲金幣 <b>${d.gc}/${GAME_CAP}</b>・經驗 <b>${d.gx||0}/${GAME_XP_CAP}</b>${d.gc>=GAME_CAP&&(d.gx||0)>=GAME_XP_CAP?"（今天都拿滿了，還是可以玩）":""}</p>${cards}`,close=>{
     document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{
       if(P().e<15){toast(`${P().name} 太累了，先哄牠睡一下`);return}
       close();const id=b.dataset.g;if(id==="catch")startCatch();else startGame(id)})},"games");
@@ -1176,6 +1264,132 @@ function startGame(id){const g=GAMES.find(x=>x.id===id);busy=true;gaming=true;cu
 const timers=()=>{const ts=[],is=[];return{t:(f,ms)=>{const x=setTimeout(f,ms);ts.push(x);return x},i:(f,ms)=>{const x=setInterval(f,ms);is.push(x);return x},clear:()=>{ts.forEach(clearTimeout);is.forEach(clearInterval)}}};
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const GAME_FN={
+  fruit(area,hud,done){const T=timers(),p=P();let left=30,score=0,hearts=3,px=50,raf=0,items=[],last=performance.now(),spawnT=0,ended=false;
+    area.innerHTML=`<div class="f-pet" id="fPet">${petSVG(p.sp,"happy",false,p.wear)}</div><div class="f-ctl"><button class="f-l" aria-label="往左">◀</button><button class="f-r" aria-label="往右">▶</button></div>`;
+    const pet=area.querySelector("#fPet"),GOOD=["🍎","🍓","🍌","🍇","🍑"];let dir=0;
+    const upd=()=>{hud.textContent=`剩 ${left} 秒・接到 ${score} 個・${"❤️".repeat(hearts)}${"🤍".repeat(3-hearts)}`};upd();
+    const hold=(b,d)=>{b.addEventListener("pointerdown",e=>{e.preventDefault();dir=d});["pointerup","pointerleave","pointercancel"].forEach(ev=>b.addEventListener(ev,()=>{if(dir===d)dir=0}))};
+    hold(area.querySelector(".f-l"),-1);hold(area.querySelector(".f-r"),1);
+    const end=()=>{if(ended)return;ended=true;done(score)};
+    const loop=now=>{const dt=Math.min(50,now-last)/1000;last=now;px=Math.max(8,Math.min(92,px+dir*70*dt));pet.style.left=px+"%";
+      spawnT-=dt;const speed=26+(30-left)*1.4;
+      if(spawnT<=0){spawnT=Math.max(.45,.9-(30-left)*.015);const bad=Math.random()<.22,el=document.createElement("span");el.className="f-item";el.textContent=bad?"🪨":GOOD[Math.floor(Math.random()*GOOD.length)];
+        const it={x:6+Math.random()*88,y:-8,bad,el};el.style.left=it.x+"%";area.appendChild(el);items.push(it)}
+      items=items.filter(it=>{it.y+=speed*dt;it.el.style.top=it.y+"%";
+        if(it.y>=56&&it.y<=76&&Math.abs(it.x-px)<11){it.el.remove();if(it.bad){hearts--;sfx("wake");pet.animate&&pet.animate([{transform:"translateX(-50%) rotate(-12deg)"},{transform:"translateX(-50%) rotate(12deg)"},{transform:"translateX(-50%)"}],{duration:300});upd();if(hearts<=0)end()}else{score++;sfx("pop");upd()}return false}
+        if(it.y>100){it.el.remove();return false}return true});
+      if(!ended)raf=requestAnimationFrame(loop)};
+    raf=requestAnimationFrame(loop);T.i(()=>{left--;upd();if(left<=0)end()},1000);
+    return()=>{T.clear();cancelAnimationFrame(raf)}},
+  fishing(area,hud,done){const T=timers();let casts=6,score=0,state="idle",biteAt=0,caught=[];
+    const FISH_T=[{n:"小魚",p:1,c:"#7cc6ee",w:.5},{n:"中魚",p:2,c:"#ffb02e",w:.3},{n:"大魚",p:3,c:"#4fae63",w:.14},{n:"金魚",p:5,c:"#f2b51f",w:.06}];
+    area.innerHTML=`<div class="fi-water"></div><div class="fi-float" hidden></div><div class="fi-msg" id="fiMsg">按「甩竿」把浮標丟進池塘</div><button class="btn fi-btn" id="fiBtn">🎣 甩竿</button>`;
+    const fl=area.querySelector(".fi-float"),msg=area.querySelector("#fiMsg"),btn=area.querySelector("#fiBtn");
+    const upd=()=>{hud.textContent=`剩 ${casts} 竿・${score} 分`};upd();
+    const pick=()=>{let r=Math.random(),acc=0;for(const f of FISH_T){acc+=f.w;if(r<acc)return f}return FISH_T[0]};
+    const reset=()=>{state="idle";fl.hidden=true;fl.className="fi-float";btn.textContent=casts>0?"🎣 甩竿":"結束";if(casts<=0)T.t(()=>done(score),900)};
+    btn.addEventListener("pointerdown",e=>{e.preventDefault();
+      if(state==="idle"){if(casts<=0)return;casts--;upd();state="wait";fl.hidden=false;fl.style.left=(30+Math.random()*40)+"%";msg.textContent="等等…看到浮標沉下去就按！";btn.textContent="拉！";
+        const wait=1500+Math.random()*2500;T.t(()=>{if(state!=="wait")return;state="bite";biteAt=performance.now();fl.classList.add("bite");sfx("pop");msg.textContent="咚！快拉！";
+          T.t(()=>{if(state==="bite"){msg.textContent="哎呀，魚跑掉了～";reset()}},1300)},wait);return}
+      if(state==="wait"){msg.textContent="太早了，魚被嚇跑了～";reset();return}
+      if(state==="bite"){const f=pick();score+=f.p;caught.push(f.n);S.fishdex=S.fishdex||{};S.fishdex[f.n]=(S.fishdex[f.n]||0)+1;
+        msg.innerHTML=`釣到<b style="color:${f.c}">${f.n}</b>！+${f.p}`;const fish=document.createElement("div");fish.className="fi-catch";fish.innerHTML=`<svg viewBox="0 0 40 24"><ellipse cx="16" cy="12" rx="12" ry="8" fill="${f.c}" stroke="#2b3445" stroke-width="2.5"/><path d="M28 12 l10 -7 v14 z" fill="${f.c}" stroke="#2b3445" stroke-width="2.5"/><circle cx="10" cy="10" r="1.8" fill="#2b3445"/></svg>`;fish.style.left=fl.style.left;area.appendChild(fish);T.t(()=>fish.remove(),1200);
+        sfx("coin");upd();reset()}});
+    return()=>T.clear()},
+  cloud(area,hud,done){const T=timers(),p=P();let score=0,raf=0,cx=50,dir=1,speed=40,ended=false,busy_=false,last=performance.now();
+    area.innerHTML=`<div class="cl-base"></div><div class="cl-next" id="clNext"></div><div class="cl-pet" id="clPet">${petSVG(p.sp,"happy",false,p.wear)}</div><button class="r-hit" aria-label="跳"></button>`;
+    const nx=area.querySelector("#clNext"),pet=area.querySelector("#clPet");
+    let left=45;const upd=()=>{hud.textContent=`跳了 ${score} 朵雲・剩 ${left} 秒・雲在正上方時點一下`};upd();
+    const loop=now=>{const dt=Math.min(50,now-last)/1000;last=now;if(!busy_){cx+=dir*speed*dt;if(cx>85){cx=85;dir=-1}if(cx<15){cx=15;dir=1}nx.style.left=cx+"%"}if(!ended)raf=requestAnimationFrame(loop)};raf=requestAnimationFrame(loop);
+    area.querySelector(".r-hit").addEventListener("pointerdown",e=>{e.preventDefault();if(busy_||ended)return;busy_=true;const ok=Math.abs(cx-50)<13;
+      pet.animate&&pet.animate([{transform:"translate(-50%,0)"},{transform:`translate(-50%,-120px) translateX(${(cx-50)*2}px)`}],{duration:380,easing:"ease-out"});
+      T.t(()=>{if(ok){score++;sfx("pop");upd();speed=Math.min(110,40+score*5);cx=Math.random()<.5?15:85;dir=cx<50?1:-1;busy_=false;area.classList.remove("cl-up");void area.offsetWidth;area.classList.add("cl-up")}
+        else{ended=true;sfx("wake");pet.animate&&pet.animate([{transform:"translate(-50%,-60px)"},{transform:"translate(-50%,200px)"}],{duration:500,easing:"ease-in"});T.t(()=>done(score*2),700)}},400)});
+    T.i(()=>{if(ended)return;left--;upd();if(left<=0){ended=true;done(score*2)}},1000);
+    return()=>{T.clear();cancelAnimationFrame(raf)}},
+  simon(area,hud,done){const T=timers();const PADS=[["#ff7a59","C5"],["#ffd35c","E5"],["#4fae63","G5"],["#6cb8f0","C6"]];let seq=[],pos=0,lock=true,round=0;
+    area.innerHTML=`<div class="si-grid">${PADS.map((c,i)=>`<button class="si-pad" data-i="${i}" style="--c:${c[0]}"></button>`).join("")}</div><div class="si-msg" id="siMsg"></div>`;
+    const pads=[...area.querySelectorAll(".si-pad")],msg=area.querySelector("#siMsg");
+    const upd=()=>{hud.textContent=`第 ${round} 關・記住 ${seq.length} 個`};
+    const flash=i=>{pads[i].classList.add("on");audioInit();if(actx)tone(hz(PADS[i][1]),actx.currentTime+.01,.35,"triangle",.22,master,1);T.t(()=>pads[i].classList.remove("on"),300)};
+    const next=()=>{round++;seq.push(Math.floor(Math.random()*4));pos=0;lock=true;upd();msg.textContent="仔細看…";const gap=Math.max(380,650-round*25);
+      seq.forEach((v,k)=>T.t(()=>flash(v),600+k*gap));T.t(()=>{lock=false;msg.textContent="換你了！照順序點"},600+seq.length*gap)};
+    pads.forEach((b,i)=>b.addEventListener("pointerdown",e=>{e.preventDefault();if(lock)return;flash(i);
+      if(i!==seq[pos]){lock=true;msg.textContent=`記錯了～你記住了 ${seq.length-1} 個！`;T.t(()=>done((seq.length-1)*2),1200);return}
+      pos++;if(pos===seq.length){lock=true;msg.textContent="答對了！";cheer();T.t(next,800)}}));
+    T.t(next,400);return()=>T.clear()},
+  diff(area,hud,done){const T=timers();let left=60,score=0,round=0,found=0,ended=false;
+    const OBJ=[{k:"sun",d:(c)=>`<circle cx="20" cy="20" r="11" fill="${c||"#f2b51f"}"/>`,alt:["#ff7a59"]},{k:"win",d:(c)=>`<rect x="52" y="10" width="34" height="28" rx="4" fill="${c||"#fff7d6"}" stroke="#2b3445" stroke-width="2.5"/><path d="M69 10v28M52 24h34" stroke="#2b3445" stroke-width="2.5"/>`,alt:["#bfe8ff"]},
+      {k:"star",d:(c)=>`<path d="M120 8 l4 9 h10 l-8 6 l3 10 l-9 -6 l-9 6 l3 -10 l-8 -6 h10z" fill="${c||"#ffd35c"}" stroke="#2b3445" stroke-width="1.5"/>`,alt:["#ff8fb1"]},
+      {k:"flower",d:(c)=>`<path d="M22 92 v18" stroke="#4fae63" stroke-width="3"/><circle cx="22" cy="88" r="7" fill="${c||"#ff8fb1"}" stroke="#2b3445" stroke-width="2"/><circle cx="22" cy="88" r="2.5" fill="#ffd35c"/>`,alt:["#9a6fd6"]},
+      {k:"ball",d:(c)=>`<circle cx="62" cy="104" r="8" fill="${c||"#6cb8f0"}" stroke="#2b3445" stroke-width="2"/>`,alt:["#e5484d"]},
+      {k:"pet",d:(c)=>`<ellipse cx="98" cy="96" rx="16" ry="14" fill="${c||"#f4f8ff"}" stroke="#2b3445" stroke-width="2.5"/><circle cx="93" cy="94" r="2" fill="#2b3445"/><circle cx="103" cy="94" r="2" fill="#2b3445"/>`,alt:["#ffc78a"]},
+      {k:"rug",d:(c)=>`<ellipse cx="98" cy="114" rx="26" ry="5" fill="${c||"#ff9e80"}"/>`,alt:["#7cc46a"]},
+      {k:"cloud",d:(c)=>`<ellipse cx="90" cy="48" rx="${c?6:12}" ry="5" fill="#fff" stroke="#c9d8f2" stroke-width="1.5"/>`,alt:["small"]},
+      {k:"plant",d:(c)=>`<rect x="128" y="96" width="12" height="14" fill="#e0794a" stroke="#2b3445" stroke-width="2"/><path d="M134 96 q-8 -12 0 -18 q8 6 0 18" fill="${c||"#4fae63"}" stroke="#2b3445" stroke-width="2"/>`,alt:["#a0662f"]}];
+    const BOX={sun:[6,6,28,28],win:[48,6,42,36],star:[106,4,30,32],flower:[12,78,22,34],ball:[50,92,24,24],pet:[78,78,40,34],rug:[70,106,56,14],cloud:[74,40,32,16],plant:[122,74,24,38]};
+    const upd=()=>{hud.textContent=`第 ${round}/2 關・找到 ${found}/3・剩 ${left} 秒`};
+    const draw=(changes)=>`<svg viewBox="0 0 150 120" class="df-pic"><rect width="150" height="120" fill="#bfe3f0"/><rect y="76" width="150" height="44" fill="#f2c29a"/>${OBJ.map(o=>changes[o.k]==="hide"?"":o.d(changes[o.k])).join("")}</svg>`;
+    const start=()=>{round++;found=0;const pick=shuffle(OBJ.slice()).slice(0,3),ch={};pick.forEach(o=>{ch[o.k]=Math.random()<.3&&o.k!=="cloud"?"hide":o.alt[0]});
+      area.innerHTML=`<p class="df-tip">下面這張和上面哪裡不一樣？點下面那張圖找出 3 個地方</p>${draw({})}<div class="df-wrap">${draw(ch)}${pick.map(o=>{const b=BOX[o.k];return`<button class="df-hot" data-k="${o.k}" style="left:${b[0]/1.5}%;top:${b[1]/1.2}%;width:${b[2]/1.5}%;height:${b[3]/1.2}%" aria-label="不一樣的地方"></button>`}).join("")}</div>`;
+      area.querySelectorAll(".df-hot").forEach(h=>h.addEventListener("pointerdown",e=>{e.preventDefault();if(h.classList.contains("ok"))return;h.classList.add("ok");found++;score+=3;sfx("pop");upd();
+        if(found===3){cheer();if(round<2)T.t(start,700);else T.t(()=>{ended=true;done(score+Math.floor(left/5))},700)}}));upd()};
+    start();T.i(()=>{left--;upd();if(left<=0&&!ended){ended=true;done(score)}},1000);return()=>T.clear()},
+  puzzle(area,hud,done){const T=timers(),p=P();let moves=0,sel=null,left=90,ended=false;
+    const svg=(i)=>{const x=(i%3)*66.67,y=Math.floor(i/3)*66.67;return`<svg viewBox="${x} ${y} 66.67 66.67" preserveAspectRatio="none"><rect x="0" y="0" width="200" height="200" fill="#ffe1ea"/><rect x="0" y="140" width="200" height="60" fill="#f2c29a"/>${petSVG(p.sp,"happy",false,p.wear).replace(/^<svg[^>]*>/,"").replace(/<\/svg>$/,"")}</svg>`};
+    let order=shuffle([0,1,2,3,4,5,6,7,8]);while(order.every((v,i)=>v===i))order=shuffle(order);
+    const upd=()=>{hud.textContent=`點兩塊交換位置・移動 ${moves} 次・剩 ${left} 秒`};
+    const draw=()=>{area.innerHTML=`<div class="pz-grid">${order.map((v,i)=>`<button class="pz${sel===i?" sel":""}${v===i?" ok":""}" data-i="${i}">${svg(v)}</button>`).join("")}</div><div class="pz-peek">${petSVG(p.sp,"happy",false,p.wear)}<small>完成圖</small></div>`;
+      area.querySelectorAll(".pz").forEach(b=>b.addEventListener("pointerdown",e=>{e.preventDefault();const i=+b.dataset.i;
+        if(sel===null){sel=i;draw();return}if(sel===i){sel=null;draw();return}
+        [order[sel],order[i]]=[order[i],order[sel]];sel=null;moves++;sfx("pop");upd();draw();
+        if(order.every((v,k)=>v===k)&&!ended){ended=true;cheer();T.t(()=>done(Math.max(6,30-Math.max(0,moves-8))+Math.floor(left/10)),700)}}))};
+    draw();upd();T.i(()=>{left--;upd();if(left<=0&&!ended){ended=true;done(order.filter((v,i)=>v===i).length)}},1000);return()=>T.clear()},
+  math(area,hud,done){const T=timers();let level=null,q=0,score=0,combo=0,ans=0,lock=false;const N=10;
+    area.innerHTML=`<div class="lv-pick"><p>選一個難度</p><button class="btn" data-lv="1">10 以內加法</button><button class="btn" data-lv="2">20 以內加減</button><button class="btn" data-lv="3">九九乘法</button></div>`;
+    const make=()=>{let a,b,t;if(level===1){a=1+Math.floor(Math.random()*5);b=1+Math.floor(Math.random()*5);ans=a+b;t=`${a} ＋ ${b}`}
+      else if(level===2){a=2+Math.floor(Math.random()*15);b=1+Math.floor(Math.random()*9);if(Math.random()<.5&&a>b){ans=a-b;t=`${a} − ${b}`}else{ans=a+b;t=`${a} ＋ ${b}`}}
+      else{a=2+Math.floor(Math.random()*8);b=2+Math.floor(Math.random()*8);ans=a*b;t=`${a} × ${b}`}
+      const opts=new Set([ans]);while(opts.size<4){const d=ans+Math.floor(Math.random()*9)-4;if(d>=0&&d!==ans)opts.add(d)}return{t,opts:shuffle([...opts])}};
+    const upd=()=>{hud.textContent=`第 ${Math.min(q+1,N)}/${N} 題・${score} 分${combo>=3?`・連對 ${combo}`:""}`};
+    const ask=()=>{if(q>=N){T.t(()=>done(score),300);return}const m=make();lock=false;
+      area.innerHTML=`<div class="mq">${m.t} ＝ ？</div>${m.opts.map((v,i)=>`<button class="balloon" style="--c:${["#ff7a59","#6cb8f0","#ffd35c","#b9a6e8"][i]};left:${8+i*23}%;animation-delay:${-i*.4}s" data-v="${v}">${v}</button>`).join("")}`;
+      area.querySelectorAll(".balloon").forEach(b=>b.addEventListener("pointerdown",e=>{e.preventDefault();if(lock)return;
+        if(+b.dataset.v===ans){lock=true;combo++;score+=2+(combo>=3?1:0);b.classList.add("popb");sfx("pop");q++;upd();T.t(ask,450)}
+        else{combo=0;b.classList.add("wrong");sfx("wake");upd()}}));upd()};
+    area.querySelectorAll("[data-lv]").forEach(b=>b.onclick=()=>{level=+b.dataset.lv;ask()});
+    return()=>T.clear()},
+  word(area,hud,done){const T=timers();const W=[["🍎","蘋果","ㄆㄧㄥˊ ㄍㄨㄛˇ","apple"],["🍌","香蕉","ㄒㄧㄤ ㄐㄧㄠ","banana"],["🐱","貓","ㄇㄠ","cat"],["🐶","狗","ㄍㄡˇ","dog"],["🐟","魚","ㄩˊ","fish"],["🐦","鳥","ㄋㄧㄠˇ","bird"],["🌸","花","ㄏㄨㄚ","flower"],["🌳","樹","ㄕㄨˋ","tree"],["☀️","太陽","ㄊㄞˋ ㄧㄤˊ","sun"],["🌙","月亮","ㄩㄝˋ ㄌㄧㄤˋ","moon"],["⭐","星星","ㄒㄧㄥ ㄒㄧㄥ","star"],["🚗","汽車","ㄑㄧˋ ㄔㄜ","car"],["📖","書","ㄕㄨ","book"],["⚽","球","ㄑㄧㄡˊ","ball"],["🎂","蛋糕","ㄉㄢˋ ㄍㄠ","cake"],["☂️","雨傘","ㄩˇ ㄙㄢˇ","umbrella"],["🥛","牛奶","ㄋㄧㄡˊ ㄋㄞˇ","milk"],["🍓","草莓","ㄘㄠˇ ㄇㄟˊ","strawberry"],["🍉","西瓜","ㄒㄧ ㄍㄨㄚ","watermelon"],["🐰","兔子","ㄊㄨˋ ㄗ˙","rabbit"]];
+    let mode=null,q=0,score=0,list=[],lock=false;const N=10;
+    area.innerHTML=`<div class="lv-pick"><p>想練習什麼？</p><button class="btn" data-m="2">注音</button><button class="btn" data-m="3">英文</button></div>`;
+    const upd=()=>{hud.textContent=`第 ${Math.min(q+1,N)}/${N} 題・${score} 分`};
+    const ask=()=>{if(q>=N){T.t(()=>done(score),300);return}const w=list[q],others=shuffle(W.filter(x=>x!==w)).slice(0,2),opts=shuffle([w,...others]);lock=false;let tries=0;
+      area.innerHTML=`<div class="wq"><span class="wpic">${w[0]}</span><small>這是什麼？</small></div><div class="wopts">${opts.map(o=>`<button class="wopt" data-a="${o===w?1:0}">${o[mode]}</button>`).join("")}</div><div class="wans" id="wAns"></div>`;
+      area.querySelectorAll(".wopt").forEach(b=>b.addEventListener("pointerdown",e=>{e.preventDefault();if(lock)return;
+        if(b.dataset.a==="1"){lock=true;score+=tries?1:2;b.classList.add("ok");sfx("pop");area.querySelector("#wAns").textContent=`${w[1]}・${w[2]}・${w[3]}`;q++;upd();T.t(ask,1100)}
+        else{tries++;b.classList.add("wrong");sfx("wake")}}));upd()};
+    area.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{mode=+b.dataset.m;list=shuffle(W.slice()).slice(0,N);ask()});
+    return()=>T.clear()},
+  clean(area,hud,done){const T=timers();let left=20,score=0,ended=false;const DIRT=["dust","paper","hair","dust"];
+    area.innerHTML=`<div class="cn-floor"></div>`;
+    const upd=()=>{hud.textContent=`剩 ${left} 秒・打掃了 ${score} 個`};
+    const add=()=>{if(area.querySelectorAll(".dirt").length>=10)return;const k=DIRT[Math.floor(Math.random()*DIRT.length)],b=document.createElement("button");b.className="dirt d-"+k;b.setAttribute("aria-label","髒東西");
+      b.style.left=(6+Math.random()*82)+"%";b.style.top=(10+Math.random()*76)+"%";
+      b.addEventListener("pointerdown",e=>{e.preventDefault();if(b._d)return;b._d=1;b.classList.add("poof");score++;sfx("pop");upd();T.t(()=>b.remove(),250)});area.appendChild(b)};
+    for(let i=0;i<8;i++)add();upd();T.i(()=>{if(left>8)add()},700);
+    T.i(()=>{left--;upd();if(left<=0&&!ended){ended=true;const clean=!area.querySelector(".dirt:not(.poof)");if(clean){area.classList.add("sparkle");score+=5}T.t(()=>done(score),clean?900:200)}},1000);
+    return()=>T.clear()},
+  chef(area,hud,done){const T=timers();const ING={bread:"🍞",lettuce:"🥬",tomato:"🍅",cheese:"🧀",egg:"🍳",ham:"🥓",cuke:"🥒"};
+    const RECIPES=[["bread","lettuce","tomato","bread"],["bread","cheese","ham","bread"],["bread","egg","lettuce","cheese","bread"],["bread","tomato","cuke","egg","bread"],["bread","ham","cheese","lettuce","tomato","bread"]];
+    let left=50,score=0,r=0,pos=0,rec=null,ended=false;
+    const upd=()=>{hud.textContent=`第 ${r} 份三明治・${score} 分・剩 ${left} 秒`};
+    const show=()=>{area.innerHTML=`<div class="ch-recipe">${rec.map((k,i)=>`<span class="${i<pos?"done":""}">${ING[k]}</span>`).join("<i>→</i>")}</div><div class="ch-plate">${rec.slice(0,pos).map((k,i)=>`<span style="bottom:${i*14}px">${ING[k]}</span>`).join("")}</div><div class="ch-btns">${Object.entries(ING).map(([k,e])=>`<button class="ch-b" data-k="${k}">${e}</button>`).join("")}</div>`;
+      area.querySelectorAll(".ch-b").forEach(b=>b.addEventListener("pointerdown",e=>{e.preventDefault();if(ended)return;
+        if(b.dataset.k===rec[pos]){pos++;sfx("pop");if(pos===rec.length){score+=rec.length;cheer();floatTxt("🥪 好吃！");T.t(nextR,500);show();return}show()}
+        else{b.classList.add("wrong");sfx("wake");T.t(()=>b.classList.remove("wrong"),300)}}))};
+    const nextR=()=>{r++;pos=0;rec=RECIPES[Math.min(r-1,RECIPES.length-1)];if(r>RECIPES.length){ended=true;done(score+Math.floor(left/5));return}upd();show()};
+    nextR();T.i(()=>{left--;upd();if(left<=0&&!ended){ended=true;done(score)}},1000);return()=>T.clear()},
   rhythm(area,hud,done){const T=timers(),p=P(),GAP=1000,APP=1000,N=20,PER=130,GOOD=260;
     area.innerHTML=`${partyFX()}<div class="r-pet">${petSVG(p.sp,"happy",false,p.wear)}</div><div class="r-target"><svg viewBox="0 0 44 40"><path d="M22 40 C8 30 0 23 0 13 C0 5 6 0 12 0 C16 0 20 2 22 6 C24 2 28 0 32 0 C38 0 44 5 44 13 C44 23 36 30 22 40 z" fill="#ff4f7b"/></svg></div><div class="r-judge" id="rJudge"></div><button class="r-hit" aria-label="跟著節奏點"></button>`;
     const pet=area.querySelector(".r-pet"),judge=area.querySelector("#rJudge"),t0=performance.now()+1200;let score=0,combo=0,maxC=0,idx=0,raf=0,dance=null;
@@ -1390,6 +1604,10 @@ const STICKERS=[
   {id:"bubble",e:"🫧",n:"泡泡王",d:"戳泡泡拿到 40 分",c:"#6cb8f0",ok:()=>best("bubble")>=40},
   {id:"cups",e:"🥤",n:"杯子神探",d:"猜杯子三回合全對",c:"#ff7a59",ok:()=>best("cups")>=9},
   {id:"whack",e:"🕳️",n:"躲貓貓高手",d:"躲貓貓拿到 30 分",c:"#a0662f",ok:()=>best("whack")>=30},
+  {id:"goldfish",e:"🎣",n:"釣魚高手",d:"釣到稀有的金魚",c:"#f2b51f",ok:()=>!!(S.fishdex&&S.fishdex["金魚"])},
+  {id:"mathkid",e:"🎈",n:"數學小天才",d:"數學氣球拿到 25 分",c:"#6cb8f0",ok:()=>best("math")>=25},
+  {id:"cleaner",e:"🧹",n:"愛乾淨小幫手",d:"打掃小屋拿到 25 分",c:"#4fae63",ok:()=>best("clean")>=25},
+  {id:"chef",e:"🥪",n:"三明治大廚",d:"小廚師做完全部 5 份三明治",c:"#ffb02e",ok:()=>best("chef")>=26},
   {id:"catch",e:"🎾",n:"接球達人",d:"接球接到 15 個",c:"#4fae63",ok:()=>best("catch")>=15},
   {id:"collect",e:"📖",n:"收藏家",d:"圖鑑收集 20 件",c:"#3d9bd6",ok:()=>bookCount()[0]>=20},
   {id:"festival",e:"🎉",n:"節慶寶寶",d:"領過 3 次節慶禮物",c:"#e5484d",ok:()=>Object.keys(S.claimed||{}).length>=3},
