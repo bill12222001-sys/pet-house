@@ -348,6 +348,8 @@ input[type=text]{font:inherit;border:2px solid var(--ink);border-radius:12px;pad
 .ab-floorL{left:4px;bottom:118px}.ab-floorR{right:4px;bottom:132px}.ab-rug{left:50%;bottom:2px;transform:translateX(-50%)}
 .rbub{position:absolute;bottom:60px;border-radius:50%;border:2px solid rgba(43,52,69,.45);background:radial-gradient(circle at 30% 30%,#fff 0 18%,rgba(173,222,255,.55) 20% 100%);padding:0;cursor:pointer;z-index:4;animation:rbub linear forwards}
 @keyframes rbub{to{transform:translate(var(--dx),-200px)}}
+.room-toy{position:absolute;right:15%;bottom:4%;width:46px;height:46px;border:0;background:none;padding:0;z-index:3;cursor:pointer;animation:bob 2.4s ease-in-out infinite}.room-toy svg{width:100%;height:100%;pointer-events:none}
+.room-toy span{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);font-size:10px;font-weight:900;background:#fff;border:2px solid var(--ink);border-radius:999px;padding:0 6px;white-space:nowrap;color:var(--ink);pointer-events:none}
 .rbub.popd{animation:none;transform:scale(1.5);opacity:0;transition:transform .15s,opacity .15s}
 .piano-bar{position:absolute;z-index:6;left:6px;right:6px;bottom:6px;background:rgba(255,255,255,.95);border:2px solid var(--ink);border-radius:14px;padding:6px;display:flex;flex-direction:column;gap:6px}
 .keys{display:grid;grid-template-columns:repeat(8,1fr);gap:3px}
@@ -989,7 +991,7 @@ function render(){
   $("pName").textContent=p.name;$("pSpecies").textContent=SPECIES[p.sp].n+"・"+STAGES[si].n+(traitLabel(p)?"・"+traitLabel(p):"");
   const af=Math.floor(p.aff||0),ab=$("affBar");if(ab.dataset.v!==String(af)){ab.dataset.v=af;ab.style.width=af+"%";$("affNum").textContent=af+"/100"}$("pLv").textContent="Lv."+p.lv;
   const pw=$("petWrap");if(pw.dataset.st!==String(si)){pw.dataset.st=si;pw.style.setProperty("--sc",STAGES[si].sc)}
-  checkWish();renderQuick();renderTheme();renderTricks();renderWall();renderDisco();renderActs();renderPainting();renderTut();
+  checkWish();renderQuick();renderTheme();renderTricks();renderWall();renderDisco();renderActs();renderRoomToy();renderPainting();renderTut();
   const mn=mealNow();const mb=$("mealBadge");
   mb.classList.toggle("on",!!mn&&!p.meals[mn]);
   mb.textContent=mn?(p.meals[mn]?`${MEAL[mn]}吃過了 ✓`:`現在是${MEAL[mn]}時間！`):`下一餐：${nextMeal()}`;
@@ -1100,7 +1102,7 @@ function openCloset(tab){
   const own=Object.keys(IT).filter(k=>S.owned[k]&&IT[k].cat===tab);
   const verbs={head:["穿上","脫下"],neck:["戴上","拿下"],deco:["擺放","收起"],toy:["使用","收起"]}[tab];
   const cards=own.map(k=>{const it=IT[k],u=inUse(k);return`<div class="item${it.hol?" hol":""}"><div class="pv">${pv(k)}</div><span class="t">${it.n}${it.hol?`<span class="tag">${HOLN[it.hol].n}</span>`:""}</span><div class="row"><span class="own">${u?"使用中":""}</span><button data-use="${k}" class="${u?"off":""}">${u?verbs[1]:verbs[0]}</button></div></div>`}).join("");
-  const tip={head:`戴在 ${p.name} 頭上`,neck:`掛在 ${p.name} 脖子上`,deco:"擺在小屋裡，每隻寵物都看得到。同一個位置只能放一樣",toy:"玩接球遊戲時會丟這個玩具，節慶玩具快樂加更多"}[tab];
+  const tip={head:`戴在 ${p.name} 頭上`,neck:`掛在 ${p.name} 脖子上`,deco:"擺在小屋裡，每隻寵物都看得到。同一個位置只能放一樣",toy:"選好的玩具會放在小屋地板上，點它就能陪寵物玩；玩接球遊戲時也會丟這個玩具"}[tab];
   sheet(`${p.name} 的衣櫥`,`${segHTML({...CATS,theme:"主題"},tab)}<p class="hint">${tip}</p>${own.length?`<div class="items">${cards}</div>`:`<p class="hint">這裡還空空的。去商店買，或在節慶時免費領取吧！</p>`}`,close=>{
     document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>openCloset(b.dataset.tab));
     document.querySelectorAll("[data-use]").forEach(b=>b.onclick=()=>{toggleUse(b.dataset.use);openCloset(tab)})},"closet");
@@ -2101,6 +2103,25 @@ function actPaint(p,id){actCd[id]=Date.now()+5000;busy=true;petSay(`${p.name}：
     sheet(`${p.name} 的畫`,`<div class="result"><div class="art-frame">${paintingSVG(seed)}</div><p class="hint">要把這幅畫掛在小屋牆上嗎？（會換掉原本掛的畫）</p></div><div class="btn-row"><button class="btn" id="hang">掛起來</button><button class="btn ghost" id="keep">收進畫冊</button></div>`,c=>{
       $("hang").onclick=()=>{S.painting=seed;paintKey="";save();c();cheer()};$("keep").onclick=()=>{c();toast(`已經收進畫冊（在日記裡）`)}},"art")},2600)}
 let paintKey="";
+let toyKey="",toyCd=0;
+function renderRoomToy(){const id=S.toy&&IT[S.toy]?S.toy:"";if(id===toyKey&&(!id||$("stage").querySelector(".room-toy")))return;toyKey=id;const st=$("stage");st.querySelectorAll(".room-toy").forEach(e=>e.remove());if(!id)return;
+  const b=document.createElement("button");b.className="room-toy";b.setAttribute("aria-label","陪牠玩"+IT[id].n);b.innerHTML=toyIc(id)+`<span>▶ 玩</span>`;b.onclick=()=>playToy(id);st.appendChild(b)}
+function playToy(id){const p=P(),it=IT[id];if(busy||partyOn||gaming)return;if(p.sleeping){toast("噓，牠在睡覺，醒來再玩吧");return}
+  if(Date.now()<toyCd)return;toyCd=Date.now()+3200;const st=$("stage"),el=st.querySelector(".room-toy"),pet=$("pet");if(!el)return;audioInit();
+  const kind=id==="t_bubblewand"?"bubble":id==="t_frisbee"?"frisbee":"toss";
+  if(kind==="bubble"){for(let i=0;i<10;i++)setTimeout(()=>{const b=document.createElement("button");b.className="rbub";b.setAttribute("aria-label","泡泡");const z=16+Math.random()*18;
+      b.style.cssText=`left:${52+Math.random()*16}%;width:${z}px;height:${z}px;animation-duration:${3+Math.random()*2}s;--dx:${(-140+Math.random()*120).toFixed(0)}px`;
+      b.addEventListener("pointerdown",e=>{e.preventDefault();if(b._p)return;b._p=1;b.classList.add("popd");sfx("pop");p.j=clamp(p.j+1);setTimeout(()=>b.remove(),160)});
+      b.addEventListener("animationend",()=>b.remove());st.appendChild(b)},i*150);
+    el.querySelector("svg").animate([{transform:"rotate(0)"},{transform:"rotate(-25deg)"},{transform:"rotate(15deg)"},{transform:"rotate(0)"}],{duration:500,iterations:3});
+    setTimeout(()=>pet.animate([{transform:"none"},{transform:"translateY(-30px)",offset:.3},{transform:"none",offset:.5},{transform:"translateY(-30px)",offset:.8},{transform:"none"}],{duration:1400}),500);floatTxt(`🫧 ${p.name} 在戳泡泡！`)}
+  else if(kind==="frisbee"){el.querySelector("svg").animate([{transform:"none"},{transform:"translate(-170px,-80px) rotate(720deg)",offset:.45},{transform:"translate(-170px,-80px) rotate(720deg)",offset:.6},{transform:"none"}],{duration:2200,easing:"ease-in-out"});
+    petWalkTo(26);setTimeout(()=>{pet.animate([{transform:"none"},{transform:"translateY(-70px) rotate(-20deg)",offset:.5},{transform:"none"}],{duration:700,easing:"ease-out"});sfx("pop")},650);floatTxt(`🥏 ${p.name}：接到了！`)}
+  else{el.querySelector("svg").animate([{transform:"none"},{transform:"translate(-70px,-100px) rotate(-200deg)",offset:.3},{transform:"translate(-120px,0) rotate(-360deg)",offset:.55},{transform:"translate(-100px,-24px) rotate(-400deg)",offset:.68},{transform:"translate(-120px,0) rotate(-420deg)",offset:.8},{transform:"none"}],{duration:2000,easing:"ease-in-out"});
+    petWalkTo(36);setTimeout(()=>pet.animate([{transform:"none"},{transform:"translateY(-24px) scale(1.05)"},{transform:"none"}],{duration:500}),1200);
+    if(id==="t_duck"&&actx){const t=actx.currentTime+.05;[0,.18].forEach(d=>tone(1400,t+d,.12,"square",.05,master))}else sfx("pop");floatTxt(`${it.n}：${p.name} 追過去了！`)}
+  vAnim([{transform:"none"},{transform:"translateY(-26px)",offset:.3},{transform:"none",offset:.5},{transform:"translateY(-18px)",offset:.75},{transform:"none"}],{duration:1200},400);
+  p.j=clamp(p.j+3);addAff(p,.3);stat("toyplay");firstTime(p,"toyplay_"+id,"🧸",`第一次在家玩${it.n}！`);cheer();save()}
 function renderPainting(){const k=String(S.painting||"");if(k===paintKey)return;paintKey=k;const st=$("stage");st.querySelectorAll(".wall-art").forEach(e=>e.remove());
   if(!S.painting)return;const d=document.createElement("div");d.className="wall-art";d.innerHTML=paintingSVG(S.painting);st.insertBefore(d,$("petWrap"))}
 
