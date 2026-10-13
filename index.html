@@ -1706,6 +1706,7 @@ const STICKERS=[
   {id:"trait",e:"🌱",n:"獨一無二",d:"寵物的性格定型",c:"#4fae63",ok:()=>S.pets.some(p=>p.trait)},
   {id:"walk",e:"🌳",n:"公園探險家",d:"在公園探索 20 次",c:"#3f9a52",ok:()=>st_("walk")>=20},
   {id:"friend",e:"🤝",n:"交朋友",d:"朋友的寵物來家裡玩",c:"#3d9bd6",ok:()=>st_("visit")>=1},
+  {id:"share",e:"🍪",n:"分享小天使",d:"把餅乾分給來玩的朋友 3 次",c:"#ffb02e",ok:()=>st_("share")>=3},
   {id:"party",e:"🪩",n:"派對動物",d:"在家裡開 10 次派對",c:"#9a6fd6",ok:()=>st_("party")>=10},
   {id:"rhythm",e:"🎵",n:"節奏大師",d:"派對節奏拿到 30 分",c:"#ff4f7b",ok:()=>best("rhythm")>=30},
   {id:"musician",e:"🎹",n:"小音樂家",d:"用小鋼琴彈 50 個音",c:"#3a2f5b",ok:()=>st_("piano")>=50},
@@ -1983,9 +1984,18 @@ function renderVisitor(){const st=$("stage");let el=st.querySelector(".visitor")
   if(!el){el=document.createElement("button");el.className="visitor";el.setAttribute("aria-label","客人");st.appendChild(el);el.onclick=greetVisitor}
   el.innerHTML=petSVG(visitor.sp,"happy",false,visitor.wear)+`<span class="vtag">${visitor.n}</span>`}
 function greetVisitor(){const v=visitor;if(!v)return;S.visits=S.visits||{};const key=v.id+"|"+today(),p=P();
-  if(S.visits[key]){petSay(`${v.n}：謝謝招待！`);return}S.visits[key]=1;
+  if(S.visits[key]){if((S.inv.cookie||0)>0)offerCookie();else petSay(`${v.n}：謝謝招待！`);return}S.visits[key]=1;
   S.coins+=2;addAff(p,1);diary(p,"🤝",`朋友的 ${v.n} 來家裡玩，我們一起玩了好久！`);stat("visit");
   petSay(`${v.n}：你好！我是 ${v.n}！`);floatTxt("🤝 金幣 +2");sfx("coin");cheer();checkStickers();save()}
+
+function offerCookie(){const v=visitor,p=P();if(!v||openSheet)return;const n=S.inv.cookie||0;if(n<=0){toast("沒有餅乾了，用小烤箱烤一些吧！");return}
+  sheet("分享餅乾",`<div class="result"><div class="pv big">${petSVG(v.sp,"happy",false,v.wear)}</div><b>要分一片手工餅乾給 ${v.n} 嗎？</b><p class="hint">🍪 你現在有 ${n} 片。一起分享，${p.name}會更開心喔！</p></div><div class="btn-row"><button class="btn" id="cShare">🍪 分給牠</button><button class="btn ghost" id="cKeep">先不要</button></div>`,c=>{
+    $("cKeep").onclick=c;$("cShare").onclick=()=>{c();shareCookie()}},"share")}
+function shareCookie(){const v=visitor,p=P();if(!v||(S.inv.cookie||0)<=0)return;S.inv.cookie--;
+  vAnim([{transform:"scale(1)"},{transform:"scale(1.08,.94)"},{transform:"scale(1)"},{transform:"scale(1.08,.94)"},{transform:"scale(1)"}],{duration:1000});
+  floatTxt(`🍪 ${v.n}：好好吃！謝謝你！`);for(let i=0;i<4;i++)setTimeout(()=>sparkle("heart"),i*150);sfx("eat");
+  p.j=clamp(p.j+4);addAff(p,1);stat("share");const k="share|"+v.id+"|"+today();S.visits=S.visits||{};if(!S.visits[k]){S.visits[k]=1;diary(p,"🍪",`把手工餅乾分給朋友的 ${v.n}，一起吃好開心！`)}
+  cheer();checkStickers();save();render()}
 
 /* ---------- party lights: 20-second dance party (soft colour changes, no strobe) ---------- */
 let partyOn=false,partyT=0,partyAnim=null;
@@ -2023,36 +2033,40 @@ function useAct(id){const p=P(),it=IT[id];if(busy||partyOn)return;if(p.sleeping)
   if(Date.now()<(actCd[id]||0)){toast(`${it.n}休息一下，等等再玩`);return}
   ({bubbles:actBubbles,piano:actPiano,tv:actTV,tramp:actTramp,oven:actOven,paint:actPaint})[it.act](p,id);
   stat("act_"+it.act);firstTime(p,"act_"+it.act,"✨",`第一次玩了${it.n}！`);checkStickers();save()}
+function vAnim(kf,o,delay){const go=()=>{const v=$("stage").querySelector(".visitor svg");if(v&&v.animate)v.animate(kf,Object.assign({duration:900,easing:"ease-in-out"},o))};if(!visitor)return false;delay?setTimeout(go,delay):go();return true}
 function petWalkTo(xPct){const pw=$("petWrap");pw.style.transition="left .7s ease-in-out";pw.style.left=xPct+"%";setTimeout(()=>{pw.style.left="";setTimeout(()=>pw.style.transition="",800)},2600)}
 function actBubbles(p,id){actCd[id]=Date.now()+6000;const st=$("stage");let popped=0;
   for(let i=0;i<12;i++)setTimeout(()=>{const b=document.createElement("button");b.className="rbub";b.setAttribute("aria-label","泡泡");const s=18+Math.random()*20;
     b.style.cssText=`left:${8+Math.random()*30}%;width:${s}px;height:${s}px;animation-duration:${3+Math.random()*2}s;--dx:${(60+Math.random()*160).toFixed(0)}px`;
     b.addEventListener("pointerdown",e=>{e.preventDefault();if(b._p)return;b._p=1;popped++;b.classList.add("popd");sfx("pop");p.j=clamp(p.j+1);setTimeout(()=>b.remove(),160)});
     b.addEventListener("animationend",()=>b.remove());st.appendChild(b)},i*160);
-  petWalkTo(35);setTimeout(()=>petWalkTo(62),1300);p.j=clamp(p.j+4);addAff(p,.5);floatTxt("🫧 追泡泡！");cheer()}
+  petWalkTo(35);setTimeout(()=>petWalkTo(62),1300);p.j=clamp(p.j+4);addAff(p,.5);floatTxt(visitor?`🫧 和 ${visitor.n} 一起追泡泡！`:"🫧 追泡泡！");cheer();
+  vAnim([{transform:"none"},{transform:"translate(30px,-26px)",offset:.2},{transform:"translate(55px,0)",offset:.4},{transform:"translate(70px,-30px)",offset:.6},{transform:"translate(40px,0)",offset:.8},{transform:"none"}],{duration:2800},300)}
 const NOTES_P=["C5","D5","E5","F5","G5","A5","B5","C6"],SONG="C5 C5 G5 G5 A5 A5 G5 - F5 F5 E5 E5 D5 D5 C5 -".split(" ");
 function actPiano(p,id){busy=true;const st=$("stage"),bar=document.createElement("div");bar.className="piano-bar";
   bar.innerHTML=`<div class="keys">${NOTES_P.map((n,i)=>`<button class="pkey" data-n="${n}" style="--h:${i*40}">${"Do Re Mi Fa So La Si Do".split(" ")[i]}</button>`).join("")}</div><div class="prow"><button class="btn" id="pSong">彈「小星星」</button><button class="btn ghost" id="pClose">好了</button></div>`;
   st.appendChild(bar);audioInit();let notes=0,songT=[];
   const play=n=>{if(actx){tone(hz(n),actx.currentTime+.01,.5,"triangle",.22,master,1)}floatTxt("♪");notes++;stat("piano");
-    $("pet").animate([{transform:"translateY(0) rotate(0)"},{transform:"translateY(-10px) rotate(-6deg)"},{transform:"translateY(0) rotate(0)"}],{duration:300})};
+    $("pet").animate([{transform:"translateY(0) rotate(0)"},{transform:"translateY(-10px) rotate(-6deg)"},{transform:"translateY(0) rotate(0)"}],{duration:300});
+    vAnim([{transform:"none"},{transform:"translateY(-12px) rotate(6deg)"},{transform:"none"}],{duration:320},60)};
   bar.querySelectorAll(".pkey").forEach(k=>k.addEventListener("pointerdown",e=>{e.preventDefault();play(k.dataset.n);k.classList.add("on");setTimeout(()=>k.classList.remove("on"),180)}));
   $("pSong").onclick=()=>{songT.forEach(clearTimeout);songT=SONG.map((n,i)=>setTimeout(()=>{if(n==="-")return;play(n);const k=bar.querySelector(`[data-n="${n}"]`);if(k){k.classList.add("on");setTimeout(()=>k.classList.remove("on"),250)}},i*480));
-    setTimeout(()=>petSay(`${p.name}：一閃一閃亮晶晶～ 🎵`),SONG.length*480+200)};
+    setTimeout(()=>petSay(visitor?`${p.name} 和 ${visitor.n}：一閃一閃亮晶晶～ 🎵`:`${p.name}：一閃一閃亮晶晶～ 🎵`),SONG.length*480+200)};
   $("pClose").onclick=()=>{songT.forEach(clearTimeout);bar.remove();busy=false;if(notes>=5){p.j=clamp(p.j+6);addAff(p,1)}cheer();save();render()};
 }
 function actTV(p,id){actCd[id]=Date.now()+30*60*1000;busy=true;const st=$("stage"),scr=document.createElement("div");scr.className="tv-show";scr.innerHTML=`<i></i><i></i><i></i>`;st.appendChild(scr);
-  petSay(`${p.name}：卡通好好看～`);let t=0;const iv=setInterval(()=>{t++;p.e=clamp(p.e+1);if(t===8){clearInterval(iv);scr.remove();busy=false;p.j=clamp(p.j+5);addAff(p,.5);toast(`${p.name} 看完卡通，精神好多了！`);cheer();save()}},1000);
+  petSay(visitor?`${p.name} 和 ${visitor.n}：卡通好好看～`:`${p.name}：卡通好好看～`);vAnim([{transform:"rotate(0)"},{transform:"rotate(-5deg)"},{transform:"rotate(5deg)"},{transform:"rotate(0)"}],{duration:1600,iterations:5});let t=0;const iv=setInterval(()=>{t++;p.e=clamp(p.e+1);if(t===8){clearInterval(iv);scr.remove();busy=false;p.j=clamp(p.j+5);addAff(p,.5);toast(`${p.name} 看完卡通，精神好多了！`);cheer();save()}},1000);
   toast("看一小段卡通，休息一下（每 30 分鐘一次）")}
 function actTramp(p,id){actCd[id]=Date.now()+4000;const el=$("pet");
   el.animate([{transform:"none"},{transform:"translateY(-40px)",offset:.15},{transform:"none",offset:.3},{transform:"translateY(-70px)",offset:.48},{transform:"none",offset:.62},{transform:"translateY(-110px) rotate(360deg)",offset:.85},{transform:"none"}],{duration:2200,easing:"ease-in-out"});
-  for(let i=0;i<6;i++)setTimeout(()=>sparkle("star"),1300+i*80);p.j=clamp(p.j+4);p.e=clamp(p.e-2);addAff(p,.5);floatTxt("🤸 彈彈彈！");sfx("pop");setTimeout(()=>sfx("level"),1800)}
+  for(let i=0;i<6;i++)setTimeout(()=>sparkle("star"),1300+i*80);p.j=clamp(p.j+4);p.e=clamp(p.e-2);addAff(p,.5);floatTxt(visitor?`🤸 和 ${visitor.n} 一起彈彈彈！`:"🤸 彈彈彈！");sfx("pop");setTimeout(()=>sfx("level"),1800);
+  vAnim([{transform:"none"},{transform:"translate(70px,-40px)",offset:.12},{transform:"translate(80px,0)",offset:.24},{transform:"translate(80px,-70px)",offset:.42},{transform:"translate(80px,0)",offset:.56},{transform:"translate(80px,-110px) rotate(-360deg)",offset:.78},{transform:"translate(80px,0) rotate(-360deg)",offset:.88},{transform:"none"}],{duration:2600},250)}
 const OVEN_PRICE=3,OVEN_DAY=3;
 function actOven(p,id){const d=daily();d.bake=d.bake||0;if(d.bake>=OVEN_DAY){toast(`今天已經烤了 ${OVEN_DAY} 次，明天再烤吧！`);return}
   if(S.coins<OVEN_PRICE){toast(`烤餅乾要 ${OVEN_PRICE} 金幣材料費`);return}
   S.coins-=OVEN_PRICE;d.bake++;busy=true;actCd[id]=Date.now()+1000;const st=$("stage"),glow=document.createElement("div");glow.className="oven-glow";glow.innerHTML=`<b>10</b>`;st.appendChild(glow);
   petSay(`${p.name}：好香喔～`);let t=10;const iv=setInterval(()=>{t--;glow.querySelector("b").textContent=t;if(t<=0){clearInterval(iv);glow.remove();busy=false;
-    S.inv.cookie=(S.inv.cookie||0)+2;stat("bake");sfx("level");toast("🍪 烤好了！得到 2 片手工餅乾（在餵食裡）","levelup");cheer();save();render()}},1000);render()}
+    S.inv.cookie=(S.inv.cookie||0)+2;stat("bake");sfx("level");toast("🍪 烤好了！得到 2 片手工餅乾（在餵食裡）","levelup");cheer();save();render();if(visitor)setTimeout(()=>offerCookie(),900)}},1000);render()}
 function paintingSVG(seed){let x=seed||1;const R=()=>(x=(x*16807)%2147483647)/2147483647;const C=["#ff7a59","#ffd35c","#4fae63","#6cb8f0","#b9a6e8","#ff8fb1","#3d9bd6"];
   let s=`<rect width="100" height="80" fill="${["#fff8e7","#eef6f9","#fdf0f5"][Math.floor(R()*3)]}"/>`;
   for(let i=0;i<6;i++){const c=C[Math.floor(R()*C.length)],k=Math.floor(R()*3);
@@ -2062,6 +2076,7 @@ function paintingSVG(seed){let x=seed||1;const R=()=>(x=(x*16807)%2147483647)/21
   return`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">${s}</svg>`}
 function actPaint(p,id){actCd[id]=Date.now()+5000;busy=true;petSay(`${p.name}：我要畫一幅畫！`);
   const el=$("pet");el.animate([{transform:"rotate(0)"},{transform:"rotate(-6deg)"},{transform:"rotate(6deg)"},{transform:"rotate(0)"}],{duration:500,iterations:5});
+  if(vAnim([{transform:"none"},{transform:"translate(40px,-6px) rotate(8deg)",offset:.3},{transform:"translate(40px,-6px) rotate(8deg)",offset:.8},{transform:"none"}],{duration:2600}))setTimeout(()=>{if(visitor)floatTxt(`${visitor.n}：畫得好棒！👏`)},1800);
   setTimeout(()=>{busy=false;const seed=Math.floor(Math.random()*2147483646)+1;S.gallery=S.gallery||[];S.gallery.push({seed,t:Date.now(),pid:p.id});if(S.gallery.length>24)S.gallery.shift();
     stat("paint");diary(p,"🎨","畫了一幅畫！");p.j=clamp(p.j+5);addAff(p,1);save();sfx("level");
     sheet(`${p.name} 的畫`,`<div class="result"><div class="art-frame">${paintingSVG(seed)}</div><p class="hint">要把這幅畫掛在小屋牆上嗎？（會換掉原本掛的畫）</p></div><div class="btn-row"><button class="btn" id="hang">掛起來</button><button class="btn ghost" id="keep">收進畫冊</button></div>`,c=>{
