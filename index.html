@@ -312,6 +312,7 @@ input[type=text]{font:inherit;border:2px solid var(--ink);border-radius:12px;pad
 .qr{width:220px;height:220px;max-width:100%;border:3px solid var(--ink);border-radius:12px}
 .visitor{position:absolute;left:4%;bottom:6%;width:96px;height:96px;border:0;background:none;padding:0;cursor:pointer;z-index:2;animation:bob 2.2s ease-in-out infinite}
 .visitor svg{width:100%;height:100%}
+.visitor.vs1{left:auto;right:4%}.visitor.vs2{left:21%;bottom:1%;width:80px;height:80px;z-index:3}
 .vtag{position:absolute;left:50%;top:-6px;transform:translateX(-50%);background:var(--sky);color:#fff;border-radius:999px;font-size:11px;font-weight:900;padding:1px 8px;white-space:nowrap}
 .disco-btn{position:absolute;z-index:3;top:46px;left:calc(98px + (100% - 112px)/2 - 30px);width:60px;height:58px;border:0;background:none;padding:0;cursor:pointer;border-radius:50%}
 .disco-btn span{position:absolute;left:calc(100% - 4px);top:50%;transform:translateY(-50%);white-space:nowrap;background:var(--plum);color:#fff;font-size:11px;font-weight:900;border-radius:999px;padding:1px 8px;animation:bob 1.6s ease-in-out infinite}
@@ -1750,15 +1751,17 @@ function photoSVG(mem,fr){const p=P(),[wall,floor]=TH_COL[S.theme||"wood"]||TH_C
   if(R.top&&IT[R.top])g+=nest(IT[R.top].art(),px+146,py+60,pw-170,86);
   if(R.floorL&&IT[R.floorL])g+=nest(IT[R.floorL].art(),px+10,py+ph-15-104*sc,68*sc,104*sc);
   if(R.floorR&&IT[R.floorR])g+=nest(IT[R.floorR].art(),px+pw-10-72*sc,py+ph-15-118*sc,72*sc,118*sc);
-  const ps=(fr?290:330)*STAGES[stageOf(p.lv)].sc,cx=fr?px+pw*.64:px+pw/2;
-  if(fr){const fs=250*STAGES[stageOf(fr.lv)].sc,fx=px+pw*.27;g+=nest(petSVG(fr.sp,"happy",false,fr.wear),fx-fs/2,py+ph-fs-10,fs,fs)+heart(px+pw*.46,py+ph-ps-4,1.3,"#ff4f7b")}
+  const frs=fr||[],nAll=frs.length+1,base=[330,290,230,190][frs.length]||190,ps=base*STAGES[stageOf(p.lv)].sc,mid=frs.length?Math.ceil(frs.length/2):0;
+  const slots=frs.length===1?[.27,.64]:Array.from({length:nAll},(_,k)=>(k+.5)/nAll),cx=px+pw*slots[frs.length===1?1:mid];
+  frs.forEach((f,k)=>{const fs=(base-30)*STAGES[stageOf(f.lv)].sc,si=frs.length===1?0:(k<mid?k:k+1),fx=px+pw*slots[si];g+=nest(petSVG(f.sp,"happy",false,f.wear),fx-fs/2,py+ph-fs-10,fs,fs)});
+  if(frs.length)g+=heart(cx-ps*.45,py+ph-ps-4,1.2,"#ff4f7b")+heart(cx+ps*.45,py+ph-ps-4,1.2,"#ff4f7b");
   g+=nest(petSVG(p.sp,"happy",false,p.wear),cx-ps/2,py+ph-ps-6,ps,ps);
   const wl=(S.wall||[]).slice(0,6).map(id=>STICKERS.find(x=>x.id===id)).filter(Boolean),bx=px+8*sc,by=py+88*vs,bw=96*sc,bh=66*vs;
   let stk=wl.length?`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="6" fill="#d2a46b" stroke="#8a5a2b" stroke-width="5"/>`+wl.map((s,i)=>{const x=bx+bw*(i%3*2+1)/6,y=by+bh*(Math.floor(i/3)*2+1)/4;
     return`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(13*sc).toFixed(1)}" fill="#fff" stroke="${s.c}" stroke-width="4"/><text x="${x.toFixed(1)}" y="${(y+7).toFixed(1)}" text-anchor="middle" font-size="19">${s.e}</text>`}).join(""):"";
   if(partyOn){stk+=`<rect x="${px}" y="${py}" width="${pw}" height="${ph}" fill="#140a28" opacity=".35"/>`+[["#ff4f7b",-30],["#6cb8f0",0],["#ffd35c",30]].map(([c,a])=>`<path d="M${px+pw/2} ${py+30} L${px+pw/2-90} ${py+ph} L${px+pw/2+90} ${py+ph} z" fill="${c}" opacity=".28" transform="rotate(${a} ${px+pw/2} ${py+30})"/>`).join("")+Array.from({length:30},()=>`<rect x="${rnd(px,px+pw).toFixed(1)}" y="${rnd(py,py+ph).toFixed(1)}" width="8" height="5" fill="${["#ff7a59","#ffd35c","#4fae63","#6cb8f0","#ff8fb1"][Math.floor(Math.random()*5)]}" transform="rotate(${rnd(0,90).toFixed(0)})" transform-origin="center" style="transform-box:fill-box"/>`).join("")}
   if(activeHol().some(i=>i.h.id==="xmas"))for(let i=0;i<40;i++)stk+=`<circle cx="${rnd(px,px+pw).toFixed(1)}" cy="${rnd(py,py+ph).toFixed(1)}" r="${rnd(2.5,5).toFixed(1)}" fill="#fff" stroke="#c9d8f2" stroke-width="1"/>`;
-  const title=fr?`${esc(p.name)} 和 ${esc(fr.n)}`:`${esc(p.name)} Lv.${p.lv}・${STAGES[stageOf(p.lv)].n}`,sub=fr?`${partyOn?"一起開派對":"好朋友來家裡玩"}・${fmtDate(Date.now())}`:partyOn?`🪩 派對時間・${fmtDate(Date.now())}`:`${esc(SPECIES[p.sp].n)}・一起生活 ${daysWith(p)} 天・${fmtDate(Date.now())}`;
+  const fNames=frs.map(f=>f.n).join("、"),title=frs.length?(fNames.length<=10?`${esc(p.name)} 和 ${esc(fNames)}`:`${esc(p.name)} 和 ${frs.length} 位好朋友`):`${esc(p.name)} Lv.${p.lv}・${STAGES[stageOf(p.lv)].n}`,sub=frs.length?`${partyOn?"一起開派對":"好朋友來家裡玩"}・${fmtDate(Date.now())}`:partyOn?`🪩 派對時間・${fmtDate(Date.now())}`:`${esc(SPECIES[p.sp].n)}・一起生活 ${daysWith(p)} 天・${fmtDate(Date.now())}`;
   const memDeco=mem?`<rect x="8" y="8" width="${W-16}" height="${H-16}" rx="14" fill="none" stroke="#f2b51f" stroke-width="10"/>`+[[40,40],[W-40,40],[40,H-40],[W-40,H-40]].map(([x,y])=>heart(x,y-10,1.4,"#ff4f7b")).join("")+`<text x="${W/2}" y="${py+ph+190}" text-anchor="middle" font-family="PingFang TC,Noto Sans TC,Microsoft JhengHei,sans-serif" font-size="26" font-weight="900" fill="#ff4f7b">💞 最好的朋友・親密度 100</text>`:"";
   return`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" rx="18" fill="${mem?"#fff6dc":"#fffdf8"}"/>${memDeco}<rect x="1" y="1" width="${W-2}" height="${H-2}" rx="18" fill="none" stroke="#e6ddd0" stroke-width="2"/><clipPath id="cp"><rect x="${px}" y="${py}" width="${pw}" height="${ph}" rx="10"/></clipPath><g clip-path="url(#cp)">${g}${stk}</g><rect x="${px}" y="${py}" width="${pw}" height="${ph}" rx="10" fill="none" stroke="#2b3445" stroke-width="4"/>
 <text x="${W/2}" y="${py+ph+90}" text-anchor="middle" font-family="PingFang TC,Noto Sans TC,Microsoft JhengHei,sans-serif" font-size="40" font-weight="900" fill="#2b3445">${title}</text>
@@ -1767,8 +1770,8 @@ function photoSVG(mem,fr){const p=P(),[wall,floor]=TH_COL[S.theme||"wood"]||TH_C
 function makePhoto(mem,fr){return new Promise((res,rej)=>{const svg=photoSVG(mem,fr),img=new Image();
   img.onload=()=>{try{const c=document.createElement("canvas");c.width=1200;c.height=1520;const x=c.getContext("2d");x.scale(2,2);x.drawImage(img,0,0);c.toBlob(b=>b?res(b):rej(),"image/png")}catch(e){rej(e)}};
   img.onerror=rej;img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg)})}
-async function openPhoto(mem){const p=P();let url="";const canMem=(p.aff||0)>=100,fr=visitor&&!photoSolo?visitor:null;
-  sheet("寵物拍立得",`<div class="photo"><div id="phBox" class="ph-box">拍照中…</div><p class="hint">按「存到相簿」後選<b>「儲存影像」</b>就會存進相簿，也可以直接傳到 LINE。或是<b>長按照片</b>選「加入照片」。</p>${visitor?`<div class="seg"><button data-fr="1" aria-pressed="${!photoSolo}">👫 和 ${visitor.n} 合照</button><button data-fr="" aria-pressed="${photoSolo}">只有 ${p.name}</button></div>`:""}${canMem?`<div class="seg"><button data-pm="" aria-pressed="${!mem}">一般照片</button><button data-pm="1" aria-pressed="${!!mem}">💞 紀念照</button></div>`:`<p class="hint">親密度到 100 會解鎖金框「紀念照」（目前 ${Math.floor(p.aff||0)}）。</p>`}<div class="btn-row"><button class="btn" id="phSave" disabled>存到相簿／分享</button><button class="btn ghost" id="phAgain">再拍一張</button></div></div>`,()=>{
+async function openPhoto(mem){const p=P();let url="";const canMem=(p.aff||0)>=100,fr=visitors.length&&!photoSolo?visitors:null;
+  sheet("寵物拍立得",`<div class="photo"><div id="phBox" class="ph-box">拍照中…</div><p class="hint">按「存到相簿」後選<b>「儲存影像」</b>就會存進相簿，也可以直接傳到 LINE。或是<b>長按照片</b>選「加入照片」。</p>${visitors.length?`<div class="seg"><button data-fr="1" aria-pressed="${!photoSolo}">👫 和${visitors.length>1?"客人們":" "+visitors[0].n}合照</button><button data-fr="" aria-pressed="${photoSolo}">只有 ${p.name}</button></div>`:""}${canMem?`<div class="seg"><button data-pm="" aria-pressed="${!mem}">一般照片</button><button data-pm="1" aria-pressed="${!!mem}">💞 紀念照</button></div>`:`<p class="hint">親密度到 100 會解鎖金框「紀念照」（目前 ${Math.floor(p.aff||0)}）。</p>`}<div class="btn-row"><button class="btn" id="phSave" disabled>存到相簿／分享</button><button class="btn ghost" id="phAgain">再拍一張</button></div></div>`,()=>{
     document.querySelectorAll("[data-pm]").forEach(b=>b.onclick=()=>openPhoto(!!b.dataset.pm));
     document.querySelectorAll("[data-fr]").forEach(b=>b.onclick=()=>{photoSolo=!b.dataset.fr;openPhoto(mem)});
     $("phAgain").onclick=()=>{cheer();setTimeout(()=>openPhoto(mem),300)};
@@ -1971,30 +1974,44 @@ ${qr||`<p class="hint">這裡產生不了 QR Code，請改用下面的連結。<
     $("vGo").onclick=()=>{const t=$("vIn").value.trim(),m=t.match(/#?v=([\w-]+)/)||t.match(/^([\w-]{20,})$/);
       if(!m||!acceptVisit(m[1],false)){$("vMsg").innerHTML=`<span class="warn">看不懂這個連結，請確認有完整貼上（裡面有「#v=」）。</span>`;return}}},"visit");
 }
-let visitor=null;
+const MAX_GUESTS=3;
+let visitors=(Array.isArray(S.guests)?S.guests:[]).filter(v=>v&&SPECIES[v.sp]&&typeof v.n==="string").slice(0,MAX_GUESTS);
+const gNames=()=>visitors.map(v=>v.n).join("、");
+const saveGuests=()=>{S.guests=visitors;save()};
 function readVisit(){const m=location.hash.match(/^#v=([\w-]+)/);if(!m)return;
   try{history.replaceState(null,"",location.pathname)}catch(e){}acceptVisit(m[1],true)}
 function acceptVisit(code,fromLink){const v=b64u.dec(code);
   if(!v||!SPECIES[v.sp]||typeof v.n!=="string")return false;
   v.n=v.n.slice(0,8);v.lv=Math.max(1,Math.min(99,+v.lv||1));v.wear={head:IT[v.h]&&IT[v.h].cat==="head"?v.h:null,neck:IT[v.k]&&IT[v.k].cat==="neck"?v.k:null};
   if(S.pets.some(p=>Math.round(p.id%1e9)===v.id)){toast("這是你自己的寵物的邀請卡喔！");return true}
-  visitor=v;renderVisitor();
-  setTimeout(()=>{if(fromLink&&openSheet)return;sheet("有客人來了！",`<div class="result"><div class="pv big">${petSVG(v.sp,"happy",false,v.wear)}</div><b>朋友的 ${v.n} 來拜訪了！</b><p class="hint">${SPECIES[v.sp].n}・Lv.${v.lv}${TRAITS[v.t]?"・"+TRAITS[v.t].n:""}。點小屋裡的牠打個招呼吧！</p></div><button class="btn" id="vOk">歡迎歡迎！</button>`,c=>{$("vOk").onclick=c},"visitor")},fromLink?700:50);return true}
-function renderVisitor(){const st=$("stage");let el=st.querySelector(".visitor");if(!visitor){if(el)el.remove();return}
-  if(!el){el=document.createElement("button");el.className="visitor";el.setAttribute("aria-label","客人");st.appendChild(el);el.onclick=greetVisitor}
-  el.innerHTML=petSVG(visitor.sp,"happy",false,visitor.wear)+`<span class="vtag">${visitor.n}</span>`}
-function greetVisitor(){const v=visitor;if(!v)return;S.visits=S.visits||{};const key=v.id+"|"+today(),p=P();
-  if(S.visits[key]){if((S.inv.cookie||0)>0)offerCookie();else petSay(`${v.n}：謝謝招待！`);return}S.visits[key]=1;
+  const old=visitors.findIndex(x=>x.id===v.id);
+  if(old>=0){visitors[old]=v;saveGuests();renderVisitors();toast(`${v.n} 已經在家裡玩囉！`);return true}
+  if(visitors.length>=MAX_GUESTS){setTimeout(()=>guestsFull(v),fromLink?700:50);return true}
+  visitors.push(v);saveGuests();renderVisitors();
+  setTimeout(()=>{if(fromLink&&openSheet)return;sheet("有客人來了！",`<div class="result"><div class="pv big">${petSVG(v.sp,"happy",false,v.wear)}</div><b>朋友的 ${v.n} 來拜訪了！</b><p class="hint">${SPECIES[v.sp].n}・Lv.${v.lv}${TRAITS[v.t]?"・"+TRAITS[v.t].n:""}。點小屋裡的牠打個招呼吧！${visitors.length>1?`<br>現在家裡有 ${visitors.length} 位客人：${gNames()}`:""}</p></div><button class="btn" id="vOk">歡迎歡迎！</button>`,c=>{$("vOk").onclick=c},"visitor")},fromLink?700:50);return true}
+function guestsFull(nv){if(openSheet)return;
+  sheet("家裡客人滿了",`<p class="hint">小屋最多同時招待 ${MAX_GUESTS} 位客人。要先送哪一位回家，讓 <b>${nv.n}</b> 進來呢？</p><div class="glist">${visitors.map((v,i)=>`<button class="gcard" data-sendhome="${i}"><span class="ge" style="width:56px;height:56px">${petSVG(v.sp,"happy",false,v.wear)}</span><b>${v.n}</b><small>送牠回家</small></button>`).join("")}</div><button class="btn ghost" id="gfNo">先不要</button>`,c=>{
+    $("gfNo").onclick=c;document.querySelectorAll("[data-sendhome]").forEach(b=>b.onclick=()=>{const i=+b.dataset.sendhome,o=visitors[i];visitors.splice(i,1);visitors.push(nv);saveGuests();renderVisitors();c();toast(`👋 ${o.n} 回家了，${nv.n} 來玩囉！`)})},"visitor")}
+function renderVisitors(){const st=$("stage");st.querySelectorAll(".visitor").forEach(e=>{if(!visitors[+e.dataset.gi]||e.dataset.gid!=String(visitors[+e.dataset.gi].id))e.remove()});
+  visitors.forEach((v,i)=>{let el=st.querySelector(`.visitor[data-gi="${i}"]`);
+    if(!el){el=document.createElement("button");el.className="visitor vs"+i;el.dataset.gi=i;el.dataset.gid=v.id;el.setAttribute("aria-label","客人 "+v.n);st.appendChild(el);el.onclick=()=>greetVisitor(i);
+      el.innerHTML=petSVG(v.sp,"happy",false,v.wear)+`<span class="vtag">${v.n}</span>`;if(partyOn)el.classList.add("dance")}})}
+function greetVisitor(i){const v=visitors[i];if(!v||busy)return;S.visits=S.visits||{};const key=v.id+"|"+today(),p=P();
+  if(S.visits[key]){guestMenu(i);return}S.visits[key]=1;
   S.coins+=2;addAff(p,1);diary(p,"🤝",`朋友的 ${v.n} 來家裡玩，我們一起玩了好久！`);stat("visit");
   petSay(`${v.n}：你好！我是 ${v.n}！`);floatTxt("🤝 金幣 +2");sfx("coin");cheer();checkStickers();save()}
-
-function offerCookie(){const v=visitor,p=P();if(!v||openSheet)return;const n=S.inv.cookie||0;if(n<=0){toast("沒有餅乾了，用小烤箱烤一些吧！");return}
-  sheet("分享餅乾",`<div class="result"><div class="pv big">${petSVG(v.sp,"happy",false,v.wear)}</div><b>要分一片手工餅乾給 ${v.n} 嗎？</b><p class="hint">🍪 你現在有 ${n} 片。一起分享，${p.name}會更開心喔！</p></div><div class="btn-row"><button class="btn" id="cShare">🍪 分給牠</button><button class="btn ghost" id="cKeep">先不要</button></div>`,c=>{
-    $("cKeep").onclick=c;$("cShare").onclick=()=>{c();shareCookie()}},"share")}
-function shareCookie(){const v=visitor,p=P();if(!v||(S.inv.cookie||0)<=0)return;S.inv.cookie--;
-  vAnim([{transform:"scale(1)"},{transform:"scale(1.08,.94)"},{transform:"scale(1)"},{transform:"scale(1.08,.94)"},{transform:"scale(1)"}],{duration:1000});
-  floatTxt(`🍪 ${v.n}：好好吃！謝謝你！`);for(let i=0;i<4;i++)setTimeout(()=>sparkle("heart"),i*150);sfx("eat");
-  p.j=clamp(p.j+4);addAff(p,1);stat("share");const k="share|"+v.id+"|"+today();S.visits=S.visits||{};if(!S.visits[k]){S.visits[k]=1;diary(p,"🍪",`把手工餅乾分給朋友的 ${v.n}，一起吃好開心！`)}
+function guestMenu(i){const v=visitors[i];if(!v||openSheet)return;const n=S.inv.cookie||0;
+  sheet(`${v.n} 在家裡玩`,`<div class="result"><div class="pv big">${petSVG(v.sp,"happy",false,v.wear)}</div><b>${v.n}：謝謝招待！</b><p class="hint">${SPECIES[v.sp].n}・Lv.${v.lv}</p></div><div class="btn-row"><button class="btn" id="gmCookie" ${n?"":"disabled"}>🍪 分餅乾${n?`（剩 ${n} 片）`:"（沒有餅乾）"}</button><button class="btn ghost" id="gmHome">👋 送牠回家</button></div>`,c=>{
+    $("gmCookie").onclick=()=>{c();shareCookie(i)};$("gmHome").onclick=()=>{c();sendHome(i)}},"guest")}
+function sendHome(i){const v=visitors[i];if(!v)return;visitors.splice(i,1);saveGuests();
+  const st=$("stage");st.querySelectorAll(".visitor").forEach(e=>e.remove());renderVisitors();petSay(`${P().name}：${v.n} 掰掰～下次再來玩！`);toast(`👋 ${v.n} 回家了`)}
+function offerCookie(){const p=P();if(!visitors.length||openSheet)return;const n=S.inv.cookie||0;if(n<=0)return;
+  sheet("分享餅乾",`<div class="result"><b>要分手工餅乾給客人嗎？</b><p class="hint">🍪 你現在有 ${n} 片。一起分享，${p.name}會更開心喔！</p></div><div class="glist">${visitors.map((v,i)=>`<button class="gcard" data-cookie="${i}"><span class="ge" style="width:56px;height:56px">${petSVG(v.sp,"happy",false,v.wear)}</span><b>分給 ${v.n}</b></button>`).join("")}</div><button class="btn ghost" id="cKeep">先不要</button>`,c=>{
+    $("cKeep").onclick=c;document.querySelectorAll("[data-cookie]").forEach(b=>b.onclick=()=>{c();shareCookie(+b.dataset.cookie);if((S.inv.cookie||0)>0&&visitors.length>1)setTimeout(offerCookie,1300)})},"share")}
+function shareCookie(i){const v=visitors[i],p=P();if(!v||(S.inv.cookie||0)<=0)return;S.inv.cookie--;
+  vAnim([{transform:"scale(1)"},{transform:"scale(1.08,.94)"},{transform:"scale(1)"},{transform:"scale(1.08,.94)"},{transform:"scale(1)"}],{duration:1000},0,i);
+  floatTxt(`🍪 ${v.n}：好好吃！謝謝你！`);for(let k=0;k<4;k++)setTimeout(()=>sparkle("heart"),k*150);sfx("eat");
+  p.j=clamp(p.j+4);addAff(p,1);stat("share");const key="share|"+v.id+"|"+today();S.visits=S.visits||{};if(!S.visits[key]){S.visits[key]=1;diary(p,"🍪",`把手工餅乾分給朋友的 ${v.n}，一起吃好開心！`)}
   cheer();checkStickers();save();render()}
 
 /* ---------- party lights: 20-second dance party (soft colour changes, no strobe) ---------- */
@@ -2006,7 +2023,7 @@ function startParty(){const p=P();if(partyOn||busy)return;if(p.sleeping){toast("
   partyOn=true;busy=true;audioInit();const st=$("stage");st.classList.add("party");
   const fx=document.createElement("div");fx.innerHTML=partyFX();st.appendChild(fx.firstChild);
   partyAnim=$("pet").animate(danceKF(),{duration:1000,iterations:Infinity,easing:"ease-in-out"});
-  const v=st.querySelector(".visitor");if(v)v.classList.add("dance");
+  st.querySelectorAll(".visitor").forEach(v=>v.classList.add("dance"));
   const hud=document.createElement("div");hud.className="party-hud";hud.innerHTML=`<span>🪩 派對中！</span><button class="btn" id="partyGame">🎵 跟著節奏玩</button><button class="btn ghost" id="partyStop">結束</button>`;st.appendChild(hud);
   $("partyGame").onclick=()=>{stopParty(true);if(P().e<15){toast(`${P().name} 跳累了，先哄牠睡一下`);return}startGame("rhythm")};$("partyStop").onclick=()=>stopParty();
   p.j=clamp(p.j+10);stat("party");const d=today();if(S.partyDay!==d){S.partyDay=d;addAff(p,2)}
@@ -2015,7 +2032,7 @@ function startParty(){const p=P();if(partyOn||busy)return;if(p.sleeping){toast("
 }
 function stopParty(quiet){if(!partyOn)return;partyOn=false;busy=false;clearTimeout(partyT);const st=$("stage");st.classList.remove("party");
   st.querySelectorAll(".pfx,.party-hud").forEach(e=>e.remove());if(partyAnim){partyAnim.cancel();partyAnim=null}
-  const v=st.querySelector(".visitor");if(v)v.classList.remove("dance");
+  st.querySelectorAll(".visitor").forEach(v=>v.classList.remove("dance"));
   if(!quiet){toast(`${P().name}：派對好好玩！`);cheer()}render()}
 let discoKey="";
 function renderDisco(){const on=S.room&&S.room.top==="d_disco",k=String(on);if(k===discoKey)return;discoKey=k;
@@ -2033,14 +2050,16 @@ function useAct(id){const p=P(),it=IT[id];if(busy||partyOn)return;if(p.sleeping)
   if(Date.now()<(actCd[id]||0)){toast(`${it.n}休息一下，等等再玩`);return}
   ({bubbles:actBubbles,piano:actPiano,tv:actTV,tramp:actTramp,oven:actOven,paint:actPaint})[it.act](p,id);
   stat("act_"+it.act);firstTime(p,"act_"+it.act,"✨",`第一次玩了${it.n}！`);checkStickers();save()}
-function vAnim(kf,o,delay){const go=()=>{const v=$("stage").querySelector(".visitor svg");if(v&&v.animate)v.animate(kf,Object.assign({duration:900,easing:"ease-in-out"},o))};if(!visitor)return false;delay?setTimeout(go,delay):go();return true}
+function vAnim(kf,o,delay,only){if(!visitors.length)return false;$("stage").querySelectorAll(".visitor").forEach(el=>{const gi=+el.dataset.gi;if(only!=null&&gi!==only)return;const v=el.querySelector("svg"),mirror=el.classList.contains("vs1")?-1:1;
+    const k2=mirror<0?kf.map(f=>Object.assign({},f,{transform:String(f.transform).replace(/translate\((-?[\d.]+)px/g,(m,x)=>`translate(${-x}px`).replace(/rotate\((-?[\d.]+)deg\)/g,(m,x)=>`rotate(${-x}deg)`)})):kf;
+    setTimeout(()=>{if(v&&v.animate)v.animate(k2,Object.assign({duration:900,easing:"ease-in-out"},o))},(delay||0)+gi*180)});return true}
 function petWalkTo(xPct){const pw=$("petWrap");pw.style.transition="left .7s ease-in-out";pw.style.left=xPct+"%";setTimeout(()=>{pw.style.left="";setTimeout(()=>pw.style.transition="",800)},2600)}
 function actBubbles(p,id){actCd[id]=Date.now()+6000;const st=$("stage");let popped=0;
   for(let i=0;i<12;i++)setTimeout(()=>{const b=document.createElement("button");b.className="rbub";b.setAttribute("aria-label","泡泡");const s=18+Math.random()*20;
     b.style.cssText=`left:${8+Math.random()*30}%;width:${s}px;height:${s}px;animation-duration:${3+Math.random()*2}s;--dx:${(60+Math.random()*160).toFixed(0)}px`;
     b.addEventListener("pointerdown",e=>{e.preventDefault();if(b._p)return;b._p=1;popped++;b.classList.add("popd");sfx("pop");p.j=clamp(p.j+1);setTimeout(()=>b.remove(),160)});
     b.addEventListener("animationend",()=>b.remove());st.appendChild(b)},i*160);
-  petWalkTo(35);setTimeout(()=>petWalkTo(62),1300);p.j=clamp(p.j+4);addAff(p,.5);floatTxt(visitor?`🫧 和 ${visitor.n} 一起追泡泡！`:"🫧 追泡泡！");cheer();
+  petWalkTo(35);setTimeout(()=>petWalkTo(62),1300);p.j=clamp(p.j+4);addAff(p,.5);floatTxt(visitors.length?`🫧 和 ${gNames()} 一起追泡泡！`:"🫧 追泡泡！");cheer();
   vAnim([{transform:"none"},{transform:"translate(30px,-26px)",offset:.2},{transform:"translate(55px,0)",offset:.4},{transform:"translate(70px,-30px)",offset:.6},{transform:"translate(40px,0)",offset:.8},{transform:"none"}],{duration:2800},300)}
 const NOTES_P=["C5","D5","E5","F5","G5","A5","B5","C6"],SONG="C5 C5 G5 G5 A5 A5 G5 - F5 F5 E5 E5 D5 D5 C5 -".split(" ");
 function actPiano(p,id){busy=true;const st=$("stage"),bar=document.createElement("div");bar.className="piano-bar";
@@ -2051,22 +2070,22 @@ function actPiano(p,id){busy=true;const st=$("stage"),bar=document.createElement
     vAnim([{transform:"none"},{transform:"translateY(-12px) rotate(6deg)"},{transform:"none"}],{duration:320},60)};
   bar.querySelectorAll(".pkey").forEach(k=>k.addEventListener("pointerdown",e=>{e.preventDefault();play(k.dataset.n);k.classList.add("on");setTimeout(()=>k.classList.remove("on"),180)}));
   $("pSong").onclick=()=>{songT.forEach(clearTimeout);songT=SONG.map((n,i)=>setTimeout(()=>{if(n==="-")return;play(n);const k=bar.querySelector(`[data-n="${n}"]`);if(k){k.classList.add("on");setTimeout(()=>k.classList.remove("on"),250)}},i*480));
-    setTimeout(()=>petSay(visitor?`${p.name} 和 ${visitor.n}：一閃一閃亮晶晶～ 🎵`:`${p.name}：一閃一閃亮晶晶～ 🎵`),SONG.length*480+200)};
+    setTimeout(()=>petSay(visitors.length?`${p.name} 和 ${gNames()}：一閃一閃亮晶晶～ 🎵`:`${p.name}：一閃一閃亮晶晶～ 🎵`),SONG.length*480+200)};
   $("pClose").onclick=()=>{songT.forEach(clearTimeout);bar.remove();busy=false;if(notes>=5){p.j=clamp(p.j+6);addAff(p,1)}cheer();save();render()};
 }
 function actTV(p,id){actCd[id]=Date.now()+30*60*1000;busy=true;const st=$("stage"),scr=document.createElement("div");scr.className="tv-show";scr.innerHTML=`<i></i><i></i><i></i>`;st.appendChild(scr);
-  petSay(visitor?`${p.name} 和 ${visitor.n}：卡通好好看～`:`${p.name}：卡通好好看～`);vAnim([{transform:"rotate(0)"},{transform:"rotate(-5deg)"},{transform:"rotate(5deg)"},{transform:"rotate(0)"}],{duration:1600,iterations:5});let t=0;const iv=setInterval(()=>{t++;p.e=clamp(p.e+1);if(t===8){clearInterval(iv);scr.remove();busy=false;p.j=clamp(p.j+5);addAff(p,.5);toast(`${p.name} 看完卡通，精神好多了！`);cheer();save()}},1000);
+  petSay(visitors.length?`${p.name} 和 ${gNames()}：卡通好好看～`:`${p.name}：卡通好好看～`);vAnim([{transform:"rotate(0)"},{transform:"rotate(-5deg)"},{transform:"rotate(5deg)"},{transform:"rotate(0)"}],{duration:1600,iterations:5});let t=0;const iv=setInterval(()=>{t++;p.e=clamp(p.e+1);if(t===8){clearInterval(iv);scr.remove();busy=false;p.j=clamp(p.j+5);addAff(p,.5);toast(`${p.name} 看完卡通，精神好多了！`);cheer();save()}},1000);
   toast("看一小段卡通，休息一下（每 30 分鐘一次）")}
 function actTramp(p,id){actCd[id]=Date.now()+4000;const el=$("pet");
   el.animate([{transform:"none"},{transform:"translateY(-40px)",offset:.15},{transform:"none",offset:.3},{transform:"translateY(-70px)",offset:.48},{transform:"none",offset:.62},{transform:"translateY(-110px) rotate(360deg)",offset:.85},{transform:"none"}],{duration:2200,easing:"ease-in-out"});
-  for(let i=0;i<6;i++)setTimeout(()=>sparkle("star"),1300+i*80);p.j=clamp(p.j+4);p.e=clamp(p.e-2);addAff(p,.5);floatTxt(visitor?`🤸 和 ${visitor.n} 一起彈彈彈！`:"🤸 彈彈彈！");sfx("pop");setTimeout(()=>sfx("level"),1800);
+  for(let i=0;i<6;i++)setTimeout(()=>sparkle("star"),1300+i*80);p.j=clamp(p.j+4);p.e=clamp(p.e-2);addAff(p,.5);floatTxt(visitors.length?`🤸 和 ${gNames()} 一起彈彈彈！`:"🤸 彈彈彈！");sfx("pop");setTimeout(()=>sfx("level"),1800);
   vAnim([{transform:"none"},{transform:"translate(70px,-40px)",offset:.12},{transform:"translate(80px,0)",offset:.24},{transform:"translate(80px,-70px)",offset:.42},{transform:"translate(80px,0)",offset:.56},{transform:"translate(80px,-110px) rotate(-360deg)",offset:.78},{transform:"translate(80px,0) rotate(-360deg)",offset:.88},{transform:"none"}],{duration:2600},250)}
 const OVEN_PRICE=3,OVEN_DAY=3;
 function actOven(p,id){const d=daily();d.bake=d.bake||0;if(d.bake>=OVEN_DAY){toast(`今天已經烤了 ${OVEN_DAY} 次，明天再烤吧！`);return}
   if(S.coins<OVEN_PRICE){toast(`烤餅乾要 ${OVEN_PRICE} 金幣材料費`);return}
   S.coins-=OVEN_PRICE;d.bake++;busy=true;actCd[id]=Date.now()+1000;const st=$("stage"),glow=document.createElement("div");glow.className="oven-glow";glow.innerHTML=`<b>10</b>`;st.appendChild(glow);
   petSay(`${p.name}：好香喔～`);let t=10;const iv=setInterval(()=>{t--;glow.querySelector("b").textContent=t;if(t<=0){clearInterval(iv);glow.remove();busy=false;
-    S.inv.cookie=(S.inv.cookie||0)+2;stat("bake");sfx("level");toast("🍪 烤好了！得到 2 片手工餅乾（在餵食裡）","levelup");cheer();save();render();if(visitor)setTimeout(()=>offerCookie(),900)}},1000);render()}
+    S.inv.cookie=(S.inv.cookie||0)+2;stat("bake");sfx("level");toast("🍪 烤好了！得到 2 片手工餅乾（在餵食裡）","levelup");cheer();save();render();if(visitors.length)setTimeout(()=>offerCookie(),900)}},1000);render()}
 function paintingSVG(seed){let x=seed||1;const R=()=>(x=(x*16807)%2147483647)/2147483647;const C=["#ff7a59","#ffd35c","#4fae63","#6cb8f0","#b9a6e8","#ff8fb1","#3d9bd6"];
   let s=`<rect width="100" height="80" fill="${["#fff8e7","#eef6f9","#fdf0f5"][Math.floor(R()*3)]}"/>`;
   for(let i=0;i<6;i++){const c=C[Math.floor(R()*C.length)],k=Math.floor(R()*3);
@@ -2076,7 +2095,7 @@ function paintingSVG(seed){let x=seed||1;const R=()=>(x=(x*16807)%2147483647)/21
   return`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">${s}</svg>`}
 function actPaint(p,id){actCd[id]=Date.now()+5000;busy=true;petSay(`${p.name}：我要畫一幅畫！`);
   const el=$("pet");el.animate([{transform:"rotate(0)"},{transform:"rotate(-6deg)"},{transform:"rotate(6deg)"},{transform:"rotate(0)"}],{duration:500,iterations:5});
-  if(vAnim([{transform:"none"},{transform:"translate(40px,-6px) rotate(8deg)",offset:.3},{transform:"translate(40px,-6px) rotate(8deg)",offset:.8},{transform:"none"}],{duration:2600}))setTimeout(()=>{if(visitor)floatTxt(`${visitor.n}：畫得好棒！👏`)},1800);
+  if(vAnim([{transform:"none"},{transform:"translate(40px,-6px) rotate(8deg)",offset:.3},{transform:"translate(40px,-6px) rotate(8deg)",offset:.8},{transform:"none"}],{duration:2600}))setTimeout(()=>{if(visitors.length)floatTxt(`${gNames()}：畫得好棒！👏`)},1800);
   setTimeout(()=>{busy=false;const seed=Math.floor(Math.random()*2147483646)+1;S.gallery=S.gallery||[];S.gallery.push({seed,t:Date.now(),pid:p.id});if(S.gallery.length>24)S.gallery.shift();
     stat("paint");diary(p,"🎨","畫了一幅畫！");p.j=clamp(p.j+5);addAff(p,1);save();sfx("level");
     sheet(`${p.name} 的畫`,`<div class="result"><div class="art-frame">${paintingSVG(seed)}</div><p class="hint">要把這幅畫掛在小屋牆上嗎？（會換掉原本掛的畫）</p></div><div class="btn-row"><button class="btn" id="hang">掛起來</button><button class="btn ghost" id="keep">收進畫冊</button></div>`,c=>{
@@ -2094,7 +2113,7 @@ $("diaryBtn").onclick=()=>{if(!busy)openDiary()};
 $("photoBtn").onclick=()=>{if(!busy||partyOn)openPhoto()};
 $("visitBtn").onclick=()=>{if(!busy)openVisitCard()};
 $("parkBtn").onclick=()=>{if(!busy)openPark()};
-setInterval(traitChat,45000);readVisit();
+setInterval(traitChat,45000);renderVisitors();readVisit();window.addEventListener("hashchange",readVisit);
 $("codeBtn").onclick=()=>{if(!busy)openCode()};
 renderTabs();render();
 if(welcome)setTimeout(showWelcome,400);
