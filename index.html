@@ -944,10 +944,11 @@ function step(p,sec,away){
   if(p.sleeping){if(away){p.e=100;p.sleeping=false}else{p.e=clamp(p.e+sec*1.5);if(p.e>=100)p.sleeping=false}dec("h",RATE.h*.5);dec("c",RATE.c*.5)}
   else{dec("h",RATE.h);dec("c",RATE.c*(p.trait==="tidy"?.8:1));dec("e",RATE.e);dec("j",(Math.min(p.h,p.c,p.e)<20?2:1)*RATE.j)}
   const avg=(p.h+p.c+p.e+p.j)/4;
-  if(away)return avg>=25?gainXP(p,m*.5,true):0;
-  return avg>=40?gainXP(p,m,true):0;
+  if(away)return 0; /* no growth while nobody is playing */
+  return avg>=40&&Date.now()-lastTouch<180000?gainXP(p,m,true):0; /* small companion XP only while someone is actually playing */
 }
-/* catch up on time away: growth counts for up to 12 hours */
+var lastTouch=Date.now();document.addEventListener("pointerdown",()=>{lastTouch=Date.now()},true);
+/* catch up on time away: stats drift (with a floor), but no XP is earned while away */
 let welcome=null;
 function catchUp(quiet,sec){
   const away=sec!=null?sec:(Date.now()-(S.last||Date.now()))/1000;if(away<=60)return;
