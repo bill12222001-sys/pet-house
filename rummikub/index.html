@@ -137,9 +137,17 @@ function checkMove(origTable,origHand,newTable,newHand,opened){
   for(const s of newTable) if(!analyze(s)) return {err:'有組合不成立（紅框的那組）'};
   if(!opened){
     const rest=newTable.map(keyOf);
-    for(const s of origTable){const i=rest.indexOf(keyOf(s)); if(i<0) return {err:'第一次出牌前，不能動桌上的牌'}; rest.splice(i,1);}
+    for(const s of origTable){const i=rest.indexOf(keyOf(s)); if(i<0) return {err:'破冰（第一次出牌）這回合只能用自己的手牌，不能動桌上的牌'}; rest.splice(i,1);}
     const sc=openScore(origTable,newTable);
     if(sc<30) return {err:`第一次出牌要湊滿 30 分（目前 ${sc} 分）`};
+  }else{
+    const ps=new Set(played);
+    for(const s of origTable) for(const j of s){ if(!T(j).j) continue;
+      const ns=newTable.find(x=>x.includes(j));
+      const mates=s.filter(id=>id!==j&&ns.includes(id)).length;
+      const retrieved=mates<Math.min(2,s.length-1);
+      if(retrieved && !ns.some(id=>ps.has(id))) return {err:'拿下來的鬼牌，這回合要跟自己手上的牌一起組成新的組合'};
+    }
   }
   return {ok:1,table:newTable.map(s=>analyze(s).order),hand:[...newHand],played};
 }
@@ -224,8 +232,11 @@ function startGame(){
   const deck=shuffle(TILES.map(t=>t.id));
   G.players.forEach(p=>{p.hand=deck.splice(0,14);p.opened=false;});
   G.pool=deck; G.table=[]; G.passes=0; G.result=null; G.phase='play'; G.round++;
-  G.turn=Math.floor(Math.random()*G.players.length); G.turnNo++;
-  G.log=[`第 ${G.round} 局開始！由 ${G.players[G.turn].name} 先出`];
+  let draws;
+  do{ const nums=shuffle(TILES.filter(t=>!t.j).map(t=>t.n)); draws=G.players.map((p,i)=>nums[i]); }
+  while(draws.filter(n=>n===Math.max(...draws)).length>1);
+  G.turn=draws.indexOf(Math.max(...draws)); G.turnNo++;
+  G.log=[`第 ${G.round} 局開始！抽牌比大小：${G.players.map((p,i)=>p.name+' '+draws[i]).join('、')}`,`${G.players[G.turn].name} 抽到最大，先出牌`];
   sync();
 }
 function viewFor(i){
@@ -262,11 +273,13 @@ function hostAct(pi,a){
 }
 function nextTurn(){G.turn=(G.turn+1)%G.players.length;G.turnNo++;sync();}
 function endRound(w){
-  if(w===null){let best=Infinity;G.players.forEach((p,i)=>{const s=p.hand.reduce((a,id)=>a+tval(id),0);if(s<best){best=s;w=i;}});}
-  const pens=G.players.map((p,i)=>i===w?0:p.hand.reduce((a,id)=>a+tval(id),0));
+  const tot=G.players.map(p=>p.hand.reduce((a,id)=>a+tval(id),0));
+  const emptyPool=w===null;
+  if(emptyPool) w=tot.indexOf(Math.min(...tot));
+  const pens=tot.map((x,i)=>i===w?0:(emptyPool?x-tot[w]:x));
   const gain=pens.reduce((a,b)=>a+b,0);
   pens.forEach((x,i)=>{G.scores[i]+=i===w?gain:-x;});
-  G.result={winner:w,pens,gain}; G.phase='end'; G.turnNo++;
+  G.result={winner:w,pens,gain,emptyPool}; G.phase='end'; G.turnNo++;
   addLog(`${G.players[w].name} 贏了這一局！`); sync();
 }
 function hostRoom(local){
@@ -384,13 +397,15 @@ function renderHome(){
   <button class="btn${roomParam?'':' pri'}" data-act="host">開新房間</button>
   <button class="btn ghost" data-act="local">自己跟電腦玩</button>
   <details class="rules"><summary>怎麼玩？</summary><ul>
-  <li>每人 14 張牌，輪流出牌，先把手牌出完的人贏。</li>
+  <li>開局每人抽一張比大小，最大的先出；每人 14 張，輪流出牌，先出完的人贏。</li>
   <li><b>群組</b>：同數字、不同顏色 3–4 張（如 紅7 藍7 黑7）。</li>
   <li><b>順子</b>：同顏色、連續數字 3 張以上（如 藍4 藍5 藍6）。</li>
   <li>☺ 是鬼牌，可以代替任何一張牌。</li>
   <li><b>第一次出牌</b>要只用自己的手牌，湊滿 30 分。</li>
   <li>開牌後可以拆開、重組桌上的牌，只要回合結束時每一組都成立。</li>
-  <li>不想出或出不了，就抽一張牌。</li>
+  <li>從桌上拿下來的鬼牌，同一回合要跟自己的手牌一起組成新的組合。</li>
+  <li>不想出或出不了，就抽一張牌，回合結束（抽到的牌下回合才能出）。</li>
+  <li>牌池抽完後，大家都沒辦法再出牌就結束，手上點數最少的人贏。</li>
   <li><b>操作</b>：點牌選取（可多選）→ 點某組後面的「＋」放進去，或點「＋新組合」。</li>
   </ul></details></div>`;
   const n=$('#name'); if(roomParam&&!myName) n.focus();
@@ -433,7 +448,7 @@ function renderGame(){
     const r=v.result;
     ov=`<div class="ov"><div class="card"><h2>🎉 ${esc(v.players[r.winner].name)} 贏了！</h2>
     <table>${v.players.map((p,i)=>`<tr><td style="text-align:left">${esc(p.name)}</td><td>${i===r.winner?'+'+r.gain:'−'+r.pens[i]}</td><td style="text-align:right">累計 ${p.score}</td></tr>`).join('')}</table>
-    <div style="font-size:12px;opacity:.6">輸家扣掉手上剩下的點數（鬼牌 30 分），全部加給贏家</div>
+    <div style="font-size:12px;opacity:.6">${r.emptyPool?'牌池抽完、沒人能再出牌：手上點數最少的人贏，其他人扣掉跟贏家的差距':'輸家扣掉手上剩下的點數（鬼牌 30 分），全部加給贏家'}</div>
     ${isHost?'<button class="btn pri" data-act="again">再玩一局</button><button class="btn" data-act="tolobby">回房間（加減玩家）</button>':'<p style="margin:0">等房主開下一局…</p>'}
     <button class="btn ghost" data-act="hideov">看一下牌桌</button></div></div>`;
   }
