@@ -29,6 +29,8 @@ body{background:var(--sky);color:var(--ink);font-family:var(--pixel);user-select
 .team .chip{width:14px;height:14px;border:2px solid var(--stone-lo);flex:none}
 .score{font-size:34px;line-height:1;color:var(--gold);font-variant-numeric:tabular-nums;text-shadow:3px 3px 0 var(--stone-lo);min-width:1.2em;text-align:center}
 .mid{display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:auto}
+#netInfo{font-size:12px;background:rgba(36,39,44,.75);padding:2px 8px;white-space:nowrap;font-variant-numeric:tabular-nums}
+#netInfo.bad{color:#ffb4a6}
 #goal{font-size:13px;background:rgba(36,39,44,.75);padding:3px 8px;white-space:nowrap}
 .mid .row{display:flex;gap:6px}
 .sbtn{font-family:var(--pixel);font-size:13px;color:var(--ink);background:var(--stone);border:3px solid var(--stone-lo);box-shadow:inset 2px 2px 0 var(--stone-hi);padding:4px 10px;cursor:pointer}
@@ -157,6 +159,7 @@ input:focus-visible{outline:3px solid var(--gold);outline-offset:1px}
   <div class="side"><div class="team"><span class="chip" id="c1"></span><span class="tname" id="n1">企鵝</span><span class="score" id="s1">0</span></div><div class="meter" id="m1"><i></i><span>技能 0%</span></div></div>
   <div class="mid">
     <div id="goal">先得 7 分獲勝</div>
+    <div id="netInfo" hidden></div>
     <div class="row"><button class="sbtn" id="pauseBtn">暫停</button><button class="sbtn" id="fsBtn" hidden>全螢幕</button><button class="sbtn" id="viewBtn">視角：側面</button><button class="sbtn" id="muteBtn">聲音：開</button></div>
   </div>
   <div class="side r"><div class="team"><span class="score" id="s2">0</span><span class="tname" id="n2">狐狸</span><span class="chip" id="c2"></span></div><div class="meter" id="m2"><i></i><span>技能 0%</span></div></div>
@@ -329,7 +332,7 @@ if(isTouch&&settings.mode==="2p")settings.mode="1p";
 const $=id=>document.getElementById(id);
 // online play state: the room creator ("host") runs the match; the friend ("guest") sends inputs and draws what the host sends
 const lnk={role:null,peer:null,conn:null,connected:false,rin:{mx:0,mz:0,sh:false,jc:0,sc:0,dc:0,kc:0},uj:0,us:0,ud:0,uk:0,ev:[],lastIn:0,lastSnap:0,lastSend:0,lastPk:"",
-  gc:{j:0,s:0,d:0,k:0},guestKey:"teal",guestSkill:"magnet",guestTouch:false,rpz:false,snap:null,mh:""};
+  gc:{j:0,s:0,d:0,k:0},guestKey:"teal",guestSkill:"magnet",guestTouch:false,rpz:false,snap:null,mh:"",epoch:0,fast:null,rtt:0,sq:0,rsq:-1,isq:-1,ctype:"",pred:null,bs:null,niT:0,piT:0};
 const REMOTE={};
 let guestHint="";
 const rand=(a,b)=>a+Math.random()*(b-a);
@@ -703,7 +706,7 @@ function readInput(p){
     const r=lnk.rin;const j=r.jc>lnk.uj,st=r.sc>lnk.us,dv=r.dc>lnk.ud,sk=r.kc>lnk.uk;
     lnk.uj=r.jc;lnk.us=r.sc;lnk.ud=r.dc;lnk.uk=r.kc;
     let mx=clamp(r.mx,-1,1),mz=clamp(r.mz,-1,1);const l=Math.hypot(mx,mz);if(l>1){mx/=l;mz/=l;}
-    return {mx,mz,jump:j,set:st||r.sh,dive:dv,skill:sk};
+    return {mx,mz,jump:j,set:st||r.sh,dive:dv,skill:sk,px:(r.ok&&r.ep===lnk.epoch)?r.px:null,pz:r.pz,pvx:r.pvx,pvz:r.pvz};
   }
   let mx=0,mz=0;
   if(p.ctrl===0){
@@ -860,7 +863,7 @@ function startMatch(){
 }
 function serverPlayer(){return players.find(p=>p.side===serverSide);}
 function startServe(side){
-  serverSide=side;state="serve";serveT=0;lastHitter=null;setter=null;touchN=0;ball.cradle=null;
+  serverSide=side;state="serve";lnk.epoch++;serveT=0;lastHitter=null;setter=null;touchN=0;ball.cradle=null;
   players.forEach(p=>{p.x=p.side===side?side*(COURT_X+1.2):p.side*4.5;p.z=0;p.y=0;p.vy=0;p.vx=p.vz=0;p.onGround=true;p.cool=0;p.ai.wantSpike=false;p.dive=0;p.rec=0;p.superAir=false;});
   ball.held=true;ball.magnet=null;ball.vx=ball.vy=ball.vz=0;
   const s=serverPlayer();
@@ -1182,6 +1185,7 @@ function updatePlayer(p,dt){
   if(busy){p.vx=0;p.vz=0;}
   if(p.side<0)p.x=clamp(p.x,-COURT_X-3,-0.7);else p.x=clamp(p.x,0.7,COURT_X+3);
   p.z=clamp(p.z,-COURT_Z-2.2,COURT_Z+2.2);
+  if(inp.px!=null&&!busy&&canMove){p.x=clamp(inp.px,0.7,COURT_X+3);p.z=clamp(inp.pz,-COURT_Z-2.2,COURT_Z+2.2);p.vx=clamp(inp.pvx,-SPEED,SPEED);p.vz=clamp(inp.pvz,-SPEED,SPEED);}
   if(inp.jump&&p.onGround&&canMove&&!busy){p.vy=JUMP_V;p.onGround=false;p.takeoffX=p.x;p.takeoffZ=p.z;sfx.jump();}
   p.fxT-=dt;
   if(p.fxT<=0){
@@ -1370,14 +1374,24 @@ $("closeDesigner").addEventListener("click",()=>{
 window.addEventListener("resize",pvSize);
 
 // ---------- online play (PeerJS) ----------
-// The room creator runs the whole match (physics, rules, scoring) exactly like single-player.
-// The friend sends joystick/buttons; the creator sends back positions, score and effects ~30 times a second.
+// The room creator runs the match (rules, ball, scoring) exactly like single-player.
+// To hide network delay, the friend moves its own player on its own screen right away and reports
+// where it is; the friend also sees the ball predicted ahead by the round-trip time, so what the
+// friend sees lines up with what the room creator judges.
 const ID_PREFIX="blockvolley-stanley-";
 const qs=new URLSearchParams(location.search);
-const peerOpts=qs.get("peerhost")?{host:qs.get("peerhost"),port:+qs.get("peerport")||9000,path:"/",secure:false,debug:0}:{debug:0};
+const ICE={iceServers:[
+  {urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302","stun:stun2.l.google.com:19302"]},
+  {urls:"stun:stun.cloudflare.com:3478"},
+  {urls:["turn:eu-0.turn.peerjs.com:3478","turn:us-0.turn.peerjs.com:3478"],username:"peerjs",credential:"peerjsp"}
+]};
+const peerOpts=qs.get("peerhost")?{host:qs.get("peerhost"),port:+qs.get("peerport")||9000,path:"/",secure:false,debug:0,config:ICE}:{debug:0,config:ICE};
+const TEST_LAG=Math.max(0,Math.min(1000,parseInt(qs.get("lag"),10)||0)); // test only: ?lag=200 adds 200 ms round trip
 const HEX=/^#[0-9a-fA-F]{6}$/;
 const r3=v=>Math.round((+v||0)*1000)/1000;
-function netSend(o){if(!lnk.connected||!lnk.conn)return;try{lnk.conn.send(o);}catch(e){}}
+function rawSend(c,o){if(!c)return;const go=()=>{try{if(c.open)c.send(o);}catch(e){}};if(TEST_LAG)setTimeout(go,TEST_LAG/2);else go();}
+function netSend(o){if(lnk.connected)rawSend(lnk.conn,o);}              // reliable: start, over, events, hello
+function fastSend(o){if(!lnk.connected)return;rawSend(lnk.fast&&lnk.fast.open?lnk.fast:lnk.conn,o);} // positions and buttons: newest wins
 function blurFocus(){const a=document.activeElement;if(a&&a.blur)a.blur();}
 function onMsg(t){const e=$("onMsg");e.hidden=!t;e.textContent=t||"";}
 function cleanSpec(s){s=s&&typeof s==="object"?s:{};const h=(v,d)=>HEX.test(v)?v:d;
@@ -1393,9 +1407,10 @@ function netErrText(e){
   return "連線出了問題（"+(t||"未知")+"），請再試一次。";
 }
 function leaveOnline(){
-  const c=lnk.conn,p=lnk.peer;
-  lnk.connected=false;lnk.conn=null;lnk.peer=null;lnk.role=null;lnk.snap=null;lnk.rpz=false;
-  try{c&&c.close();}catch(e){}try{p&&p.destroy();}catch(e){}
+  const c=lnk.conn,f=lnk.fast,p=lnk.peer;
+  lnk.connected=false;lnk.conn=null;lnk.fast=null;lnk.peer=null;lnk.role=null;lnk.snap=null;lnk.rpz=false;lnk.pred=null;lnk.bs=null;lnk.rtt=0;lnk.ctype="";
+  try{f&&f.close();}catch(e){}try{c&&c.close();}catch(e){}try{p&&p.destroy();}catch(e){}
+  const ni=$("netInfo");if(ni)ni.hidden=true;
 }
 function netDrop(t){if(!lnk.role)return;leaveOnline();toMenu();onMsg(t);}
 function lobbyFail(t){leaveOnline();$("lobbyOv").hidden=true;onMsg(t);}
@@ -1412,13 +1427,19 @@ function hostRoom(tries){
   peer.on("open",()=>{if(lnk.peer!==peer)return;$("codeOut").textContent=code;$("waitMsg").textContent="等待好友加入…好友連上後會自動開始。";});
   peer.on("connection",c=>{
     if(lnk.peer!==peer)return;
+    const fast=c.metadata&&c.metadata.fast;
+    if(fast){ // second, fast channel from the same friend
+      if(lnk.conn&&c.peer===lnk.conn.peer){lnk.fast=c;c.on("data",d=>{if(lnk.fast===c&&d&&typeof d==="object")onData(d);});}
+      else setTimeout(()=>{try{c.close();}catch(e){}},400);
+      return;
+    }
     if(lnk.conn){c.on("open",()=>{try{c.send({t:"full"});}catch(e){}setTimeout(()=>{try{c.close();}catch(e){}},400);});return;}
     lnk.conn=c;wireConn(c);
   });
   peer.on("error",e=>{
     if(lnk.peer!==peer)return;
     if(e.type==="unavailable-id"&&tries<5){hostRoom(tries+1);return;}
-    if(lnk.connected)return; // a signalling hiccup after we are already playing does not matter
+    if(lnk.connected)return; // a hiccup with the matchmaking server after we are already playing does not matter
     lobbyFail(netErrText(e));
   });
   peer.on("disconnected",()=>{if(lnk.peer===peer&&!peer.destroyed){try{peer.reconnect();}catch(e){}}});
@@ -1446,11 +1467,15 @@ function joinRoom(){
 function wireConn(c){
   c.on("open",()=>{
     if(lnk.conn!==c)return;
-    lnk.connected=true;const now=performance.now();lnk.lastIn=now;lnk.lastSnap=now;lnk.lastSend=0;lnk.lastPk="";
-    lnk.uj=lnk.us=lnk.ud=lnk.uk=0;lnk.rin={mx:0,mz:0,sh:false,jc:0,sc:0,dc:0,kc:0};lnk.gc={j:0,s:0,d:0,k:0};
+    lnk.connected=true;const now=performance.now();lnk.lastIn=now;lnk.lastSnap=now;lnk.lastSend=0;lnk.lastPk="";lnk.piT=0;lnk.niT=0;
+    lnk.uj=lnk.us=lnk.ud=lnk.uk=0;lnk.rin={mx:0,mz:0,sh:false,jc:0,sc:0,dc:0,kc:0,ok:false};lnk.gc={j:0,s:0,d:0,k:0};lnk.sq=0;lnk.rsq=-1;lnk.isq=-1;
     blurFocus();
-    if(lnk.role==="guest"){$("joinMsg").textContent="連上了！馬上開始…";netSend({t:"hello",c:charPayload(settings.c1),sk:settings.skill,touch:isTouch});}
-    else $("waitMsg").textContent="好友連上了，準備開始…";
+    if(lnk.role==="guest"){
+      $("joinMsg").textContent="連上了！馬上開始…";
+      netSend({t:"hello",c:charPayload(settings.c1),sk:settings.skill,touch:isTouch});
+      try{const f=lnk.peer.connect(c.peer,{reliable:false,serialization:"json",metadata:{fast:1}});
+        f.on("open",()=>{if(lnk.conn===c)lnk.fast=f;});f.on("data",d=>{if(lnk.fast===f&&d&&typeof d==="object")onData(d);});}catch(e){}
+    }else $("waitMsg").textContent="好友連上了，準備開始…";
   });
   c.on("data",d=>{if(lnk.conn!==c||!d||typeof d!=="object")return;onData(d);});
   c.on("close",()=>{if(lnk.conn===c)netDrop(lnk.role==="host"?"好友離開了，連線已中斷。":"房主離開了，連線已中斷。");});
@@ -1458,40 +1483,57 @@ function wireConn(c){
 }
 function onData(d){
   const now=performance.now();
+  if(d.t==="pi"){fastSend({t:"po",ts:d.ts});return;}
+  if(d.t==="po"){const s=now-(+d.ts||now);if(s>=0&&s<5000)lnk.rtt=lnk.rtt?lnk.rtt*0.75+s*0.25:s;return;}
   if(lnk.role==="host"){
     lnk.lastIn=now;
     if(d.t==="hello"){
       lnk.guestKey=resolveChar(d.c,1);
-      if(lnk.guestKey===settings.c1&&CHARS[settings.c1])lnk.guestKey=settings.c1==="teal"?"red":"teal"; // same built-in look on both sides is hard to tell apartlnk.guestSkill=SKILLS[d.sk]?d.sk:"magnet";lnk.guestTouch=!!d.touch;
+      if(lnk.guestKey===settings.c1&&CHARS[settings.c1])lnk.guestKey=settings.c1==="teal"?"red":"teal"; // same built-in look on both sides is hard to tell apart
+      lnk.guestSkill=SKILLS[d.sk]?d.sk:"magnet";lnk.guestTouch=!!d.touch;
       ["lobbyOv","menu","designer","cabinet","overMenu"].forEach(id=>$(id).hidden=true);ensureAudio();startMatch();
     }else if(d.t==="in"&&Array.isArray(d.a)){
-      const a=d.a;lnk.rin={mx:+a[0]||0,mz:+a[1]||0,sh:!!a[2],jc:a[3]|0,sc:a[4]|0,dc:a[5]|0,kc:a[6]|0};
+      const a=d.a,q=d.q|0;if(q<=lnk.isq)return;lnk.isq=q; // drop late, out-of-order packets
+      lnk.rin={mx:+a[0]||0,mz:+a[1]||0,sh:!!a[2],jc:a[3]|0,sc:a[4]|0,dc:a[5]|0,kc:a[6]|0,
+        ep:a[7]|0,ok:a[8]!==null&&a[9]!==null&&isFinite(+a[8])&&isFinite(+a[9]),px:+a[8],pz:+a[9],pvx:+a[10]||0,pvz:+a[11]||0};
     }else if(d.t==="pz"){
       if(state==="serve"||state==="play"||state==="point"||state==="over-wait"){paused=!!d.v;$("pauseMenu").hidden=!paused;}
     }
   }else{
     lnk.lastSnap=now;
-    if(d.t==="s")onSnap(d);
+    if(d.t==="s"){const q=d.q|0;if(q<=lnk.rsq)return;lnk.rsq=q;onSnap(d,now);}
+    else if(d.t==="ev")playEvents(d.ev);
     else if(d.t==="start")startRemoteMatch(d);
     else if(d.t==="over")showRemoteOver(d);
     else if(d.t==="arena"&&ARENAS[d.v])setArena(d.v);
     else if(d.t==="full")lobbyFail("這個房間已經有人在玩了。");
   }
 }
-// ----- host side -----
+// ----- room creator side -----
 function poseOf(p){const c=p.ch;return [c.g.position.x,c.g.position.y,c.g.position.z,c.g.rotation.y,c.root.rotation.x,c.root.position.y,c.legs[0].rotation.x,c.arms[0].rotation.x,c.arms[1].rotation.x,c.shadow.position.x,c.shadow.position.z,c.shadow.scale.x].map(r3);}
 function sendSnap(){
-  netSend({t:"s",st:state,ss:serverSide,sT:r3(serveT),sc:scores.slice(),b:[ball.x,ball.y,ball.z,ballMesh.rotation.x,ballMesh.rotation.z].map(r3),
-    pl:players.map(poseOf),m:players.map(p=>p.meter),gh:guestHint,pz:paused?1:0,ev:lnk.ev});
-  lnk.ev=[];
+  const free=state==="play"&&!ball.held&&!ball.cradle&&!ball.magnet;
+  fastSend({t:"s",q:++lnk.sq,ep:lnk.epoch,st:state,ss:serverSide,sT:r3(serveT),sc:scores.slice(),
+    b:[ball.x,ball.y,ball.z,ballMesh.rotation.x,ballMesh.rotation.z,ball.vx,ball.vy,ball.vz].map(r3),bf:free?1:0,
+    pl:players.map(poseOf),py:players.map(p=>r3(p.y)),bz:players.map(p=>(p.dive>0||p.rec>0)?1:0),m:players.map(p=>p.meter),gh:guestHint,pz:paused?1:0});
+  if(lnk.ev.length){netSend({t:"ev",ev:lnk.ev});lnk.ev=[];}
 }
-// ----- guest side -----
+// ----- friend side -----
+function playEvents(ev){
+  if(!Array.isArray(ev))return;
+  ev.forEach(e=>{try{
+    const a=e.a;
+    if(e.k==="b")beepRaw(+a[0],+a[1],a[2],+a[3],a[4]?+a[4]:0);
+    else if(e.k==="p"&&typeof a[3]==="string"&&a[3].length<12)burstRaw(+a[0],+a[1],+a[2],a[3],Math.min(30,a[4]|0),+a[5]);
+    else if(e.k==="m")showMsgRaw(String(a[0]).slice(0,40),+a[1]||0);
+  }catch(err){}});
+}
 function startRemoteMatch(d){
   clearPlayers();
   const k0=resolveChar(d.c&&d.c[0],0),k1=resolveChar(d.c&&d.c[1],1);
   players=[makePlayer(k0,-1,true,0),makePlayer(k1,1,true,1)];
   players.forEach((p,i)=>{const s=d.sk&&d.sk[i];if(SKILLS[s])p.skill=s;p.rp=null;p.ch.g.position.set(p.side*5,0.12,0);p.ch.shadow.position.set(p.side*5,0.13,0);});
-  target=parseInt(d.tg,10)||7;scores=[0,0];lnk.snap=null;lnk.rpz=false;lnk.mh="";
+  target=parseInt(d.tg,10)||7;scores=[0,0];lnk.snap=null;lnk.rpz=false;lnk.mh="";lnk.pred=null;lnk.bs=null;lnk.rsq=-1;
   if(ARENAS[d.ar])setArena(d.ar);
   $("n1").textContent=getChar(k0).name;$("n2").textContent=getChar(k1).name+"（你）";
   $("c1").style.background=getChar(k0).chip;$("c2").style.background=getChar(k1).chip;
@@ -1512,21 +1554,30 @@ function showRemoteOver(d){
   $("againBtn").hidden=true;$("overMenu").hidden=false;$("touch").hidden=true;$("pauseMenu").hidden=true;
   showMsgRaw("",0);setHint("");hideClock();
 }
-function onSnap(d){
-  if(Array.isArray(d.ev))d.ev.forEach(e=>{try{
-    const a=e.a;
-    if(e.k==="b")beepRaw(+a[0],+a[1],a[2],+a[3],a[4]?+a[4]:0);
-    else if(e.k==="p"&&typeof a[3]==="string"&&a[3].length<12)burstRaw(+a[0],+a[1],+a[2],a[3],Math.min(30,a[4]|0),+a[5]);
-    else if(e.k==="m")showMsgRaw(String(a[0]).slice(0,40),+a[1]||0);
-  }catch(err){}});
+function onSnap(d,now){
   if(state!=="remote")return;
-  lnk.snap=d;
+  const prev=lnk.snap;lnk.snap=d;
   if(Array.isArray(d.sc)&&(d.sc[0]!==scores[0]||d.sc[1]!==scores[1])){scores=[d.sc[0]|0,d.sc[1]|0];updateHud();}
   serverSide=d.ss;serveT=+d.sT||0;
   if(Array.isArray(d.m))players.forEach((p,i)=>{p.meter=clamp(d.m[i]|0,0,100);});
   guestMeterHud(false);
   setHint(typeof d.gh==="string"?d.gh:"");
   const pz=!!d.pz;if(pz!==lnk.rpz){lnk.rpz=pz;$("pauseMenu").hidden=!pz;}
+  // ball snapshot for prediction
+  const b=d.b;if(b&&b.length>=8)lnk.bs={x:b[0],y:b[1],z:b[2],rx:b[3],rz:b[4],vx:b[5],vy:b[6],vz:b[7],free:!!d.bf,t:now};
+  // my own player: reset to the room creator's position when it moved us (new serve) or while diving
+  const me=d.pl&&d.pl[1];
+  if(me){
+    const P=lnk.pred;
+    const busy=!!(d.bz&&d.bz[1]);
+    if(!P||(prev&&prev.ep!==d.ep)||d.ep!==P.ep||busy){
+      lnk.pred={x:me[0],z:me[2],vx:0,vz:0,y:0,vy:0,air:false,landT:0,walk:P?P.walk:0,ep:d.ep,hist:[]};
+    }else if(d.st==="play"||d.st==="serve"){
+      // gentle correction: compare with where we were one round trip ago
+      const ago=now-(lnk.rtt||0);let h=null;for(let i=P.hist.length-1;i>=0;i--){if(P.hist[i].t<=ago){h=P.hist[i];break;}}
+      if(h){const ex=me[0]-h.x,ez=me[2]-h.z;if(Math.hypot(ex,ez)>2.5){P.x=me[0];P.z=me[2];P.hist=[];}else{P.x+=ex*0.1;P.z+=ez*0.1;}}
+    }
+  }
 }
 function guestMeterHud(force){
   const sig=players.map(p=>p.meter).join(",");if(!force&&sig===lnk.mh)return;lnk.mh=sig;
@@ -1538,9 +1589,19 @@ function guestMeterHud(force){
     if(mine)$("skillBtn").classList.toggle("ready",ready);
   });
 }
+function myMove(){
+  let mx=0,mz=0;
+  if(keys.KeyA||keys.ArrowLeft)mx-=1;if(keys.KeyD||keys.ArrowRight)mx+=1;if(keys.KeyW||keys.ArrowUp)mz-=1;if(keys.KeyS||keys.ArrowDown)mz+=1;
+  mx+=touchMove.x;mz+=touchMove.z;
+  if(behindView()){const sx=mx,sz=mz;mx=sz;mz=-sx;}
+  const l=Math.hypot(mx,mz);if(l>1){mx/=l;mz/=l;}
+  return [mx,mz];
+}
+function myCanMove(){const d=lnk.snap;return !!d&&(d.st==="play"||d.st==="serve")&&!d.pz&&!(d.bz&&d.bz[1]);}
 function remoteUpdate(dt){
   const d=lnk.snap;if(!d)return;
-  const k=1-Math.exp(-dt*18);
+  const now=performance.now();
+  const k=1-Math.exp(-dt*25);
   players.forEach((p,i)=>{
     const T=d.pl&&d.pl[i];if(!T||T.length<12)return;
     if(!p.rp||Math.hypot(T[0]-p.rp[0],T[2]-p.rp[2])>3)p.rp=T.slice();
@@ -1553,34 +1614,89 @@ function remoteUpdate(dt){
     c.legs[0].rotation.x=a[6];c.legs[1].rotation.x=-a[6];c.arms[0].rotation.x=a[7];c.arms[1].rotation.x=a[8];
     c.shadow.position.set(a[9],0.13,a[10]);c.shadow.scale.set(a[11],a[11],1);
   });
-  const b=d.b;
-  if(b&&b.length>=5){
-    if(Math.hypot(b[0]-ball.x,b[1]-ball.y,b[2]-ball.z)>3){ball.x=b[0];ball.y=b[1];ball.z=b[2];}
-    else{const kb=1-Math.exp(-dt*25);ball.x+=(b[0]-ball.x)*kb;ball.y+=(b[1]-ball.y)*kb;ball.z+=(b[2]-ball.z)*kb;}
-    ballMesh.rotation.x=b[3];ballMesh.rotation.z=b[4];
+  // my own player moves immediately on my screen
+  const P=lnk.pred,me=players[1];
+  if(P&&me){
+    const can=myCanMove();const [mx,mz]=can?myMove():[0,0];
+    P.vx+=(mx*SPEED-P.vx)*Math.min(1,dt*24);P.vz+=(mz*SPEED-P.vz)*Math.min(1,dt*24);
+    if(can||Math.hypot(P.vx,P.vz)>0.05){P.x+=P.vx*dt;P.z+=P.vz*dt;}
+    P.x=clamp(P.x,0.7,COURT_X+3);P.z=clamp(P.z,-COURT_Z-2.2,COURT_Z+2.2);
+    if(P.air){P.vy-=G*dt;P.y+=P.vy*dt;if(P.y<=0){P.y=0;P.vy=0;P.air=false;P.landT=now;}}
+    P.hist.push({t:now,x:P.x,z:P.z});if(P.hist.length>90)P.hist.shift();
+    const busy=!!(d.bz&&d.bz[1]);
+    if(!busy){
+      const hostY=d.py?+d.py[1]||0:0;
+      const y=P.air?P.y:(now-P.landT<(lnk.rtt||0)+150?0:hostY);
+      const c=me.ch;c.g.position.set(P.x,y+0.12,P.z);
+      c.shadow.position.set(P.x,0.13,P.z);const ss=1/(1+y*0.3);c.shadow.scale.set(ss,ss,1);
+      if(c.root.rotation.x<0.2){
+        const sp=Math.hypot(P.vx,P.vz);P.walk+=sp*dt*2.2;const sw=Math.sin(P.walk)*Math.min(1,sp/3)*0.7;
+        c.legs[0].rotation.x=sw;c.legs[1].rotation.x=-sw;
+      }
+    }
+  }
+  // ball: while it flies freely, show where it is "now" on the room creator's side plus the way back
+  const bs=lnk.bs;
+  if(bs){
+    let tx=bs.x,ty=bs.y,tz=bs.z;
+    if(bs.free){
+      const tau=Math.min(0.4,(now-bs.t)/1000+(lnk.rtt||0)/1000);
+      tx=bs.x+bs.vx*tau;ty=bs.y+bs.vy*tau-G/2*tau*tau;tz=bs.z+bs.vz*tau;
+      if(ty<R+0.12)ty=R+0.12;
+      if(Math.sign(tx)!==Math.sign(bs.x)&&ty-R<NET_H&&Math.abs(tz)<COURT_Z+0.7){tx=Math.sign(bs.x)*(R+0.06);} // don't draw it through the net
+    }
+    if(Math.hypot(tx-ball.x,ty-ball.y,tz-ball.z)>3){ball.x=tx;ball.y=ty;ball.z=tz;}
+    else{const kb=1-Math.exp(-dt*(bs.free?40:25));ball.x+=(tx-ball.x)*kb;ball.y+=(ty-ball.y)*kb;ball.z+=(tz-ball.z)*kb;}
+    ballMesh.rotation.x=bs.rx;ballMesh.rotation.z=bs.rz;
   }
   if(d.st==="serve"&&d.ss===1)showClockRem(Math.max(0,SERVE_LIMIT-(+d.sT||0)));else hideClock();
 }
 function guestSend(now){
   let mx=0,mz=0;
+  const d=lnk.snap,P=lnk.pred;
   if(state==="remote"){
-    if(keys.KeyA||keys.ArrowLeft)mx-=1;if(keys.KeyD||keys.ArrowRight)mx+=1;if(keys.KeyW||keys.ArrowUp)mz-=1;if(keys.KeyS||keys.ArrowDown)mz+=1;
-    mx+=touchMove.x;mz+=touchMove.z;
-    if(behindView()){const sx=mx,sz=mz;mx=sz;mz=-sx;}
-    const l=Math.hypot(mx,mz);if(l>1){mx/=l;mz/=l;}
-    if(jumpQ[0])lnk.gc.j++;if(setQ[0])lnk.gc.s++;if(diveQ[0])lnk.gc.d++;if(skillQ[0])lnk.gc.k++;
+    [mx,mz]=myMoveIf();
+    if(jumpQ[0]){
+      lnk.gc.j++;
+      // jump right away on my screen (but pressing to serve is not a jump)
+      const serving=d&&d.st==="serve"&&d.ss===1;
+      if(P&&!P.air&&myCanMove()&&!serving){P.vy=JUMP_V;P.air=true;}
+    }
+    if(setQ[0])lnk.gc.s++;if(diveQ[0])lnk.gc.d++;if(skillQ[0])lnk.gc.k++;
   }
   jumpQ[0]=setQ[0]=diveQ[0]=skillQ[0]=false;
   const sh=state==="remote"&&(P1SET.some(k=>keys[k])||P2SET.some(k=>keys[k])||touchSetHeld);
-  const a=[r3(mx),r3(mz),sh?1:0,lnk.gc.j,lnk.gc.s,lnk.gc.d,lnk.gc.k];
+  const a=[r3(mx),r3(mz),sh?1:0,lnk.gc.j,lnk.gc.s,lnk.gc.d,lnk.gc.k,P?P.ep:-1,P?r3(P.x):null,P?r3(P.z):null,P?r3(P.vx):0,P?r3(P.vz):0];
   const pk=a.join(",");
-  if(pk!==lnk.lastPk||now-lnk.lastSend>100){netSend({t:"in",a});lnk.lastPk=pk;lnk.lastSend=now;}
+  if(pk!==lnk.lastPk||now-lnk.lastSend>100){fastSend({t:"in",q:++lnk.sq,a});lnk.lastPk=pk;lnk.lastSend=now;}
+}
+function myMoveIf(){return myCanMove()?myMove():[0,0];}
+function updateNetInfo(now){
+  if(now-lnk.niT<1000)return;lnk.niT=now;
+  const el=$("netInfo");if(!el)return;
+  const inMatch=!$("hud").hidden;el.hidden=!inMatch;if(!inMatch)return;
+  const ms=Math.round(lnk.rtt||0);
+  const kind=lnk.ctype==="relay"?"經國外轉送":lnk.ctype==="direct"?"直接連線":"";
+  el.textContent=ms?`延遲 ${ms}ms${kind?"・"+kind:""}`:"測量延遲中…";
+  el.classList.toggle("bad",ms>150||lnk.ctype==="relay");
+  // which path did the connection take? (relay = going through an overseas server)
+  const pc=lnk.conn&&lnk.conn.peerConnection;
+  if(pc&&pc.getStats)pc.getStats().then(st=>{
+    let pair=null;const cand={};
+    st.forEach(r=>{if(r.type==="transport"&&r.selectedCandidatePairId)pair=st.get(r.selectedCandidatePairId)||pair;if(r.type==="local-candidate"||r.type==="remote-candidate")cand[r.id]=r;});
+    if(!pair)st.forEach(r=>{if(r.type==="candidate-pair"&&(r.selected||r.nominated)&&r.state==="succeeded")pair=r;});
+    if(!pair)return;
+    const l=cand[pair.localCandidateId],r=cand[pair.remoteCandidateId];
+    lnk.ctype=(l&&l.candidateType==="relay")||(r&&r.candidateType==="relay")?"relay":"direct";
+  }).catch(()=>{});
 }
 function netTick(){
   if(!lnk.connected)return;
   const now=performance.now();
+  if(now-lnk.piT>1000){lnk.piT=now;fastSend({t:"pi",ts:now});}
+  updateNetInfo(now);
   if(lnk.role==="host"){
-    if(now-lnk.lastSend>=33){lnk.lastSend=now;if(players.length===2&&state!=="menu"&&state!=="demo")sendSnap();else netSend({t:"hb"});}
+    if(now-lnk.lastSend>=20){lnk.lastSend=now;if(players.length===2&&state!=="menu"&&state!=="demo")sendSnap();else fastSend({t:"hb"});}
     if(now-lnk.lastIn>10000)netDrop("好友沒有回應，連線已中斷。");
   }else if(lnk.role==="guest"){
     guestSend(now);
@@ -1591,8 +1707,8 @@ $("hostBtn").addEventListener("click",()=>hostRoom());
 $("joinBtn").addEventListener("click",joinRoom);
 $("codeIn").addEventListener("keydown",e=>{if(e.key==="Enter")joinRoom();});
 $("lobCancel").addEventListener("click",()=>{leaveOnline();$("lobbyOv").hidden=true;onMsg("");});
-window.__bv={get s(){return {state,role:lnk.role,conn:lnk.connected,scores:scores.slice(),serverSide,
-  p:players.map(p=>[r3(p.x),r3(p.ch.g.position.x),r3(p.ch.g.position.z)]),b:[r3(ball.x),r3(ball.y),r3(ball.z)],msg:$("msg").textContent,hint:$("hint").textContent,clock:$("clock").hidden?"":$("clock").textContent};}};
+window.__bv={get s(){return {state,role:lnk.role,conn:lnk.connected,fast:!!(lnk.fast&&lnk.fast.open),rtt:Math.round(lnk.rtt),ctype:lnk.ctype,scores:scores.slice(),serverSide,
+  p:players.map(p=>[r3(p.x),r3(p.ch.g.position.x),r3(p.ch.g.position.z)]),b:[r3(ball.x),r3(ball.y),r3(ball.z)],msg:$("msg").textContent,hint:$("hint").textContent,clock:$("clock").hidden?"":$("clock").textContent,net:$("netInfo").hidden?"":$("netInfo").textContent};}};
 
 // ---------- loop ----------
 // fixed-step game clock: the game keeps real-time speed even when the screen draws fewer frames
