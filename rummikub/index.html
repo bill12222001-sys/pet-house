@@ -32,6 +32,7 @@ input:focus{border-color:var(--gold)}
 @media(min-width:700px){.tile{width:44px;height:60px;font-size:26px}.tile.joker{font-size:28px}}
 /* home */
 .home,.lobby,.center{display:flex;flex-direction:column;gap:14px;padding:28px 20px 40px;max-width:420px;margin:0 auto}
+.hub{align-self:flex-start;color:var(--cream);opacity:.8;text-decoration:none;font-size:14px;padding:6px 12px;border-radius:999px;border:1px solid rgba(246,240,225,.3)}
 .logo{display:flex;gap:8px;justify-content:center;margin-top:18px}
 .logo .tile:nth-child(odd){transform:rotate(-5deg)}.logo .tile:nth-child(even){transform:rotate(4deg) translateY(4px)}
 h1{text-align:center;font-size:34px;margin:6px 0 0;letter-spacing:4px}
@@ -374,6 +375,7 @@ function render(){
 }
 function renderHome(){
   app.innerHTML=`<div class="home">
+  <a class="hub" href="/">🏠 遊戲中心</a>
   <div class="logo">${tileHTML(1)}${tileHTML(15)}${tileHTML(29)}${tileHTML(104)}</div>
   <h1>家庭拉密</h1><p class="sub">跟家人線上連線，一起拼牌磚</p>
   ${roomParam?`<div class="invite">你收到房間 <b>${roomParam}</b> 的邀請，輸入名字後按「加入」</div>`:''}
